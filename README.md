@@ -43,6 +43,7 @@ Create and run a small sample (recommended first step):
 ```bash
 uv run off-extract \
   --require-front-lang en \
+  --require-category \
   --output out/sample_2k_front_en.ndjson \
   --report out/sample_2k_front_en_report.json \
   --max-output-records 2000 \
@@ -52,10 +53,11 @@ uv run off-extract \
 Run full extraction (no arbitrary cutoff; reads to EOF):
 
 ```
-  uv run off-extract \
+uv run off-extract \
   --require-front-lang en \
-  --output out/off_en_clean.ndjson \
-  --report out/report.json \
+  --require-category \
+  --output out/off_en_clean_categorized.ndjson \
+  --report out/report_categorized.json \
   --progress-every 500000
   ```
 
