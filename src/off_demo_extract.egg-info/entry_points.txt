@@ -1,2 +1,0 @@
-[console_scripts]
-off-extract = off_demo_extract.extract:main

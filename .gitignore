@@ -8,3 +8,7 @@ report.json
 # keep placeholders
 !data/.gitkeep
 !out/.gitkeep
+
+__pycache__/
+*.py[cod]
+*.egg-info/
