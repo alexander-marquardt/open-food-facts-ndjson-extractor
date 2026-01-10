@@ -9,7 +9,7 @@ import sys
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Iterable, Iterator, Optional, TextIO
+from typing import Any, Dict, Iterable, Iterator, Optional, Set, TextIO
 
 
 IMAGE_BASE = "https://images.openfoodfacts.org/images/products"
@@ -166,11 +166,9 @@ def compute_image_url(
     rev = sel.get("rev")
     sel_sizes = sel.get("sizes") if isinstance(sel.get("sizes"), dict) else {}
 
-    # Selected image path if rev exists
     if rev is not None:
         return build_selected_image_url(code=code, key=front_key, rev=str(rev), sizes=sel_sizes)
 
-    # Fallback to raw image by imgid
     imgid = sel.get("imgid")
     if imgid is None:
         return None
@@ -224,6 +222,40 @@ def get_english_description(product: Dict[str, Any], max_len: int = 600) -> Opti
 
 
 # ----------------------------
+# Categories
+# ----------------------------
+
+def parse_category_exclude(csv: str) -> Set[str]:
+    """
+    Parse comma-separated excluded category tags.
+    """
+    items = [x.strip() for x in (csv or "").split(",")]
+    return {x for x in items if x}
+
+
+def extract_categories(product: Dict[str, Any]) -> list[str]:
+    cats = product.get("categories_tags")
+    if isinstance(cats, list):
+        out: list[str] = []
+        for x in cats:
+            if isinstance(x, str) and x.strip():
+                out.append(x.strip())
+        return out
+    return []
+
+
+def filter_categories(cats: list[str], exclude: Set[str]) -> list[str]:
+    return [c for c in cats if c not in exclude]
+
+
+def primary_category(cats: list[str], exclude: Set[str]) -> Optional[str]:
+    for c in cats:
+        if c not in exclude:
+            return c
+    return None
+
+
+# ----------------------------
 # Synthetic price
 # ----------------------------
 
@@ -267,6 +299,7 @@ class Counters:
     missing_title_en: int = 0
     missing_desc_en: int = 0
     missing_image: int = 0
+    missing_category: int = 0
 
 
 # ----------------------------
@@ -287,6 +320,18 @@ def build_parser(default_input: Path, default_output: Path, default_report: Path
         default="",
         help="If set (e.g., 'en'), require front_<lang> image key; otherwise allow any front_*.",
     )
+
+    p.add_argument(
+        "--require-category",
+        action="store_true",
+        help="If set, require at least one non-placeholder category tag.",
+    )
+    p.add_argument(
+        "--category-exclude",
+        default="en:null,en:unknown",
+        help="Comma-separated category tags to treat as placeholders and exclude (default: en:null,en:unknown).",
+    )
+
     p.add_argument("--min-price", type=float, default=0.99)
     p.add_argument("--max-price", type=float, default=19.99)
     p.add_argument("--currency", type=str, default="EUR")
@@ -322,12 +367,15 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
     t0 = time.time()
 
     req_front_lang = args.require_front_lang.strip() or None
+    cat_exclude = parse_category_exclude(args.category_exclude)
 
     log(f"Input:  {args.input}")
     log(f"Output: {args.output}")
     log(f"Report: {args.report}")
     if req_front_lang:
         log(f"Images: require front_{req_front_lang}")
+    if args.require_category:
+        log(f"Categories: require real category (exclude={sorted(cat_exclude)})")
 
     with open_maybe_gzip(args.input) as f, args.output.open("w", encoding="utf-8") as out:
         for product in iter_products(f):
@@ -364,6 +412,14 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
                 c.missing_image += 1
                 continue
 
+            cats_raw = extract_categories(product)
+            cats_filtered = filter_categories(cats_raw, cat_exclude)
+            prim_cat = primary_category(cats_raw, cat_exclude)
+
+            if args.require_category and not prim_cat:
+                c.missing_category += 1
+                continue
+
             price = synthetic_price(code=code, min_price=args.min_price, max_price=args.max_price)
 
             doc = {
@@ -373,9 +429,10 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
                 "image_url": image_url,
                 "price": price,
                 "currency": args.currency,
-                # helpful extras for demos
                 "brand": product.get("brands"),
-                "categories_tags": product.get("categories_tags") or [],
+                # categories_tags are filtered to remove placeholders; primary_category is convenient for UI/facets
+                "categories_tags": cats_filtered,
+                "primary_category": prim_cat,
                 "lang": "en",
             }
 
@@ -402,6 +459,11 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
                 f"computed from images/front_{req_front_lang} + rev/imgid"
                 if req_front_lang
                 else "computed from images/front_* + rev/imgid"
+            ),
+            "category": (
+                f"require at least one category tag not in {sorted(cat_exclude)}"
+                if args.require_category
+                else f"kept (filtered placeholders: {sorted(cat_exclude)})"
             ),
             "price": f"synthetic deterministic [{args.min_price}, {args.max_price}] {args.currency}",
         },
