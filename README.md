@@ -1,30 +1,116 @@
 # off-demo-extract
 
-Extract a clean NDJSON catalog (English title + English description + image URL + synthetic price)
-from the Open Food Facts JSONL export.
+Extract a clean **NDJSON** demo catalog from the Open Food Facts (OFF) JSONL export.
 
-This repository contains **code only**. It does not ship Open Food Facts data.
+This repository contains **code only**. It does **not** ship Open Food Facts data or any derived dataset.
 
-## Input data
+## What this produces
 
-Download the Open Food Facts JSONL export yourself, for example:
-- openfoodfacts-products.jsonl.gz / openfoodfacts-products.jsonl (Open Food Facts exports)
+One JSON object per line (NDJSON) with:
 
-Refer to Open Food Facts documentation for data reuse and export details.
+- `id` (GTIN-13 padded)
+- `title` (English)
+- `description` (English; typically ingredients/generic name)
+- `image_url` (computed from OFF `images` metadata)
+- `price` (synthetic, deterministic)
+- `currency`, `brand`, `categories_tags`, `lang`
 
-## Output format
+Image URLs are constructed using OFF’s documented image URL scheme. 
 
-Each line is a JSON object like:
+## Clean data definition
 
-```json
+A record is included if it has all of:
+
+- English title: `product_name_en` OR (`lang == en` AND `product_name`)
+- English description: `generic_name_en` OR `ingredients_text_en` OR (`lang == en` AND `generic_name`/`ingredients_text`)
+- A **front image in English**: `images.front_en` (via `--require-front-lang en`)
+- Deterministic synthetic price in a configurable range
+
+## Data is not included in this repo
+
+Users must download the [OFF JSONL export](https://static.openfoodfacts.org/data/openfoodfacts-products.jsonl.gz) and place it at:
+
+`data/openfoodfacts-products.jsonl.gz`
+
+The script reads `.jsonl` or `.jsonl.gz` and streams it; it does not require full decompression.
+
+## Quickstart (uv)
+
+Create and run a small sample (recommended first step):
+
+```bash
+uv run off-extract \
+  --require-front-lang en \
+  --output out/sample_2k_front_en.ndjson \
+  --report out/sample_2k_front_en_report.json \
+  --max-output-records 2000 \
+  --max-input-lines 3000000
+```
+
+Run full extraction (no arbitrary cutoff; reads to EOF):
+
+```
+  uv run off-extract \
+  --require-front-lang en \
+  --output out/off_en_clean.ndjson \
+  --report out/report.json \
+  --progress-every 500000
+  ```
+
+## Output example
+
+```
 {
-  "id": "0000101209159",
-  "title": "...",
-  "description": "...",
-  "image_url": "https://images.openfoodfacts.org/images/products/000/010/120/9159/front_en.3.400.jpg",
-  "price": 4.99,
+  "id": "0000159487776",
+  "title": "Magic Stars Chocolates",
+  "description": "SUGAR, COCOA BUTTER, ...",
+  "image_url": "https://images.openfoodfacts.org/images/products/000/015/948/7776/front_en.3.400.jpg",
+  "price": 5.58,
   "currency": "EUR",
-  "brand": "…",
-  "categories_tags": ["…"],
+  "brand": "Milkyway",
+  "categories_tags": ["en:null"],
   "lang": "en"
 }
+```
+
+## Licensing and data reuse (important)
+	•	This repository’s code is licensed under the MIT License (see LICENSE).
+	•	Open Food Facts data and images are governed by Open Food Facts’ own licenses and terms.
+
+OFF data reuse is based on the Open Database License (ODbL) with attribution and share-alike requirements.  ￼
+Image URL construction follows OFF documentation.  ￼
+
+See DATA_LICENSE.md for a concise summary of OFF data obligations and links to the authoritative OFF pages.
+
+## Notes
+	•	The Open Food Facts “description” fields are often ingredient lists rather than marketing copy. This is normal for OFF.
+	•	The generated price is synthetic and deterministic (stable per barcode) and should not be interpreted as a real market price.
+
+# Data licensing and reuse notes (Open Food Facts)
+
+This repository does **not** distribute Open Food Facts (OFF) data or any derived dataset.
+It provides code to transform OFF exports into an NDJSON demo catalog.
+
+## Authoritative sources
+
+Open Food Facts maintains official guidance on:
+- Reusing OFF data (ODbL)  [wiki.openfoodfacts.org](https://wiki.openfoodfacts.org/Reusing_Open_Food_Facts_Data)
+- ODbL license details on the OFF wiki  [wiki.openfoodfacts.org](https://wiki.openfoodfacts.org/ODBL_License)
+- API/data reuse conditions summary (attribution + share-alike)  [support.openfoodfacts.org](https://support.openfoodfacts.org/help/en-gb/12-api-data-reuse/94-are-there-conditions-to-use-the-api)
+- Image URL construction for product images  [Open Food Facts](https://openfoodfacts.github.io/openfoodfacts-server/api/how-to-download-images/)
+- API overview (open data and reuse framing)  [Open Food Facts](https://openfoodfacts.github.io/openfoodfacts-server/api/)
+
+## What this code does
+
+- Reads the OFF JSONL export (`.jsonl` or `.jsonl.gz`) line-by-line.
+- Filters for “clean” English records (title + description + `front_en` image key).
+- Computes `image_url` from OFF `images` metadata using OFF’s documented scheme.  [Open Food Facts](https://openfoodfacts.github.io/openfoodfacts-server/api/how-to-download-images/)
+- Adds a synthetic deterministic price.
+
+## Important reminder
+
+If you redistribute OFF data or a derived database, you may have obligations under ODbL
+(attribution and share-alike). Review OFF’s official guidance and terms before sharing any
+datasets generated by this project.  [wiki.openfoodfacts.org](https://wiki.openfoodfacts.org/Reusing_Open_Food_Facts_Data)
+
+This file is informational and not legal advice.
