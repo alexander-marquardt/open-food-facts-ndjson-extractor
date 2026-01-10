@@ -1,0 +1,10 @@
+data/*
+out/*
+*.ndjson
+*.jsonl
+*.jsonl.gz
+report.json
+
+# keep placeholders
+!data/.gitkeep
+!out/.gitkeep
