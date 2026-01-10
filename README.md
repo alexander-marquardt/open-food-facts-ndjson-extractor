@@ -28,7 +28,9 @@ A record is included if it has all of:
 
 ## Data is not included in this repo
 
-Users must download the [OFF JSONL export](https://static.openfoodfacts.org/data/openfoodfacts-products.jsonl.gz) and place it at:
+Users must download the OFF JSONL export at: [https://static.openfoodfacts.org/data/openfoodfacts-products.jsonl.gz](https://static.openfoodfacts.org/data/openfoodfacts-products.jsonl.gz)
+
+Then place it in the data directory:
 
 `data/openfoodfacts-products.jsonl.gz`
 
