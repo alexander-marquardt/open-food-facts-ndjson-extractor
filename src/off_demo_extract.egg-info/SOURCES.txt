@@ -1,0 +1,9 @@
+README.md
+pyproject.toml
+src/off_demo_extract/__init__.py
+src/off_demo_extract/extract.py
+src/off_demo_extract.egg-info/PKG-INFO
+src/off_demo_extract.egg-info/SOURCES.txt
+src/off_demo_extract.egg-info/dependency_links.txt
+src/off_demo_extract.egg-info/entry_points.txt
+src/off_demo_extract.egg-info/top_level.txt
