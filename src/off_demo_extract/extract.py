@@ -9,7 +9,7 @@ import sys
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Iterable, Iterator, Optional, Set, TextIO
+from typing import Any, Dict, Iterable, Iterator, Optional, Set, TextIO, Tuple
 
 
 IMAGE_BASE = "https://images.openfoodfacts.org/images/products"
@@ -20,10 +20,7 @@ IMAGE_BASE = "https://images.openfoodfacts.org/images/products"
 # ----------------------------
 
 def repo_root() -> Path:
-    """
-    Find repo root by walking up from this file and looking for pyproject.toml.
-    Falls back to current working directory if not found.
-    """
+    """Find repo root by walking up from this file and looking for pyproject.toml."""
     here = Path(__file__).resolve()
     for parent in [here.parent, *here.parents]:
         if (parent / "pyproject.toml").exists():
@@ -32,9 +29,7 @@ def repo_root() -> Path:
 
 
 def open_maybe_gzip(path: Path, encoding: str = "utf-8") -> TextIO:
-    """
-    Open a .jsonl or .jsonl.gz file as a text stream (read-only).
-    """
+    """Open a .jsonl or .jsonl.gz file as a text stream (read-only)."""
     if path.suffix == ".gz":
         return io.TextIOWrapper(gzip.open(path, "rb"), encoding=encoding, errors="replace")
     return path.open("r", encoding=encoding, errors="replace")
@@ -57,9 +52,7 @@ def pad_gtin13(code: str) -> str:
 
 def product_folder_from_code(code: str) -> str:
     """
-    OFF image folder scheme:
-      - GTIN padded to 13 digits
-      - split: 3/3/3/rest => aaa/bbb/ccc/rest
+    OFF image folder scheme: GTIN-13 padded then split 3/3/3/rest
     Example: 0000101209159 -> 000/010/120/9159
     """
     c = pad_gtin13(code)
@@ -67,9 +60,6 @@ def product_folder_from_code(code: str) -> str:
 
 
 def pick_image_resolution_from_sizes(sizes: Dict[str, Any]) -> str:
-    """
-    Prefer 400 if available; else 200; else 100; else 'full'.
-    """
     if not isinstance(sizes, dict):
         return "full"
     for res in ("400", "200", "100"):
@@ -79,22 +69,12 @@ def pick_image_resolution_from_sizes(sizes: Dict[str, Any]) -> str:
 
 
 def build_selected_image_url(code: str, key: str, rev: str, sizes: Dict[str, Any]) -> str:
-    """
-    Selected image filename pattern:
-      <key>.<rev>.<resolution>.jpg  (or .full.jpg)
-    Example: front_en.3.400.jpg
-    """
     res = pick_image_resolution_from_sizes(sizes)
     folder = product_folder_from_code(code)
     return f"{IMAGE_BASE}/{folder}/{key}.{rev}.{res}.jpg"
 
 
 def build_raw_image_url(code: str, imgid: str, sizes: Dict[str, Any]) -> str:
-    """
-    Raw image filename pattern:
-      <imgid>.<resolution>.jpg  (or <imgid>.jpg for full)
-    Example: 1.400.jpg or 1.jpg
-    """
     res = pick_image_resolution_from_sizes(sizes)
     folder = product_folder_from_code(code)
     if res == "full":
@@ -108,8 +88,6 @@ def choose_front_key(
     require_lang: Optional[str] = None,
 ) -> Optional[str]:
     """
-    Select a 'front' image key from OFF's `images` object.
-
     - If require_lang is set (e.g., 'en'), only accept front_<require_lang>.
     - Otherwise prefer front_<prefer_lang>, then any front_?? key, then 'front'.
     """
@@ -139,14 +117,6 @@ def compute_image_url(
     prefer_lang: str = "en",
     require_front_lang: Optional[str] = None,
 ) -> Optional[str]:
-    """
-    Compute a usable image URL from the OFF JSONL 'images' structure.
-
-    Strategy:
-    - pick a front_* key (prefer front_en unless require_front_lang is set)
-    - if selected image has a 'rev', use selected URL
-    - else if selected image has an 'imgid', use raw URL and locate sizes under images[imgid]
-    """
     code = str(product.get("code") or product.get("_id") or "").strip()
     if not code:
         return None
@@ -183,10 +153,6 @@ def compute_image_url(
 # ----------------------------
 
 def get_english_title(product: Dict[str, Any]) -> Optional[str]:
-    """
-    English-only title.
-    Prefer product_name_en. If product is marked as English, allow product_name.
-    """
     t = product.get("product_name_en")
     if isinstance(t, str) and t.strip():
         return t.strip()
@@ -201,11 +167,6 @@ def get_english_title(product: Dict[str, Any]) -> Optional[str]:
 
 
 def get_english_description(product: Dict[str, Any], max_len: int = 600) -> Optional[str]:
-    """
-    English-only description-like field.
-    Prefer generic_name_en, then ingredients_text_en.
-    If product is English, allow generic_name / ingredients_text.
-    """
     for k in ("generic_name_en", "ingredients_text_en"):
         v = product.get(k)
         if isinstance(v, str) and v.strip():
@@ -226,14 +187,11 @@ def get_english_description(product: Dict[str, Any], max_len: int = 600) -> Opti
 # ----------------------------
 
 def parse_category_exclude(csv: str) -> Set[str]:
-    """
-    Parse comma-separated excluded category tags.
-    """
     items = [x.strip() for x in (csv or "").split(",")]
     return {x for x in items if x}
 
 
-def extract_categories(product: Dict[str, Any]) -> list[str]:
+def extract_categories_tags(product: Dict[str, Any]) -> list[str]:
     cats = product.get("categories_tags")
     if isinstance(cats, list):
         out: list[str] = []
@@ -244,15 +202,222 @@ def extract_categories(product: Dict[str, Any]) -> list[str]:
     return []
 
 
-def filter_categories(cats: list[str], exclude: Set[str]) -> list[str]:
-    return [c for c in cats if c not in exclude]
+def filter_category_tags(tags: list[str], exclude: Set[str]) -> list[str]:
+    return [t for t in tags if t not in exclude]
 
 
-def primary_category(cats: list[str], exclude: Set[str]) -> Optional[str]:
-    for c in cats:
-        if c not in exclude:
-            return c
+def pick_primary_category_tag(tags: list[str], exclude: Set[str]) -> Optional[str]:
+    for t in tags:
+        if t not in exclude:
+            return t
     return None
+
+
+def prettify_category(tag: str) -> str:
+    """
+    Convert OFF tag to a human-ish label.
+    Example: en:chocolate-candies -> Chocolate candies
+    """
+    t = tag
+    if ":" in t:
+        t = t.split(":", 1)[1]
+    t = t.replace("-", " ").replace("_", " ").strip()
+    if not t:
+        return tag
+    return t[0].upper() + t[1:]
+
+
+def build_categories_list(primary_tag: Optional[str], tags_filtered: list[str], max_n: int = 3) -> list[str]:
+    # Prefer primary first, then a couple more distinct categories (humanized)
+    seen: Set[str] = set()
+    out: list[str] = []
+
+    def add(tag: str) -> None:
+        label = prettify_category(tag)
+        if label not in seen:
+            seen.add(label)
+            out.append(label)
+
+    if primary_tag:
+        add(primary_tag)
+
+    for t in tags_filtered:
+        if len(out) >= max_n:
+            break
+        add(t)
+
+    return out
+
+
+# ----------------------------
+# Attributes extraction (OFF -> attrs)
+# ----------------------------
+
+def join_tags(tags: Any, prefix_strip: Optional[str] = None, sep: str = ", ") -> Optional[str]:
+    if not isinstance(tags, list):
+        return None
+    vals: list[str] = []
+    for x in tags:
+        if not isinstance(x, str):
+            continue
+        s = x.strip()
+        if not s:
+            continue
+        if prefix_strip and s.startswith(prefix_strip):
+            s = s[len(prefix_strip):]
+        vals.append(s)
+    if not vals:
+        return None
+    return sep.join(vals)
+
+
+def get_first_str(product: Dict[str, Any], *keys: str) -> Optional[str]:
+    for k in keys:
+        v = product.get(k)
+        if isinstance(v, str) and v.strip():
+            return v.strip()
+    return None
+
+
+def get_first_num(product: Dict[str, Any], *keys: str) -> Optional[float]:
+    for k in keys:
+        v = product.get(k)
+        if isinstance(v, (int, float)):
+            return float(v)
+    return None
+
+
+def format_nutrient(nutriments: Dict[str, Any], key_100g: str, unit_key: Optional[str] = None) -> Optional[str]:
+    if not isinstance(nutriments, dict):
+        return None
+    v = nutriments.get(key_100g)
+    if v is None or not isinstance(v, (int, float)):
+        return None
+    unit = nutriments.get(unit_key) if unit_key and isinstance(nutriments.get(unit_key), str) else None
+    if unit:
+        return f"{v:g} {unit}"
+    return f"{v:g}"
+
+
+def build_attrs(product: Dict[str, Any], primary_category_tag: Optional[str]) -> Dict[str, str]:
+    attrs: Dict[str, str] = {}
+
+    # Quantity / serving
+    qty = get_first_str(product, "quantity")
+    if qty:
+        attrs["Quantity"] = qty
+    serving = get_first_str(product, "serving_size")
+    if serving:
+        attrs["Serving size"] = serving
+
+    # High-level nutrition signals (often present)
+    nutri = get_first_str(product, "nutrition_grades", "nutriscore_grade")
+    if nutri and nutri.lower() != "unknown":
+        attrs["Nutri-Score"] = nutri.upper()
+
+    nova = product.get("nova_group")
+    if isinstance(nova, (int, float)):
+        attrs["NOVA group"] = str(int(nova))
+
+    eco = get_first_str(product, "ecoscore_grade", "environmental_score_grade")
+    if eco and eco.lower() != "unknown":
+        attrs["Eco-Score"] = eco.upper()
+
+    # Allergens / labels / dietary
+    allergens = join_tags(product.get("allergens_tags"), prefix_strip="en:")
+    if allergens:
+        attrs["Allergens"] = allergens
+
+    labels = join_tags(product.get("labels_tags"), prefix_strip="en:")
+    if labels:
+        attrs["Labels"] = labels
+
+    analysis = join_tags(product.get("ingredients_analysis_tags"), prefix_strip="en:")
+    if analysis:
+        attrs["Ingredients analysis"] = analysis
+
+    # Country (sometimes useful for demos)
+    countries = get_first_str(product, "countries")
+    if countries:
+        attrs["Countries"] = countries
+
+    # Category hint
+    if primary_category_tag:
+        attrs["Category"] = prettify_category(primary_category_tag)
+
+    # A few nutriments (if available)
+    nutriments = product.get("nutriments")
+    if isinstance(nutriments, dict):
+        # Use common 100g keys when available
+        energy_kcal = format_nutrient(nutriments, "energy-kcal_100g", "energy-kcal_unit")
+        if energy_kcal:
+            attrs["Energy (kcal/100g)"] = energy_kcal
+
+        fat = format_nutrient(nutriments, "fat_100g", "fat_unit")
+        if fat:
+            attrs["Fat (g/100g)"] = fat
+
+        sat = format_nutrient(nutriments, "saturated-fat_100g", "saturated-fat_unit")
+        if sat:
+            attrs["Saturated fat (g/100g)"] = sat
+
+        sugars = format_nutrient(nutriments, "sugars_100g", "sugars_unit")
+        if sugars:
+            attrs["Sugars (g/100g)"] = sugars
+
+        salt = format_nutrient(nutriments, "salt_100g", "salt_unit")
+        if salt:
+            attrs["Salt (g/100g)"] = salt
+
+        protein = format_nutrient(nutriments, "proteins_100g", "proteins_unit")
+        if protein:
+            attrs["Protein (g/100g)"] = protein
+
+        fiber = format_nutrient(nutriments, "fiber_100g", "fiber_unit")
+        if fiber:
+            attrs["Fiber (g/100g)"] = fiber
+
+    return attrs
+
+
+def build_description(title: str, desc: str, attrs: Dict[str, str]) -> str:
+    """
+    Icecat-like description formatting: title + short body + key specs.
+    Keep it readable for demos.
+    """
+    lines = [title, "", desc.strip()]
+
+    # Select a small set of "key specs" to display
+    preferred_keys = [
+        "Category",
+        "Quantity",
+        "Serving size",
+        "Nutri-Score",
+        "NOVA group",
+        "Eco-Score",
+        "Allergens",
+        "Labels",
+        "Ingredients analysis",
+        "Energy (kcal/100g)",
+        "Fat (g/100g)",
+        "Saturated fat (g/100g)",
+        "Sugars (g/100g)",
+        "Salt (g/100g)",
+        "Protein (g/100g)",
+        "Fiber (g/100g)",
+        "Countries",
+    ]
+    spec_lines = []
+    for k in preferred_keys:
+        v = attrs.get(k)
+        if v:
+            spec_lines.append(f"- **{k}**: {v}")
+
+    if spec_lines:
+        lines += ["", "", "Key Specifications:"]
+        lines += spec_lines
+
+    return "\n".join(lines)
 
 
 # ----------------------------
@@ -260,14 +425,10 @@ def primary_category(cats: list[str], exclude: Set[str]) -> Optional[str]:
 # ----------------------------
 
 def synthetic_price(code: str, min_price: float, max_price: float) -> float:
-    """
-    Deterministic synthetic price from barcode.
-    Produces a stable value in [min_price, max_price].
-    """
     c = pad_gtin13(code)
     h = hashlib.blake2b(c.encode("utf-8"), digest_size=8).digest()
     n = int.from_bytes(h, "big")
-    x = n / float(2**64 - 1)  # 0..1
+    x = n / float(2**64 - 1)
     price = min_price + x * (max_price - min_price)
     return round(price, 2)
 
@@ -308,7 +469,7 @@ class Counters:
 
 def build_parser(default_input: Path, default_output: Path, default_report: Path) -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
-        description="Extract clean English NDJSON demo catalog from Open Food Facts JSONL/JSONL.GZ export."
+        description="Extract Icecat-like NDJSON demo catalog from Open Food Facts JSONL/JSONL.GZ export."
     )
     p.add_argument("--input", type=Path, default=default_input, help=f"Input JSONL/JSONL.GZ (default: {default_input})")
     p.add_argument("--output", type=Path, default=default_output, help=f"Output NDJSON (default: {default_output})")
@@ -347,7 +508,7 @@ def build_parser(default_input: Path, default_output: Path, default_report: Path
 def main(argv: Optional[Iterable[str]] = None) -> int:
     root = repo_root()
     default_input = root / "data" / "openfoodfacts-products.jsonl.gz"
-    default_output = root / "out" / "off_en_clean.ndjson"
+    default_output = root / "out" / "off_common.ndjson"
     default_report = root / "out" / "report.json"
 
     args = build_parser(default_input, default_output, default_report).parse_args(list(argv) if argv is not None else None)
@@ -412,28 +573,34 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
                 c.missing_image += 1
                 continue
 
-            cats_raw = extract_categories(product)
-            cats_filtered = filter_categories(cats_raw, cat_exclude)
-            prim_cat = primary_category(cats_raw, cat_exclude)
+            tags_raw = extract_categories_tags(product)
+            tags_filtered = filter_category_tags(tags_raw, cat_exclude)
+            primary_tag = pick_primary_category_tag(tags_raw, cat_exclude)
 
-            if args.require_category and not prim_cat:
+            if args.require_category and not primary_tag:
                 c.missing_category += 1
                 continue
+
+            categories = build_categories_list(primary_tag, tags_filtered, max_n=3)
+
+            attrs = build_attrs(product, primary_category_tag=primary_tag)
+            attr_keys = sorted(attrs.keys())
+
+            description = build_description(title=title, desc=desc, attrs=attrs)
 
             price = synthetic_price(code=code, min_price=args.min_price, max_price=args.max_price)
 
             doc = {
                 "id": pad_gtin13(code),
                 "title": title,
-                "description": desc,
+                "brand": (product.get("brands") if isinstance(product.get("brands"), str) else "") or "",
+                "description": description,
                 "image_url": image_url,
                 "price": price,
                 "currency": args.currency,
-                "brand": product.get("brands"),
-                # categories_tags are filtered to remove placeholders; primary_category is convenient for UI/facets
-                "categories_tags": cats_filtered,
-                "primary_category": prim_cat,
-                "lang": "en",
+                "categories": categories,
+                "attrs": attrs,
+                "attr_keys": attr_keys,
             }
 
             out.write(json.dumps(doc, ensure_ascii=False) + "\n")
