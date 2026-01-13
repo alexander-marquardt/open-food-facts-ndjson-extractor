@@ -417,15 +417,20 @@ def build_parser(default_input: Path, default_output: Path, default_report: Path
     p.add_argument("--max-input-lines", type=int, default=0)
     p.add_argument("--max-output-records", type=int, default=0)
     p.add_argument("--progress-every", type=int, default=100000)
+    p.add_argument(
+        "--yes",
+        action="store_true",
+        help="Automatically confirm overwriting the output file.",
+    )
 
     return p
 
 
 def main(argv: Optional[Iterable[str]] = None) -> int:
     root = repo_root()
-    default_input = root / "data" / "openfoodfacts-products.jsonl.gz"
-    default_output = root / "out" / "off_common.ndjson"
-    default_report = root / "out" / "report.json"
+    default_input = root / "data" / "json_source" / "openfoodfacts-products.jsonl.gz"
+    default_output = root / "data" / "products" / "off_common.ndjson"
+    default_report = root / "data" / "products" / "report.json"
     default_pricing = root / "config" / "pricing_buckets.json"
 
     args = build_parser(default_input, default_output, default_report, default_pricing).parse_args(
@@ -435,6 +440,12 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
     def log(msg: str) -> None:
         print(msg, file=sys.stderr, flush=True)
 
+    if args.output.exists() and not args.yes:
+        confirm = input(f"⚠️  Output file exists. Overwrite {args.output}? [y/N]: ").lower().strip()
+        if confirm != 'y':
+            log("Aborted.")
+            return 1
+            
     if not args.input.exists():
         log(f"ERROR: input file not found: {args.input}")
         return 2
