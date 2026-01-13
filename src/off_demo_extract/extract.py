@@ -170,11 +170,6 @@ def get_english_description(product: Dict[str, Any], max_len: int = 600) -> Opti
 # Categories
 # ----------------------------
 
-def parse_category_exclude(csv: str) -> Set[str]:
-    items = [x.strip() for x in (csv or "").split(",")]
-    return {x for x in items if x}
-
-
 def extract_categories_tags(product: Dict[str, Any]) -> list[str]:
     cats = product.get("categories_tags")
     if isinstance(cats, list):
@@ -242,25 +237,21 @@ def dietary_tags_from_off(product: Dict[str, Any]) -> list[str]:
 
     tags: set[str] = set()
 
-    # Vegan / vegetarian: accept explicit label or computed analysis
     if "en:vegan" in labels or "en:vegan" in analysis:
         tags.add("vegan")
     if "en:vegetarian" in labels or "en:vegetarian" in analysis:
         tags.add("vegetarian")
 
-    # Religious labels (best treated as label-driven)
     if "en:halal" in labels:
         tags.add("halal")
     if "en:kosher" in labels:
         tags.add("kosher")
 
-    # Common dietary constraints as labels
     if "en:gluten-free" in labels:
         tags.add("gluten_free")
     if "en:lactose-free" in labels:
         tags.add("lactose_free")
 
-    # Optional but useful for demos
     if "en:organic" in labels or "en:usda-organic" in labels:
         tags.add("organic")
 
@@ -433,6 +424,35 @@ class Counters:
     missing_category: int = 0
 
 
+@dataclass
+class ProgressSnapshot:
+    t: float
+    read: int
+    written: int
+    bad_json: int
+    missing_code: int
+    missing_title_en: int
+    missing_desc_en: int
+    missing_image: int
+    missing_category: int
+
+
+def _fmt_int(n: int) -> str:
+    return f"{n:,}"
+
+
+def _progress_line(c: Counters, elapsed_s: float) -> str:
+    rps = c.read / elapsed_s if elapsed_s > 0 else 0.0
+    wps = c.written / elapsed_s if elapsed_s > 0 else 0.0
+    return (
+        f"Elapsed {elapsed_s:,.1f}s | "
+        f"Read {_fmt_int(c.read)} ({rps:,.0f}/s) | "
+        f"Wrote {_fmt_int(c.written)} ({wps:,.0f}/s) | "
+        f"Skipped: title {_fmt_int(c.missing_title_en)}, desc {_fmt_int(c.missing_desc_en)}, "
+        f"image {_fmt_int(c.missing_image)}, cat {_fmt_int(c.missing_category)}"
+    )
+
+
 # ----------------------------
 # CLI
 # ----------------------------
@@ -456,7 +476,21 @@ def build_parser(default_input: Path, default_output: Path, default_report: Path
     # Debug/perf controls
     p.add_argument("--max-input-lines", type=int, default=0)
     p.add_argument("--max-output-records", type=int, default=0)
-    p.add_argument("--progress-every", type=int, default=100000)
+
+    # Progress controls
+    p.add_argument(
+        "--progress-every",
+        type=int,
+        default=100000,
+        help="Emit a progress line every N records read (0 disables).",
+    )
+    p.add_argument(
+        "--progress-seconds",
+        type=float,
+        default=5.0,
+        help="Emit a progress line at least every N seconds (0 disables).",
+    )
+
     p.add_argument(
         "--yes",
         action="store_true",
@@ -501,18 +535,20 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
 
     c = Counters()
     t0 = time.time()
+    last_progress_t = t0
 
     req_front_lang = args.require_front_lang.strip() or None
     cat_exclude = {x.strip() for x in args.category_exclude.split(",") if x.strip()}
 
-    log(f"Input:         {args.input}")
-    log(f"Output:        {args.output}")
-    log(f"Report:        {args.report}")
-    log(f"Pricing config:{args.pricing_config}")
+    log(f"Input:          {args.input}")
+    log(f"Output:         {args.output}")
+    log(f"Report:         {args.report}")
+    log(f"Pricing config: {args.pricing_config}")
     if req_front_lang:
         log(f"Images: require front_{req_front_lang}")
     if args.require_category:
         log(f"Categories: require real category (exclude={sorted(cat_exclude)})")
+    log("Starting extraction...")
 
     with open_maybe_gzip(args.input) as f, args.output.open("w", encoding="utf-8") as out:
         for product in iter_products(f):
@@ -556,15 +592,12 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
             categories = build_categories_list(primary_tag, tags_filtered, max_n=3)
             primary_category_label = categories[0] if categories else None
 
-            # Build attrs first (also exposes Quantity/Serving size/Labels etc.)
             attrs = build_attrs(product, primary_category_tag=primary_tag, primary_category_label=primary_category_label)
 
-            # Dietary keyword list
             dietary = dietary_tags_from_off(product)
             if dietary:
                 attrs["Dietary"] = ", ".join(dietary)
 
-            # Price estimation: uses category + quantity/serving size + labels + brand, with deterministic noise
             labels_tags = product.get("labels_tags") if isinstance(product.get("labels_tags"), list) else []
             brand = product.get("brands") if isinstance(product.get("brands"), str) else ""
             quantity = product.get("quantity") if isinstance(product.get("quantity"), str) else None
@@ -581,7 +614,6 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
                 config=pricing_cfg,
             )
 
-            # Add pricing metadata into attrs (optional but useful for debugging/demos)
             attrs["Price source"] = "estimated_unit_model"
             attrs["Pricing bucket"] = bucket_name
             attrs["Estimated unit price"] = unit_debug
@@ -600,7 +632,6 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
                 "categories": categories,
                 "attrs": attrs,
                 "attr_keys": attr_keys,
-                # Efficient filter field
                 "dietary": dietary,
             }
 
@@ -610,11 +641,23 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
             if args.max_output_records and c.written >= args.max_output_records:
                 break
 
+            # Progress by count
+            now = time.time()
             if args.progress_every and (c.read % args.progress_every == 0):
-                elapsed = time.time() - t0
-                log(f"Read {c.read:,} | Wrote {c.written:,} | Elapsed {elapsed:,.1f}s")
+                elapsed = now - t0
+                log(_progress_line(c, elapsed))
+                last_progress_t = now
+
+            # Progress by wall-clock seconds (helps even when progress_every is large)
+            if args.progress_seconds and (now - last_progress_t >= args.progress_seconds):
+                elapsed = now - t0
+                log(_progress_line(c, elapsed))
+                last_progress_t = now
 
     elapsed = time.time() - t0
+    log(_progress_line(c, elapsed))
+    log("Done.")
+
     report = {
         "input": str(args.input),
         "output": str(args.output),
@@ -627,7 +670,8 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
             "image": f"computed from images/front_{req_front_lang} + rev/imgid" if req_front_lang else "computed from images/front_* + rev/imgid",
             "category": "required" if args.require_category else "optional",
             "price": "category baseline unit model + deterministic noise + label premiums + retail rounding",
-            "dietary": "keyword list derived from labels_tags and ingredients_analysis_tags (positive-only)"
+            "dietary": "keyword list derived from labels_tags and ingredients_analysis_tags (positive-only)",
+            "progress": f"every {args.progress_every} records and/or {args.progress_seconds}s",
         },
     }
     args.report.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
