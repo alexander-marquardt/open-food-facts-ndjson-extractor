@@ -15,10 +15,75 @@ One JSON object per line (NDJSON) with:
 - `price` (synthetic, deterministic)
 - `currency`, `brand`, `categories_tags`, `lang`
 
-Image URLs are constructed using OFF’s documented image URL scheme. 
+Image URLs are constructed using OFF’s documented image URL scheme.
+
+## Why this tool is necessary
+
+The raw data from Open Food Facts is incredibly detailed but also complex, containing hundreds of fields, nested objects, and language-specific keys. This makes it difficult to use directly in many applications, especially search and recommendation engines that expect a simple, flat document structure.
+
+This script transforms the raw data into a clean, consistent, and search-ready format. It performs several key operations:
+
+*   **Selects a primary language:** It extracts titles and descriptions from a complex, multi-language structure into single `title` and `description` fields.
+*   **Constructs a reliable image URL:** It navigates nested image metadata to build a single, high-quality `image_url`.
+*   **Synthesizes a full description:** It combines the title, generic name, and key attributes into a comprehensive `description` field.
+*   **Generates a synthetic price:** It creates a deterministic, plausible price to enable e-commerce simulations.
+*   **Flattens the structure:** It extracts key attributes into a simple key-value `attrs` object.
+
+### Before: Raw Open Food Facts Data Example
+
+A single product can have over 500 fields. Key information like the product name or image URL is buried in nested objects and requires logic to extract.
+
+```json
+{
+  "_id": "0000105000011",
+  "product_name_en": "Chamomile Herbal Tea",
+  "product_name": "Chamomile Herbal Tea",
+  "ingredients_text_en": "CHAMOMILE FLOWERS.",
+  "images": {
+    "front_en": {
+      "imgid": "some_id",
+      "rev": "1",
+      "sizes": {
+        "400": { "h": 400, "w": 300 }
+      }
+    }
+  },
+  "nutriments": {
+    "energy-kcal_100g": 280,
+    "fat_100g": 0,
+    "sugars_100g": 0
+  },
+  "...": "Many more fields..."
+}
+```
+
+### After: Cleaned NDJSON for Search Example
+
+The output is a clean, flat JSON object, ready to be indexed into a search engine like Elasticsearch or OpenSearch.
+
+```json
+{
+  "id": "0000105000011",
+  "title": "Chamomile Herbal Tea",
+  "brand": "Lagg's",
+  "description": "Chamomile Herbal Tea\\nCHAMOMILE FLOWERS.\\n\\nKey Specifications:\\n- **NOVA group**: 1\\n- **Energy (kcal/100g)**: 280 kcal\\n- **Fat (g/100g)**: 0 g",
+  "image_url": "https://images.openfoodfacts.org/images/products/000/010/500/0011/front_en.1.400.jpg",
+  "price": 1.25,
+  "currency": "EUR",
+  "categories": ["Teas", "Hot beverages", "Beverages"],
+  "attrs": {
+    "NOVA group": "1",
+    "Energy (kcal/100g)": "280 kcal",
+    "Fat (g/100g)": "0 g",
+    "Category": "Teas",
+    "Price source": "estimated_unit_model",
+    "Pricing bucket": "teas",
+    "Estimated unit price": "€1.25/unit"
+  }
+}
+```
 
 ## Clean data definition
-
 A record is included if it has all of:
 
 - English title: `product_name_en` OR (`lang == en` AND `product_name`)
