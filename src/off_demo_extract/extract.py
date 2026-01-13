@@ -44,6 +44,7 @@ def open_maybe_gzip(path: Path, encoding: str = "utf-8") -> TextIO:
         return io.TextIOWrapper(gzip.open(path, "rb"), encoding=encoding, errors="replace")
     return path.open("r", encoding=encoding, errors="replace")
 
+
 # ----------------------------
 # OFF image URL construction
 # ----------------------------
@@ -83,7 +84,11 @@ def build_raw_image_url(code: str, imgid: str, sizes: Dict[str, Any]) -> str:
     return f"{IMAGE_BASE}/{folder}/{imgid}.{res}.jpg"
 
 
-def choose_front_key(images: Dict[str, Any], prefer_lang: str = "en", require_lang: Optional[str] = None) -> Optional[str]:
+def choose_front_key(
+    images: Dict[str, Any],
+    prefer_lang: str = "en",
+    require_lang: Optional[str] = None,
+) -> Optional[str]:
     if not isinstance(images, dict) or not images:
         return None
 
@@ -105,7 +110,11 @@ def choose_front_key(images: Dict[str, Any], prefer_lang: str = "en", require_la
     return None
 
 
-def compute_image_url(product: Dict[str, Any], prefer_lang: str = "en", require_front_lang: Optional[str] = None) -> Optional[str]:
+def compute_image_url(
+    product: Dict[str, Any],
+    prefer_lang: str = "en",
+    require_front_lang: Optional[str] = None,
+) -> Optional[str]:
     code = str(product.get("code") or product.get("_id") or "").strip()
     if not code:
         return None
@@ -229,12 +238,12 @@ def build_categories_list(primary_tag: Optional[str], tags_filtered: list[str], 
 
 
 # ----------------------------
-# Dietary tags (efficient keyword list)
+# Dietary restrictions (efficient keyword list)
 # ----------------------------
 
-def dietary_tags_from_off(product: Dict[str, Any]) -> list[str]:
+def dietary_restrictions_from_off(product: Dict[str, Any]) -> list[str]:
     """
-    Return a list of dietary keyword tags suitable for efficient filtering.
+    Return a list of dietary restriction keyword tags suitable for efficient filtering.
     Positive-only (no maybe/unknown flags).
     """
     labels = set(product.get("labels_tags") or [])
@@ -305,7 +314,11 @@ def format_nutrient(nutriments: Dict[str, Any], key_100g: str, unit_key: Optiona
     return f"{v:g}"
 
 
-def build_attrs(product: Dict[str, Any], primary_category_tag: Optional[str], primary_category_label: Optional[str]) -> Dict[str, str]:
+def build_attrs(
+    product: Dict[str, Any],
+    primary_category_tag: Optional[str],
+    primary_category_label: Optional[str],
+) -> Dict[str, str]:
     attrs: Dict[str, str] = {}
 
     qty = get_first_str(product, "quantity")
@@ -380,7 +393,7 @@ def build_description(title: str, desc: str, attrs: Dict[str, str]) -> str:
 
     preferred_keys = [
         "Category", "Quantity", "Serving size", "Nutri-Score", "NOVA group", "Eco-Score",
-        "Dietary",
+        "Dietary restrictions",
         "Allergens", "Labels", "Ingredients analysis",
         "Energy (kcal/100g)", "Fat (g/100g)", "Saturated fat (g/100g)",
         "Sugars (g/100g)", "Salt (g/100g)", "Protein (g/100g)", "Fiber (g/100g)",
@@ -429,19 +442,6 @@ class Counters:
     missing_category: int = 0
 
 
-@dataclass
-class ProgressSnapshot:
-    t: float
-    read: int
-    written: int
-    bad_json: int
-    missing_code: int
-    missing_title_en: int
-    missing_desc_en: int
-    missing_image: int
-    missing_category: int
-
-
 def _fmt_int(n: int) -> str:
     return f"{n:,}"
 
@@ -462,7 +462,12 @@ def _progress_line(c: Counters, elapsed_s: float) -> str:
 # CLI
 # ----------------------------
 
-def build_parser(default_input: Path, default_output: Path, default_report: Path, default_pricing: Path) -> argparse.ArgumentParser:
+def build_parser(
+    default_input: Path,
+    default_output: Path,
+    default_report: Path,
+    default_pricing: Path,
+) -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
         description="Extract Icecat-like NDJSON demo catalog from Open Food Facts JSONL/JSONL.GZ export."
     )
@@ -508,6 +513,7 @@ def build_parser(default_input: Path, default_output: Path, default_report: Path
 def main(argv: Optional[Iterable[str]] = None) -> int:
     root = repo_root()
     print(f"Resolved repo root: {root}", file=sys.stderr, flush=True)
+
     default_input = root / "data" / "json_source" / "openfoodfacts-products.jsonl.gz"
     default_output = root / "data" / "products" / "off_common.ndjson"
     default_report = root / "data" / "products" / "report.json"
@@ -600,9 +606,9 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
 
             attrs = build_attrs(product, primary_category_tag=primary_tag, primary_category_label=primary_category_label)
 
-            dietary = dietary_tags_from_off(product)
-            if dietary:
-                attrs["Dietary"] = ", ".join(dietary)
+            dietary_restrictions = dietary_restrictions_from_off(product)
+            if dietary_restrictions:
+                attrs["Dietary restrictions"] = ", ".join(dietary_restrictions)
 
             labels_tags = product.get("labels_tags") if isinstance(product.get("labels_tags"), list) else []
             brand = product.get("brands") if isinstance(product.get("brands"), str) else ""
@@ -638,7 +644,7 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
                 "categories": categories,
                 "attrs": attrs,
                 "attr_keys": attr_keys,
-                "dietary": dietary,
+                "dietary_restrictions": dietary_restrictions,
             }
 
             out.write(json.dumps(doc, ensure_ascii=False) + "\n")
@@ -647,8 +653,9 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
             if args.max_output_records and c.written >= args.max_output_records:
                 break
 
-            # Progress by count
             now = time.time()
+
+            # Progress by count
             if args.progress_every and (c.read % args.progress_every == 0):
                 elapsed = now - t0
                 log(_progress_line(c, elapsed))
@@ -676,7 +683,7 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
             "image": f"computed from images/front_{req_front_lang} + rev/imgid" if req_front_lang else "computed from images/front_* + rev/imgid",
             "category": "required" if args.require_category else "optional",
             "price": "category baseline unit model + deterministic noise + label premiums + retail rounding",
-            "dietary": "keyword list derived from labels_tags and ingredients_analysis_tags (positive-only)",
+            "dietary_restrictions": "keyword list derived from labels_tags and ingredients_analysis_tags (positive-only)",
             "progress": f"every {args.progress_every} records and/or {args.progress_seconds}s",
         },
     }
