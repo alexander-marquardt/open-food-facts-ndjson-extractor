@@ -35,26 +35,44 @@ A single product can have over 500 fields. Key information like the product name
 
 ```json
 {
-  "_id": "0000105000011",
-  "product_name_en": "Chamomile Herbal Tea",
-  "product_name": "Chamomile Herbal Tea",
-  "ingredients_text_en": "CHAMOMILE FLOWERS.",
-  "images": {
-    "front_en": {
-      "imgid": "some_id",
-      "rev": "1",
-      "sizes": {
-        "400": { "h": 400, "w": 300 }
-      }
-    }
+  "_id": "0008127000019",
+  "pnns_groups_2": "Fats",
+  "labels_old": "",
+  "ingredients_from_palm_oil_tags": [],
+  "brands": "Athena Imports",
+  "code": "0008127000019",
+  "editors_tags": [
+    "aleene",
+    "clockwerx",
+    "ecoscore-impact-estimator",
+    "kiliweb",
+    "usda-ndb-import",
+    "yuka.sY2b0xO6T85zoF3NwEKvlkBmTtT-iz2cKD3tvnWnxIyJDIfrfuxX2KLROas",
+    "yuka.sY2b0xO6T85zoF3NwEKvlnAfXOTz-RmeOxLgh3egzemsPJb1YepV7aSnHas"
+  ],
+  "packaging_materials_tags": [],
+  "ingredients_sweeteners_n": 0,
+  "generic_name": "",
+  "categories_properties": {
+    "agribalyse_food_code:en": "17270",
+    "ciqual_food_code:en": "17270",
+    "agribalyse_proxy_food_code:en": "17270"
   },
-  "nutriments": {
-    "energy-kcal_100g": 280,
-    "fat_100g": 0,
-    "sugars_100g": 0
-  },
-  "...": "Many more fields..."
-}
+  "nutriscore_2021_tags": [
+    "c"
+  ],
+  "languages_tags": [
+    "en:english",
+    "en:1"
+  ],
+  "link": "",
+  "purchase_places": "",
+  "ingredients_with_unspecified_percent_sum": 100,
+  "ingredients_with_specified_percent_n": 0,
+  "origin_en": "",
+  "nutriscore_version": "2023",
+  "...": "hundreds of additional fields"
+
 ```
 
 ### After: Cleaned NDJSON for Search Example
@@ -63,23 +81,60 @@ The output is a clean, flat JSON object, ready to be indexed into a search engin
 
 ```json
 {
-  "id": "0000105000011",
-  "title": "Chamomile Herbal Tea",
-  "brand": "Lagg's",
-  "description": "Chamomile Herbal Tea\\nCHAMOMILE FLOWERS.\\n\\nKey Specifications:\\n- **NOVA group**: 1\\n- **Energy (kcal/100g)**: 280 kcal\\n- **Fat (g/100g)**: 0 g",
-  "image_url": "https://images.openfoodfacts.org/images/products/000/010/500/0011/front_en.1.400.jpg",
-  "price": 1.25,
+  "id": "0008127000019",
+  "title": "Extra virgin olive oil",
+  "brand": "Athena Imports",
+  "description": "Extra virgin olive oil\n\nExtra virgin olive oil\n\n\nKey Specifications:\n- **Category**: Plant based foods and beverages\n- **Serving size**: 15 ml\n- **Nutri-Score**: B\n- **NOVA group**: 2\n- **Eco-Score**: E\n- **Dietary**: vegan, vegetarian\n- **Ingredients analysis**: palm-oil-free, vegan, vegetarian\n- **Energy (kcal/100g)**: 800 kcal\n- **Fat (g/100g)**: 93.3 g\n- **Saturated fat (g/100g)**: 13.3 g\n- **Sugars (g/100g)**: 0 g\n- **Salt (g/100g)**: 0 g\n- **Protein (g/100g)**: 0 g\n- **Countries**: United States",
+  "image_url": "https://images.openfoodfacts.org/images/products/000/812/700/0019/front_en.5.400.jpg",
+  "price": 0.49,
   "currency": "EUR",
-  "categories": ["Teas", "Hot beverages", "Beverages"],
+  "categories": [
+    "Plant based foods and beverages",
+    "Plant based foods",
+    "Fats"
+  ],
   "attrs": {
-    "NOVA group": "1",
-    "Energy (kcal/100g)": "280 kcal",
-    "Fat (g/100g)": "0 g",
-    "Category": "Teas",
+    "Serving size": "15 ml",
+    "Nutri-Score": "B",
+    "NOVA group": "2",
+    "Eco-Score": "E",
+    "Ingredients analysis": "palm-oil-free, vegan, vegetarian",
+    "Countries": "United States",
+    "Category": "Plant based foods and beverages",
+    "Energy (kcal/100g)": "800 kcal",
+    "Fat (g/100g)": "93.3 g",
+    "Saturated fat (g/100g)": "13.3 g",
+    "Sugars (g/100g)": "0 g",
+    "Salt (g/100g)": "0 g",
+    "Protein (g/100g)": "0 g",
+    "Dietary": "vegan, vegetarian",
     "Price source": "estimated_unit_model",
-    "Pricing bucket": "teas",
-    "Estimated unit price": "€1.25/unit"
-  }
+    "Pricing bucket": "oils_fats",
+    "Estimated unit price": "11.59 EUR/l (15ml, bucket=oils_fats, scale=1.21, ratio=0.15)"
+  },
+  "attr_keys": [
+    "Category",
+    "Countries",
+    "Dietary",
+    "Eco-Score",
+    "Energy (kcal/100g)",
+    "Estimated unit price",
+    "Fat (g/100g)",
+    "Ingredients analysis",
+    "NOVA group",
+    "Nutri-Score",
+    "Price source",
+    "Pricing bucket",
+    "Protein (g/100g)",
+    "Salt (g/100g)",
+    "Saturated fat (g/100g)",
+    "Serving size",
+    "Sugars (g/100g)"
+  ],
+  "dietary": [
+    "vegan",
+    "vegetarian"
+  ]
 }
 ```
 
@@ -147,21 +202,6 @@ uv run -m off_demo_extract.extract \
   --progress-every 500000
   ```
 
-## Output example
-
-```
-{
-  "id": "0000159487776",
-  "title": "Magic Stars Chocolates",
-  "description": "SUGAR, COCOA BUTTER, ...",
-  "image_url": "https://images.openfoodfacts.org/images/products/000/015/948/7776/front_en.3.400.jpg",
-  "price": 5.58,
-  "currency": "EUR",
-  "brand": "Milkyway",
-  "categories_tags": ["en:null"],
-  "lang": "en"
-}
-```
 
 ## Licensing and data reuse (important)
 	•	This repository’s code is licensed under the MIT License (see LICENSE).
