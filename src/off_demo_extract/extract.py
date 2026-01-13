@@ -229,6 +229,45 @@ def build_categories_list(primary_tag: Optional[str], tags_filtered: list[str], 
 
 
 # ----------------------------
+# Dietary tags (efficient keyword list)
+# ----------------------------
+
+def dietary_tags_from_off(product: Dict[str, Any]) -> list[str]:
+    """
+    Return a list of dietary keyword tags suitable for efficient filtering.
+    Positive-only (no maybe/unknown flags).
+    """
+    labels = set(product.get("labels_tags") or [])
+    analysis = set(product.get("ingredients_analysis_tags") or [])
+
+    tags: set[str] = set()
+
+    # Vegan / vegetarian: accept explicit label or computed analysis
+    if "en:vegan" in labels or "en:vegan" in analysis:
+        tags.add("vegan")
+    if "en:vegetarian" in labels or "en:vegetarian" in analysis:
+        tags.add("vegetarian")
+
+    # Religious labels (best treated as label-driven)
+    if "en:halal" in labels:
+        tags.add("halal")
+    if "en:kosher" in labels:
+        tags.add("kosher")
+
+    # Common dietary constraints as labels
+    if "en:gluten-free" in labels:
+        tags.add("gluten_free")
+    if "en:lactose-free" in labels:
+        tags.add("lactose_free")
+
+    # Optional but useful for demos
+    if "en:organic" in labels or "en:usda-organic" in labels:
+        tags.add("organic")
+
+    return sorted(tags)
+
+
+# ----------------------------
 # Attributes extraction (OFF -> attrs)
 # ----------------------------
 
@@ -345,6 +384,7 @@ def build_description(title: str, desc: str, attrs: Dict[str, str]) -> str:
 
     preferred_keys = [
         "Category", "Quantity", "Serving size", "Nutri-Score", "NOVA group", "Eco-Score",
+        "Dietary",
         "Allergens", "Labels", "Ingredients analysis",
         "Energy (kcal/100g)", "Fat (g/100g)", "Saturated fat (g/100g)",
         "Sugars (g/100g)", "Salt (g/100g)", "Protein (g/100g)", "Fiber (g/100g)",
@@ -441,11 +481,11 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
         print(msg, file=sys.stderr, flush=True)
 
     if args.output.exists() and not args.yes:
-        confirm = input(f"⚠️  Output file exists. Overwrite {args.output}? [y/N]: ").lower().strip()
-        if confirm != 'y':
+        confirm = input(f"WARNING: Output file exists. Overwrite {args.output}? [y/N]: ").lower().strip()
+        if confirm != "y":
             log("Aborted.")
             return 1
-            
+
     if not args.input.exists():
         log(f"ERROR: input file not found: {args.input}")
         return 2
@@ -519,6 +559,11 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
             # Build attrs first (also exposes Quantity/Serving size/Labels etc.)
             attrs = build_attrs(product, primary_category_tag=primary_tag, primary_category_label=primary_category_label)
 
+            # Dietary keyword list
+            dietary = dietary_tags_from_off(product)
+            if dietary:
+                attrs["Dietary"] = ", ".join(dietary)
+
             # Price estimation: uses category + quantity/serving size + labels + brand, with deterministic noise
             labels_tags = product.get("labels_tags") if isinstance(product.get("labels_tags"), list) else []
             brand = product.get("brands") if isinstance(product.get("brands"), str) else ""
@@ -555,6 +600,8 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
                 "categories": categories,
                 "attrs": attrs,
                 "attr_keys": attr_keys,
+                # Efficient filter field
+                "dietary": dietary,
             }
 
             out.write(json.dumps(doc, ensure_ascii=False) + "\n")
@@ -579,7 +626,8 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
             "english_description": "generic_name_en OR ingredients_text_en OR (lang==en AND generic_name/ingredients_text)",
             "image": f"computed from images/front_{req_front_lang} + rev/imgid" if req_front_lang else "computed from images/front_* + rev/imgid",
             "category": "required" if args.require_category else "optional",
-            "price": "category baseline unit model + deterministic noise + label premiums + retail rounding"
+            "price": "category baseline unit model + deterministic noise + label premiums + retail rounding",
+            "dietary": "keyword list derived from labels_tags and ingredients_analysis_tags (positive-only)"
         },
     }
     args.report.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
