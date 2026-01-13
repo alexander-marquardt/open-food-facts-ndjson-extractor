@@ -6,16 +6,23 @@ This repository contains **code only**. It does **not** ship Open Food Facts dat
 
 ## What this produces
 
-One JSON object per line (NDJSON) with:
+This tool transforms raw, complex Open Food Facts data into a flattened, search-ready **NDJSON** format. 
 
-- `id` (GTIN-13 padded)
-- `title` (English)
-- `description` (English; typically ingredients/generic name)
-- `image_url` (computed from OFF `images` metadata)
-- `price` (synthetic, deterministic)
-- `currency`, `brand`, `categories_tags`, `lang`
+### Schema Overview
 
-Image URLs are constructed using OFF’s documented image URL scheme.
+| Field | Type | Description |
+| :--- | :--- | :--- |
+| `id` | string | GTIN-13 barcode (padded). |
+| `title` | string | Product name (English). |
+| `brand` | string | Manufacturer or brand name. |
+| `description` | string | Synthesized description (Title + Ingredients + Key Specs). |
+| `price` | float | Synthetic, deterministic price for e-commerce simulation. |
+| `currency` | string | Currency code (default: EUR). |
+| `image_url` | string | Computed primary product image URL. |
+| `categories` | list | Cleaned list of category tags. |
+| `attrs` | object | **Flattened Dictionary** of key-value attributes (e.g., Nutri-Score, Energy). |
+| `attr_keys` | list | List of all keys available in `attrs` for faceting. |
+| `dietary_restrictions` | list | Extracted dietary tags (e.g., vegan, vegetarian). |
 
 ## Why this tool is necessary
 
@@ -107,7 +114,7 @@ The output is a clean, flat JSON object, ready to be indexed into a search engin
     "Sugars (g/100g)": "0 g",
     "Salt (g/100g)": "0 g",
     "Protein (g/100g)": "0 g",
-    "Dietary": "vegan, vegetarian",
+    "Dietary restrictions": "vegan, vegetarian",
     "Price source": "estimated_unit_model",
     "Pricing bucket": "oils_fats",
     "Estimated unit price": "11.59 EUR/l (15ml, bucket=oils_fats, scale=1.21, ratio=0.15)"
@@ -131,7 +138,7 @@ The output is a clean, flat JSON object, ready to be indexed into a search engin
     "Serving size",
     "Sugars (g/100g)"
   ],
-  "dietary": [
+  "dietary_restrictions": [
     "vegan",
     "vegetarian"
   ]
