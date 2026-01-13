@@ -13,3 +13,7 @@ report.json
 __pycache__/
 *.py[cod]
 *.egg-info/
+
+# But do not ignore the sample-data directory inside it
+!data/sample-data/
+
