@@ -21,23 +21,28 @@ IMAGE_BASE = "https://images.openfoodfacts.org/images/products"
 # ----------------------------
 
 def repo_root() -> Path:
-    """Find repo root by walking up from this file and looking for pyproject.toml."""
+    """
+    Find repo root by walking up from this file and looking for *project-root markers*.
+    We require both:
+      - pyproject.toml
+      - src/ directory
+    This prevents accidentally treating ./data (or other subdirs) as the repo root.
+    """
     here = Path(__file__).resolve()
     for parent in [here.parent, *here.parents]:
-        if (parent / "pyproject.toml").exists():
+        if (parent / "pyproject.toml").exists() and (parent / "src").is_dir():
             return parent
     return Path.cwd()
+
+
+def ensure_parent_dir(path: Path) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
 
 
 def open_maybe_gzip(path: Path, encoding: str = "utf-8") -> TextIO:
     if path.suffix == ".gz":
         return io.TextIOWrapper(gzip.open(path, "rb"), encoding=encoding, errors="replace")
     return path.open("r", encoding=encoding, errors="replace")
-
-
-def ensure_parent_dir(path: Path) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-
 
 # ----------------------------
 # OFF image URL construction
@@ -502,6 +507,7 @@ def build_parser(default_input: Path, default_output: Path, default_report: Path
 
 def main(argv: Optional[Iterable[str]] = None) -> int:
     root = repo_root()
+    print(f"Resolved repo root: {root}", file=sys.stderr, flush=True)
     default_input = root / "data" / "json_source" / "openfoodfacts-products.jsonl.gz"
     default_output = root / "data" / "products" / "off_common.ndjson"
     default_report = root / "data" / "products" / "report.json"
