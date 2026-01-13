@@ -153,6 +153,9 @@ A record is included if it has all of:
 - A **front image in English**: `images.front_en` (via `--require-front-lang en`)
 - Deterministic synthetic price in a configurable range
 
+## Example cleaned data
+![Demo screenshot](assets/cleaned-data.png)
+
 ## Data is not included in this repo
 
 Users must download the OFF JSONL export at: [https://static.openfoodfacts.org/data/openfoodfacts-products.jsonl.gz](https://static.openfoodfacts.org/data/openfoodfacts-products.jsonl.gz)
