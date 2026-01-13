@@ -4,6 +4,7 @@ out/*
 *.jsonl
 *.jsonl.gz
 report.json
+.DS_Store
 
 # keep placeholders
 !data/.gitkeep

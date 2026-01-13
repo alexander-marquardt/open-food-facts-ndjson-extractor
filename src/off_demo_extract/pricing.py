@@ -89,8 +89,7 @@ def parse_quantity(quantity: Optional[str], serving_size: Optional[str]) -> Tupl
         if ml is not None:
             return (None, ml * count, count)
 
-    # If text contains a parenthetical with g/ml, prefer that (often more precise)
-    # We'll just scan all unit expressions and pick the "best" based on presence.
+    # Scan all unit expressions and pick a reasonable max (often the pack size).
     grams = []
     mls = []
     for mm in _QTY_RE.finditer(text):
@@ -103,10 +102,8 @@ def parse_quantity(quantity: Optional[str], serving_size: Optional[str]) -> Tupl
         if ml is not None:
             mls.append(ml)
 
-    # Heuristic: if both appear, prefer grams (foods) unless grams is tiny and ml is plausible
     weight_g = max(grams) if grams else None
     volume_ml = max(mls) if mls else None
-
     return (weight_g, volume_ml, None)
 
 
@@ -156,7 +153,7 @@ def load_pricing_config(path: Path) -> PricingConfig:
         )
 
     if "default" not in buckets:
-        buckets["default"] = Bucket(name="default", unit="kg", median_unit_price=10.0, sigma=0.55, default_qty_g=250)
+        buckets["default"] = Bucket(name="default", unit="kg", median_unit_price=10.0, sigma=0.55, default_qty_g=250, default_qty_ml=500)
 
     return PricingConfig(
         currency=currency,
@@ -175,43 +172,33 @@ def bucket_from_categories(primary_category: str, categories: Iterable[str]) -> 
     """
     hay = " | ".join([primary_category, *categories]).lower()
 
-    # Snacks / sweets
     if any(k in hay for k in ["snack", "confection", "candy", "chocolate", "sweet", "biscuit", "cookie", "gummies"]):
         return "snacks_sweets"
 
-    # Condiments / sauces / vinegars / dressings
     if any(k in hay for k in ["condiment", "sauce", "vinegar", "dressing", "marinade", "ketchup", "mustard"]):
         return "condiments_sauces"
 
-    # Oils / fats
     if any(k in hay for k in ["oil", "olive oil", "sesame oil", "fat"]):
         return "oils_fats"
 
-    # Sweeteners / syrups
     if any(k in hay for k in ["sweetener", "syrup", "maple", "honey"]):
         return "sweeteners_syrups"
 
-    # Meals / prepared / frozen
     if any(k in hay for k in ["meal", "pasta", "ravioli", "frozen", "ready", "prepared", "dish"]):
         return "meals_chilled_frozen"
 
-    # Produce
     if any(k in hay for k in ["fruit", "vegetable", "produce", "salad", "lettuce", "apple"]):
         return "produce"
 
-    # Dairy
     if any(k in hay for k in ["milk", "cheese", "yogurt", "dairy", "butter"]):
         return "dairy"
 
-    # Beverages (non-alcohol)
     if any(k in hay for k in ["beverage", "drink", "juice", "soda", "soft", "water"]):
         return "beverages_soft"
 
-    # Coffee / tea
     if any(k in hay for k in ["coffee", "tea"]):
         return "coffee_tea"
 
-    # Bakery
     if any(k in hay for k in ["bread", "bakery", "croissant", "cake", "pastry"]):
         return "bakery"
 
@@ -235,9 +222,8 @@ def _lognormal_with_median(rng: random.Random, median: float, sigma: float) -> f
 
 def _apply_retail_rounding(price: float, endings: tuple[float, ...]) -> float:
     """
-    Round down to nearest retail-ish ending in the same euro.
-    Example: 2.83 -> 2.79? (if endings include .79)
-    We use endings like .99, .49, .29 etc.
+    Round down to nearest retail-ish ending within the current euro.
+    Uses endings like .99, .49, .29, etc.
     """
     if price <= 0:
         return 0.0
@@ -245,7 +231,6 @@ def _apply_retail_rounding(price: float, endings: tuple[float, ...]) -> float:
     euros = math.floor(price)
     cents = price - euros
 
-    # pick the largest ending <= cents; otherwise go down 1 euro and use max ending
     endings_sorted = sorted(endings)
     chosen = None
     for e in endings_sorted:
@@ -305,7 +290,6 @@ def estimate_price(
             qty_in_unit = 0.5
             qty_debug = "fallback 500ml"
     else:
-        # Shouldn't happen, but keep safe
         qty_in_unit = 1.0
         qty_debug = "fallback unit"
 
@@ -315,13 +299,30 @@ def estimate_price(
     # Sample unit price (EUR per kg or per L)
     unit_price = _lognormal_with_median(rng, bucket.median_unit_price, bucket.sigma)
 
-    # Mild economy of scale: larger packs slightly cheaper per unit (cap effect)
-    # (If we used a default qty, keep it neutral.)
+    # Economy of scale:
+    # - larger packs: meaningfully cheaper per unit
+    # - smaller packs: modestly more expensive per unit
+    # Keep neutral if quantity was a bucket default (we don't want fake pack-size effects).
+    scale_debug = ""
     if "default" not in qty_debug:
-        ref = 0.25 if bucket.unit == "kg" else 0.5
-        ratio = max(0.25, min(4.0, qty_in_unit / ref))
-        # larger ratio => cheaper per unit; smaller => slightly pricier
-        unit_price *= ratio ** (-0.10)
+        ref = 0.25 if bucket.unit == "kg" else 0.5  # 250g or 500ml reference
+        ratio = qty_in_unit / ref
+
+        # Clamp ratio range to avoid extreme effects on very large/small packs
+        ratio = max(0.15, min(10.0, ratio))
+
+        alpha_large = 0.22  # stronger discount for bulk
+        alpha_small = 0.10  # mild premium for small packs
+
+        if ratio >= 1.0:
+            scale = ratio ** (-alpha_large)
+        else:
+            scale = ratio ** (-alpha_small)
+
+        # Clamp final multiplier so the per-unit discount/premium stays plausible
+        scale = max(0.55, min(1.35, scale))
+        unit_price *= scale
+        scale_debug = f", scale={scale:.2f}, ratio={ratio:.2f}"
 
     # Apply label premiums
     mult = 1.0
@@ -345,5 +346,5 @@ def estimate_price(
     price = max(config.min_price, min(config.max_price, price))
     price = _apply_retail_rounding(price, config.rounding_endings)
 
-    unit_debug = f"{unit_price:.2f} {config.currency}/{bucket.unit} ({qty_debug}, bucket={bucket.name})"
+    unit_debug = f"{unit_price:.2f} {config.currency}/{bucket.unit} ({qty_debug}, bucket={bucket.name}{scale_debug})"
     return price, bucket.name, unit_debug
