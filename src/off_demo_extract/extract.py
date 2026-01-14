@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, Iterator, Optional, Set, TextIO
 
 from off_demo_extract.pricing import load_pricing_config, estimate_price
+from off_demo_extract.describe import DescribeConfig, generate_description, generate_search_text
 
 
 IMAGE_BASE = "https://images.openfoodfacts.org/images/products"
@@ -177,6 +178,18 @@ def get_english_description(product: Dict[str, Any], max_len: int = 600) -> Opti
             if isinstance(v, str) and v.strip():
                 return v.strip()[:max_len]
 
+    return None
+
+
+def get_best_ingredients_text(product: Dict[str, Any], max_len: int = 600) -> Optional[str]:
+    """
+    Prefer English ingredients text if present, else fall back to non-language-specific.
+    This is used for keyword extraction and fallback description generation.
+    """
+    for k in ("ingredients_text_en", "ingredients_text"):
+        v = product.get(k)
+        if isinstance(v, str) and v.strip():
+            return v.strip()[:max_len]
     return None
 
 
@@ -388,30 +401,6 @@ def build_attrs(
     return attrs
 
 
-def build_description(title: str, desc: str, attrs: Dict[str, str]) -> str:
-    lines = [title, "", desc.strip()]
-
-    preferred_keys = [
-        "Category", "Quantity", "Serving size", "Nutri-Score", "NOVA group", "Eco-Score",
-        "Dietary restrictions",
-        "Allergens", "Labels", "Ingredients analysis",
-        "Energy (kcal/100g)", "Fat (g/100g)", "Saturated fat (g/100g)",
-        "Sugars (g/100g)", "Salt (g/100g)", "Protein (g/100g)", "Fiber (g/100g)",
-        "Countries"
-    ]
-    spec_lines = []
-    for k in preferred_keys:
-        v = attrs.get(k)
-        if v:
-            spec_lines.append(f"- **{k}**: {v}")
-
-    if spec_lines:
-        lines += ["", "", "Key Specifications:"]
-        lines += spec_lines
-
-    return "\n".join(lines)
-
-
 # ----------------------------
 # Streaming parse
 # ----------------------------
@@ -469,7 +458,7 @@ def build_parser(
     default_pricing: Path,
 ) -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
-        description="Extract Icecat-like NDJSON demo catalog from Open Food Facts JSONL/JSONL.GZ export."
+        description="Extract demo-ready NDJSON catalog from Open Food Facts JSONL/JSONL.GZ export."
     )
     p.add_argument("--input", type=Path, default=default_input)
     p.add_argument("--output", type=Path, default=default_output)
@@ -542,6 +531,14 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
 
     pricing_cfg = load_pricing_config(args.pricing_config)
 
+    # Describe config (optional phrase bank)
+    phrase_bank_path = root / "config" / "phrase_bank.json"
+    describe_cfg = DescribeConfig(
+        phrase_bank_path=phrase_bank_path if phrase_bank_path.exists() else None,
+        max_phrases=2,
+        max_tags=4,
+    )
+
     ensure_parent_dir(args.output)
     ensure_parent_dir(args.report)
 
@@ -556,6 +553,8 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
     log(f"Output:         {args.output}")
     log(f"Report:         {args.report}")
     log(f"Pricing config: {args.pricing_config}")
+    if describe_cfg.phrase_bank_path:
+        log(f"Phrase bank:    {describe_cfg.phrase_bank_path}")
     if req_front_lang:
         log(f"Images: require front_{req_front_lang}")
     if args.require_category:
@@ -583,8 +582,12 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
                 c.missing_title_en += 1
                 continue
 
-            desc = get_english_description(product)
-            if not desc:
+            # Keep an English-ish fallback text for keywords / fallback descriptions
+            ingredients_text = get_best_ingredients_text(product, max_len=600)
+
+            # Keep existing "generic/ingredients" description as a fallback if needed
+            fallback_desc = get_english_description(product)
+            if not fallback_desc:
                 c.missing_desc_en += 1
                 continue
 
@@ -604,14 +607,16 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
             categories = build_categories_list(primary_tag, tags_filtered, max_n=3)
             primary_category_label = categories[0] if categories else None
 
-            attrs = build_attrs(product, primary_category_tag=primary_tag, primary_category_label=primary_category_label)
-
+            brand = product.get("brands") if isinstance(product.get("brands"), str) else ""
             dietary_restrictions = dietary_restrictions_from_off(product)
+
+            attrs = build_attrs(product, primary_category_tag=primary_tag, primary_category_label=primary_category_label)
             if dietary_restrictions:
+                # Keep attrs display-friendly; parsed array lives in top-level field.
                 attrs["Dietary restrictions"] = ", ".join(dietary_restrictions)
 
+            # Price estimation (existing)
             labels_tags = product.get("labels_tags") if isinstance(product.get("labels_tags"), list) else []
-            brand = product.get("brands") if isinstance(product.get("brands"), str) else ""
             quantity = product.get("quantity") if isinstance(product.get("quantity"), str) else None
             serving_size = product.get("serving_size") if isinstance(product.get("serving_size"), str) else None
 
@@ -630,8 +635,37 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
             attrs["Pricing bucket"] = bucket_name
             attrs["Estimated unit price"] = unit_debug
 
+            # -------- NEW: algorithmic demo-friendly description + search text --------
+            # Prefer generating a readable description. Only fall back to ingredients/attrs if needed.
+            description = generate_description(
+                gtin=pad_gtin13(code),
+                title=title,
+                brand=brand or "",
+                categories=categories,
+                dietary_restrictions=dietary_restrictions,
+                ingredients_text=ingredients_text or fallback_desc,
+                attrs=attrs,
+                cfg=describe_cfg,
+            )
+
+            search_text = generate_search_text(
+                title=title,
+                brand=brand or "",
+                categories=categories,
+                dietary_restrictions=dietary_restrictions,
+                ingredients_text=ingredients_text or fallback_desc,
+                attrs=attrs,
+                cfg=describe_cfg,
+            )
+            # ------------------------------------------------------------------------
+
             attr_keys = sorted(attrs.keys())
-            description = build_description(title=title, desc=desc, attrs=attrs)
+
+
+            # Fold matchable terms into the single description field.
+            # Keep it short to avoid spammy-looking cards.
+            if search_text:
+                description = f"{description}\n\nKeywords: {search_text}"
 
             doc = {
                 "id": pad_gtin13(code),
@@ -645,7 +679,7 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
                 "attrs": attrs,
                 "attr_keys": attr_keys,
                 "dietary_restrictions": dietary_restrictions,
-            }
+}
 
             out.write(json.dumps(doc, ensure_ascii=False) + "\n")
             c.written += 1
@@ -661,7 +695,7 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
                 log(_progress_line(c, elapsed))
                 last_progress_t = now
 
-            # Progress by wall-clock seconds (helps even when progress_every is large)
+            # Progress by wall-clock seconds
             if args.progress_seconds and (now - last_progress_t >= args.progress_seconds):
                 elapsed = now - t0
                 log(_progress_line(c, elapsed))
@@ -675,15 +709,17 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
         "input": str(args.input),
         "output": str(args.output),
         "pricing_config": str(args.pricing_config),
+        "phrase_bank": str(describe_cfg.phrase_bank_path) if describe_cfg.phrase_bank_path else None,
         "elapsed_seconds": elapsed,
         "counters": c.__dict__,
         "filters": {
-            "english_title": "product_name_en OR (lang==en AND product_name)",
-            "english_description": "generic_name_en OR ingredients_text_en OR (lang==en AND generic_name/ingredients_text)",
+            "english_title": "product_name_en OR (lang == en AND product_name)",
+            "fallback_text": "generic_name_en / ingredients_text_en (or lang == en fallbacks)",
             "image": f"computed from images/front_{req_front_lang} + rev/imgid" if req_front_lang else "computed from images/front_* + rev/imgid",
             "category": "required" if args.require_category else "optional",
             "price": "category baseline unit model + deterministic noise + label premiums + retail rounding",
-            "dietary_restrictions": "keyword list derived from labels_tags and ingredients_analysis_tags (positive-only)",
+            "description": "algorithmic demo-friendly generator; ingredients/spec lists only used as fallback",
+            "search_text": "denormalized matching field from title/brand/categories/dietary/ingredients/attrs",
             "progress": f"every {args.progress_every} records and/or {args.progress_seconds}s",
         },
     }
