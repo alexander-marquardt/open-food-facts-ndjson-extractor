@@ -19,7 +19,7 @@ This tool transforms raw, complex Open Food Facts data into a flattened, search-
 | `brand` | string | Manufacturer or brand name. |
 | `description` | string | Synthesized description (Title + Ingredients + Key Specs). |
 | `price` | float | Synthetic, deterministic price for e-commerce simulation. |
-| `currency` | string | Currency code (default: EUR). |
+| `currency` | string | Currency code (default: USD). |
 | `image_url` | string | Computed primary product image URL. |
 | `categories` | list | Cleaned list of category tags. |
 | `attrs` | object | **Flattened Dictionary** of key-value attributes (e.g., Nutri-Score, Energy). |
@@ -96,7 +96,7 @@ The output is a clean, flat JSON object, ready to be indexed into a search engin
   "description": "Extra virgin olive oil\n\nExtra virgin olive oil\n\n\nKey Specifications:\n- **Category**: Plant based foods and beverages\n- **Serving size**: 15 ml\n- **Nutri-Score**: B\n- **NOVA group**: 2\n- **Eco-Score**: E\n- **Dietary restrictions**: vegan, vegetarian\n- **Ingredients analysis**: palm-oil-free, vegan, vegetarian\n- **Energy (kcal/100g)**: 800 kcal\n- **Fat (g/100g)**: 93.3 g\n- **Saturated fat (g/100g)**: 13.3 g\n- **Sugars (g/100g)**: 0 g\n- **Salt (g/100g)**: 0 g\n- **Protein (g/100g)**: 0 g\n- **Countries**: United States",
   "image_url": "https://images.openfoodfacts.org/images/products/000/812/700/0019/front_en.5.400.jpg",
   "price": 2.49,
-  "currency": "EUR",
+  "currency": "USD",
   "categories": [
     "Plant based foods and beverages",
     "Plant based foods",
@@ -119,7 +119,7 @@ The output is a clean, flat JSON object, ready to be indexed into a search engin
     "Dietary restrictions": "vegan, vegetarian",
     "Price source": "estimated_unit_model",
     "Pricing bucket": "oils_fats",
-    "Estimated unit price": "11.59 EUR/l (15ml, bucket=oils_fats, scale=1.21, ratio=0.15)"
+    "Estimated unit price": "11.59 USD/l (15ml, bucket=oils_fats, scale=1.21, ratio=0.15)"
   },
   "attr_keys": [
     "Category",
