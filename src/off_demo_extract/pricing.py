@@ -59,52 +59,72 @@ def _unit_to_ml(num: float, unit: str) -> Optional[float]:
     return None
 
 
-def parse_quantity(quantity: Optional[str], serving_size: Optional[str]) -> Tuple[Optional[float], Optional[float], Optional[int]]:
+def parse_quantity(
+    quantity: Optional[str],
+    serving_size: Optional[str],
+    *,
+    allow_serving_size_fallback: bool = True,
+    min_serving_ml: float = 100.0,
+    min_serving_g: float = 100.0,
+) -> Tuple[Optional[float], Optional[float], Optional[int]]:
     """
     Return (weight_g, volume_ml, count) when parseable.
 
-    Supports:
-      - "3 oz", "946 ml", "0.75 oz (22 g)"
-      - "6 x 330 ml", "12x250ml"
+    Rules:
+      - Prefer parsing `quantity` as the pack size.
+      - Only use `serving_size` as a fallback if it looks like a PACK size
+        (>= min_serving_ml or >= min_serving_g). This avoids treating
+        "Serving size: 15 ml" as the package size for oils.
     """
-    candidates = []
-    for s in (quantity, serving_size):
-        if isinstance(s, str) and s.strip():
-            candidates.append(s)
+    # Helper to parse one string
+    def _parse_one(text: str) -> Tuple[Optional[float], Optional[float], Optional[int]]:
+        if not text:
+            return (None, None, None)
 
-    text = " | ".join(candidates)
-    if not text:
-        return (None, None, None)
+        # Multipacks like "6 x 330 ml"
+        m = _MULTI_RE.search(text)
+        if m:
+            count = int(m.group("count"))
+            num = _to_float(m.group("num"))
+            unit = m.group("unit")
+            g = _unit_to_g(num, unit)
+            ml = _unit_to_ml(num, unit)
+            if g is not None:
+                return (g * count, None, count)
+            if ml is not None:
+                return (None, ml * count, count)
 
-    # Multipacks like "6 x 330 ml"
-    m = _MULTI_RE.search(text)
-    if m:
-        count = int(m.group("count"))
-        num = _to_float(m.group("num"))
-        unit = m.group("unit")
-        g = _unit_to_g(num, unit)
-        ml = _unit_to_ml(num, unit)
-        if g is not None:
-            return (g * count, None, count)
-        if ml is not None:
-            return (None, ml * count, count)
+        grams = []
+        mls = []
+        for mm in _QTY_RE.finditer(text):
+            num = _to_float(mm.group("num"))
+            unit = mm.group("unit")
+            g = _unit_to_g(num, unit)
+            ml = _unit_to_ml(num, unit)
+            if g is not None:
+                grams.append(g)
+            if ml is not None:
+                mls.append(ml)
 
-    # Scan all unit expressions and pick a reasonable max (often the pack size).
-    grams = []
-    mls = []
-    for mm in _QTY_RE.finditer(text):
-        num = _to_float(mm.group("num"))
-        unit = mm.group("unit")
-        g = _unit_to_g(num, unit)
-        ml = _unit_to_ml(num, unit)
-        if g is not None:
-            grams.append(g)
-        if ml is not None:
-            mls.append(ml)
+        weight_g = max(grams) if grams else None
+        volume_ml = max(mls) if mls else None
+        return (weight_g, volume_ml, None)
 
-    weight_g = max(grams) if grams else None
-    volume_ml = max(mls) if mls else None
-    return (weight_g, volume_ml, None)
+    q = (quantity or "").strip()
+    s = (serving_size or "").strip()
+
+    # 1) Prefer quantity (pack size)
+    wg, vm, cnt = _parse_one(q)
+    if wg is not None or vm is not None or cnt is not None:
+        return (wg, vm, cnt)
+
+    # 2) Serving size fallback only if it looks like a package amount
+    if allow_serving_size_fallback and s:
+        wg2, vm2, cnt2 = _parse_one(s)
+        if (vm2 is not None and vm2 >= min_serving_ml) or (wg2 is not None and wg2 >= min_serving_g):
+            return (wg2, vm2, cnt2)
+
+    return (None, None, None)
 
 
 # ----------------------------
@@ -263,8 +283,12 @@ def estimate_price(
     bucket = config.buckets.get(bucket_name, config.buckets["default"])
 
     # Parse sizes
-    weight_g, volume_ml, _count = parse_quantity(quantity, serving_size)
-
+    weight_g, volume_ml, _count = parse_quantity(
+        quantity,
+        serving_size,
+        allow_serving_size_fallback=True,  # but only if it's >=100ml/100g (defaults above)
+    )
+    
     # Determine quantity in bucket unit
     qty_in_unit: Optional[float] = None
     qty_debug = ""
