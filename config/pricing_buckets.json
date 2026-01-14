@@ -36,6 +36,13 @@
       "default_qty_ml": 250
     },
 
+    "olive_oil": {
+      "unit": "l",
+      "median_unit_price": 26.0,
+      "sigma": 0.50,
+      "default_qty_ml": 500
+    },
+
     "oils_fats": {
       "unit": "l",
       "median_unit_price": 12.0,
