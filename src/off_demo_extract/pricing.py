@@ -1,3 +1,26 @@
+"""
+pricing.py
+
+Deterministic, demo-oriented price estimation for Open Food Facts products.
+
+Goal:
+- Provide plausible prices for UI demos and search testing, without claiming to represent
+  real market prices.
+
+Approach:
+- Map each product to a pricing bucket based on category.
+- Estimate unit price (per kg or per L) using a log-normal distribution with configurable
+  medians/spread (config/pricing_buckets.json).
+- Convert unit price to pack price using parsed package quantity when available.
+- Apply conservative premiums (e.g., organic labels) and an economy-of-scale adjustment so
+  larger packs tend to be cheaper per unit.
+- Use a GTIN-seeded RNG so the same product always gets the same price across runs.
+
+Important:
+- This is synthetic demo data. Do not interpret as real retail pricing.
+- When package quantity is missing, bucket defaults are used (configurable).
+"""
+
 from __future__ import annotations
 
 import hashlib
@@ -288,7 +311,7 @@ def estimate_price(
         serving_size,
         allow_serving_size_fallback=True,  # but only if it's >=100ml/100g (defaults above)
     )
-    
+
     # Determine quantity in bucket unit
     qty_in_unit: Optional[float] = None
     qty_debug = ""
