@@ -115,7 +115,7 @@ def parse_quantity(quantity: Optional[str], serving_size: Optional[str]) -> Tupl
 class Bucket:
     name: str
     unit: str  # "kg" or "l"
-    median_unit_price: float  # EUR per unit
+    median_unit_price: float  # USD per unit
     sigma: float  # lognormal sigma
     default_qty_g: Optional[float] = None
     default_qty_ml: Optional[float] = None
@@ -133,7 +133,7 @@ class PricingConfig:
 
 def load_pricing_config(path: Path) -> PricingConfig:
     obj = json.loads(path.read_text(encoding="utf-8"))
-    currency = obj.get("currency", "EUR")
+    currency = obj.get("currency", "USD")
     endings = tuple(float(x) for x in obj.get("rounding_endings", [0.99, 0.49, 0.29]))
     min_price = float(obj.get("min_price", 0.49))
     max_price = float(obj.get("max_price", 99.99))
@@ -222,14 +222,14 @@ def _lognormal_with_median(rng: random.Random, median: float, sigma: float) -> f
 
 def _apply_retail_rounding(price: float, endings: tuple[float, ...]) -> float:
     """
-    Round down to nearest retail-ish ending within the current euro.
+    Round down to nearest retail-ish ending within the current dollar.
     Uses endings like .99, .49, .29, etc.
     """
     if price <= 0:
         return 0.0
 
-    euros = math.floor(price)
-    cents = price - euros
+    dollars = math.floor(price)
+    cents = price - dollars
 
     endings_sorted = sorted(endings)
     chosen = None
@@ -237,10 +237,10 @@ def _apply_retail_rounding(price: float, endings: tuple[float, ...]) -> float:
         if e <= cents + 1e-9:
             chosen = e
     if chosen is None:
-        euros = max(0, euros - 1)
+        dollars = max(0, dollars - 1)
         chosen = endings_sorted[-1]
 
-    return round(euros + chosen, 2)
+    return round(dollars + chosen, 2)
 
 
 def estimate_price(
@@ -296,7 +296,7 @@ def estimate_price(
     # Deterministic RNG: tie to gtin + bucket + qty_debug
     rng = _seeded_rng(gtin, bucket.name, qty_debug)
 
-    # Sample unit price (EUR per kg or per L)
+    # Sample unit price (USD per kg or per L)
     unit_price = _lognormal_with_median(rng, bucket.median_unit_price, bucket.sigma)
 
     # Economy of scale:
