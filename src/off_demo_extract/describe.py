@@ -1,3 +1,28 @@
+"""
+describe.py
+
+Algorithmic (non-LLM) description generation for demo catalogs.
+
+Goal:
+- Produce short, readable product descriptions that are suitable for e-commerce demos,
+  without making unsupported claims and without requiring an LLM at runtime.
+
+Approach:
+- Category-aware phrase templates (optionally loaded from config/phrase_bank.json).
+- Deterministic variation (seeded by GTIN) so results are stable across runs.
+- Lightweight keyword extraction from title/ingredients to add “Notes” terms that help
+  simple matching and make descriptions less repetitive.
+
+Behavior:
+- If config/phrase_bank.json is present, it is used as the primary phrase source.
+- If it is missing (or a bucket is missing), built-in defaults are used as fallback.
+- Ingredients/attribute text is used only as a fallback when a usable description
+  cannot otherwise be generated.
+
+This module is intentionally conservative: phrases should be generic, category-appropriate,
+and avoid health/quality claims (“premium”, “healthy”, “authentic”, etc.).
+"""
+
 from __future__ import annotations
 
 import hashlib
@@ -10,6 +35,52 @@ from typing import Any, Dict, Iterable, Optional
 
 _WORD_RE = re.compile(r"[A-Za-z][A-Za-z\-']{2,}")
 _SPACE_RE = re.compile(r"\s+")
+
+_END_PUNCT = (".", "!", "?")
+
+
+def _collapse_spaces(s: str) -> str:
+    return _SPACE_RE.sub(" ", s).strip()
+
+
+def _finalize_sentence(s: str) -> str:
+    """
+    Ensure exactly one sentence-ending punctuation mark.
+    """
+    s = _collapse_spaces(s)
+    if not s:
+        return s
+    if s.endswith(_END_PUNCT):
+        # Avoid things like "Inc.." by collapsing multiple dots
+        while s.endswith(".."):
+            s = s[:-1]
+        return s
+    return s + "."
+
+
+def _improve_phrase_grammar(s: str) -> str:
+    """
+    Make generic phrases read more naturally by adding a relative clause
+    before certain verb phrases.
+
+    Examples:
+      "A cooking staple is suitable for ..." -> "A cooking staple that is suitable for ..."
+      "A pantry staple can be used for ..." -> "A pantry staple that can be used for ..."
+      "A product option fits well for ..." -> "A product option that fits well for ..."
+    """
+    # Only adjust the first matching verb phrase to avoid over-editing
+    fixes = [
+        " is suitable ",
+        " is useful ",
+        " is convenient ",
+        " is intended ",
+        " can be used ",
+        " fits well ",
+    ]
+    for f in fixes:
+        if f in s:
+            return s.replace(f, " that" + f, 1)
+    return s
 
 STOPWORDS = {
     "and", "or", "the", "a", "an", "with", "without", "from", "of", "to", "in", "on",
@@ -244,12 +315,16 @@ def generate_description(
         phrase_bank = {**DEFAULT_PHRASES, **ext}
 
     # Sentence 1: title + brand (if present)
-    brand_part = f" by {brand.strip()}" if brand.strip() else ""
-    s1 = f"{title.strip()}{brand_part}."
+    title_clean = _collapse_spaces(title)
+    brand_clean = _collapse_spaces(brand)
+
+    brand_part = f" by {brand_clean}" if brand_clean else ""
+    s1 = _finalize_sentence(f"{title_clean}{brand_part}")
 
     # Sentence 2: category-based usage sentence (deterministic pick)
-    candidates = phrase_bank.get(bucket) or phrase_bank["default"]
-    s2 = rng.choice(candidates)
+    candidates = phrase_bank.get(bucket) or phrase_bank.get("default") or ["A product option for everyday use."]
+    phrase = rng.choice(candidates)
+    s2 = _finalize_sentence(_improve_phrase_grammar(phrase))
 
     # Optional: tags from ingredients/title for flavor/profile line
     tags: list[str] = []
@@ -267,7 +342,7 @@ def generate_description(
     extra_sentences: list[str] = []
 
     if tags:
-        extra_sentences.append("Notes: " + ", ".join(tags[: cfg.max_tags]) + ".")
+        extra_sentences.append("Notes include: " + ", ".join(tags[: cfg.max_tags]) + ".")
 
     # Dietary: keep factual language
     if dietary_restrictions:

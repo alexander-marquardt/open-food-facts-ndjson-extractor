@@ -535,7 +535,7 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
     phrase_bank_path = root / "config" / "phrase_bank.json"
     describe_cfg = DescribeConfig(
         phrase_bank_path=phrase_bank_path if phrase_bank_path.exists() else None,
-        max_phrases=2,
+        max_phrases=4,
         max_tags=4,
     )
 
