@@ -15,6 +15,9 @@ from off_demo_extract.pricing import load_pricing_config, estimate_price
 
 IMAGE_BASE = "https://images.openfoodfacts.org/images/products"
 
+# Values we should treat as "not meaningful" and avoid emitting in attrs/description.
+_UNDEFINED_LIKE = {"undefined", "unknown", "null", "none", "n/a", "na", ""}
+
 
 # ----------------------------
 # Repo / IO helpers
@@ -43,6 +46,45 @@ def open_maybe_gzip(path: Path, encoding: str = "utf-8") -> TextIO:
     if path.suffix == ".gz":
         return io.TextIOWrapper(gzip.open(path, "rb"), encoding=encoding, errors="replace")
     return path.open("r", encoding=encoding, errors="replace")
+
+
+# ----------------------------
+# Text normalization helpers
+# ----------------------------
+
+def _is_undefined_like(value: Optional[str]) -> bool:
+    if value is None:
+        return True
+    v = value.strip().lower()
+    return v in _UNDEFINED_LIKE
+
+
+def _is_mostly_uppercase(s: str, threshold: float = 0.80) -> bool:
+    """
+    Heuristic: return True when the text is overwhelmingly uppercase letters.
+    We only use this to "de-shout" ingredients/description/title that come through
+    in all-caps from OFF.
+    """
+    letters = [ch for ch in s if ch.isalpha()]
+    if not letters:
+        return False
+    upper = sum(1 for ch in letters if ch.isupper())
+    return (upper / len(letters)) >= threshold
+
+
+def _deshout_text(s: str) -> str:
+    """
+    Convert shouty ALL CAPS text to a more natural sentence case.
+    Conservative: only applied when _is_mostly_uppercase() is True.
+    """
+    if not s:
+        return s
+    if not _is_mostly_uppercase(s):
+        return s.strip()
+
+    lowered = s.strip().lower()
+    # Sentence-case: capitalize only the first character if present.
+    return lowered[:1].upper() + lowered[1:]
 
 
 # ----------------------------
@@ -153,13 +195,13 @@ def compute_image_url(
 def get_english_title(product: Dict[str, Any]) -> Optional[str]:
     t = product.get("product_name_en")
     if isinstance(t, str) and t.strip():
-        return t.strip()
+        return _deshout_text(t)
 
     lang = product.get("lang") or product.get("lc")
     if lang == "en":
         t2 = product.get("product_name")
         if isinstance(t2, str) and t2.strip():
-            return t2.strip()
+            return _deshout_text(t2)
 
     return None
 
@@ -168,14 +210,14 @@ def get_english_description(product: Dict[str, Any], max_len: int = 600) -> Opti
     for k in ("generic_name_en", "ingredients_text_en"):
         v = product.get(k)
         if isinstance(v, str) and v.strip():
-            return v.strip()[:max_len]
+            return _deshout_text(v.strip()[:max_len])
 
     lang = product.get("lang") or product.get("lc")
     if lang == "en":
         for k in ("generic_name", "ingredients_text"):
             v = product.get(k)
             if isinstance(v, str) and v.strip():
-                return v.strip()[:max_len]
+                return _deshout_text(v.strip()[:max_len])
 
     return None
 
@@ -222,6 +264,9 @@ def build_categories_list(primary_tag: Optional[str], tags_filtered: list[str], 
 
     def add(tag: str) -> None:
         label = prettify_category(tag)
+        # Suppress "Undefined"/"Unknown"/etc from appearing as categories.
+        if _is_undefined_like(label):
+            return
         if label not in seen:
             seen.add(label)
             out.append(label)
@@ -324,6 +369,7 @@ def build_attrs(
     qty = get_first_str(product, "quantity")
     if qty:
         attrs["Quantity"] = qty
+
     serving = get_first_str(product, "serving_size")
     if serving:
         attrs["Serving size"] = serving
@@ -356,10 +402,13 @@ def build_attrs(
     if countries:
         attrs["Countries"] = countries
 
-    if primary_category_label:
+    # Category: suppress undefined-like values.
+    if primary_category_label and not _is_undefined_like(primary_category_label):
         attrs["Category"] = primary_category_label
     elif primary_category_tag:
-        attrs["Category"] = prettify_category(primary_category_tag)
+        cat = prettify_category(primary_category_tag)
+        if not _is_undefined_like(cat):
+            attrs["Category"] = cat
 
     nutriments = product.get("nutriments")
     if isinstance(nutriments, dict):
@@ -388,9 +437,7 @@ def build_attrs(
     return attrs
 
 
-def build_description(title: str, desc: str, attrs: Dict[str, str]) -> str:
-    lines = [title, "", desc.strip()]
-
+def build_description(title: str, desc: str, attrs: Dict[str, str], *, single_line: bool = True) -> str:
     preferred_keys = [
         "Category", "Quantity", "Serving size", "Nutri-Score", "NOVA group", "Eco-Score",
         "Dietary restrictions",
@@ -399,16 +446,34 @@ def build_description(title: str, desc: str, attrs: Dict[str, str]) -> str:
         "Sugars (g/100g)", "Salt (g/100g)", "Protein (g/100g)", "Fiber (g/100g)",
         "Countries"
     ]
-    spec_lines = []
+
+    specs: list[str] = []
     for k in preferred_keys:
         v = attrs.get(k)
-        if v:
-            spec_lines.append(f"- **{k}**: {v}")
+        if not v:
+            continue
+        if _is_undefined_like(v):
+            continue
+        specs.append(f"{k}: {v}")
 
-    if spec_lines:
-        lines += ["", "", "Key Specifications:"]
-        lines += spec_lines
+    t = title.strip()
+    d = desc.strip()
 
+    # Avoid double periods ("Title..")
+    if t.endswith("."):
+        base = f"{t} {d}".strip()
+    else:
+        base = f"{t}. {d}".strip()
+
+    if not specs:
+        return base
+
+    if single_line:
+        return f"{base} Key specifications: " + "; ".join(specs)
+
+    # Multiline (plain text, no markdown)
+    lines = [t, "", d, "", "Key specifications:"]
+    lines += [f"- {s}" for s in specs]
     return "\n".join(lines)
 
 
@@ -479,7 +544,9 @@ def build_parser(
     p.add_argument("--require-front-lang", default="")
 
     p.add_argument("--require-category", action="store_true")
-    p.add_argument("--category-exclude", default="en:null,en:unknown")
+
+    # Include en:undefined by default so "Undefined" does not become the primary category.
+    p.add_argument("--category-exclude", default="en:null,en:unknown,en:undefined")
 
     p.add_argument("--pricing-config", type=Path, default=default_pricing, help="Path to pricing_buckets.json")
 
@@ -631,7 +698,7 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
             attrs["Estimated unit price"] = unit_debug
 
             attr_keys = sorted(attrs.keys())
-            description = build_description(title=title, desc=desc, attrs=attrs)
+            description = build_description(title=title, desc=desc, attrs=attrs, single_line=True)
 
             doc = {
                 "id": pad_gtin13(code),
