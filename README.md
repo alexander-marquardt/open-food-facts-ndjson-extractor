@@ -93,9 +93,9 @@ The output is a clean, flat JSON object, ready to be indexed into a search engin
   "id": "0008127000019",
   "title": "Extra virgin olive oil",
   "brand": "Athena Imports",
-  "description": "Extra virgin olive oil\n\nExtra virgin olive oil\n\n\nKey Specifications:\n- **Category**: Plant based foods and beverages\n- **Serving size**: 15 ml\n- **Nutri-Score**: B\n- **NOVA group**: 2\n- **Eco-Score**: E\n- **Dietary restrictions**: vegan, vegetarian\n- **Ingredients analysis**: palm-oil-free, vegan, vegetarian\n- **Energy (kcal/100g)**: 800 kcal\n- **Fat (g/100g)**: 93.3 g\n- **Saturated fat (g/100g)**: 13.3 g\n- **Sugars (g/100g)**: 0 g\n- **Salt (g/100g)**: 0 g\n- **Protein (g/100g)**: 0 g\n- **Countries**: United States",
+  "description": "Extra virgin olive oil. Extra virgin olive oil Key specifications: Category: Plant based foods and beverages; Serving size: 15 ml; Nutri-Score: B; NOVA group: 2; Eco-Score: E; Dietary restrictions: vegan, vegetarian; Ingredients analysis: palm-oil-free, vegan, vegetarian; Energy (kcal/100g): 800 kcal; Fat (g/100g): 93.3 g; Saturated fat (g/100g): 13.3 g; Sugars (g/100g): 0 g; Salt (g/100g): 0 g; Protein (g/100g): 0 g; Countries: United States",
   "image_url": "https://images.openfoodfacts.org/images/products/000/812/700/0019/front_en.5.400.jpg",
-  "price": 2.49,
+  "price": 14.29,
   "currency": "USD",
   "categories": [
     "Plant based foods and beverages",

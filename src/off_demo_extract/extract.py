@@ -691,6 +691,7 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
                 labels_tags=labels_tags,
                 brand=brand,
                 config=pricing_cfg,
+                title=title, 
             )
 
             attrs["Price source"] = "estimated_unit_model"

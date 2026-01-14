@@ -7,7 +7,7 @@ import random
 import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Iterable, Optional, Tuple
+from typing import Iterable, Optional, Tuple
 
 
 # ----------------------------
@@ -59,20 +59,8 @@ def _unit_to_ml(num: float, unit: str) -> Optional[float]:
     return None
 
 
-def parse_quantity(quantity: Optional[str], serving_size: Optional[str]) -> Tuple[Optional[float], Optional[float], Optional[int]]:
-    """
-    Return (weight_g, volume_ml, count) when parseable.
-
-    Supports:
-      - "3 oz", "946 ml", "0.75 oz (22 g)"
-      - "6 x 330 ml", "12x250ml"
-    """
-    candidates = []
-    for s in (quantity, serving_size):
-        if isinstance(s, str) and s.strip():
-            candidates.append(s)
-
-    text = " | ".join(candidates)
+def _parse_text_for_qty(text: str) -> Tuple[Optional[float], Optional[float], Optional[int]]:
+    text = (text or "").strip()
     if not text:
         return (None, None, None)
 
@@ -89,7 +77,6 @@ def parse_quantity(quantity: Optional[str], serving_size: Optional[str]) -> Tupl
         if ml is not None:
             return (None, ml * count, count)
 
-    # Scan all unit expressions and pick a reasonable max (often the pack size).
     grams = []
     mls = []
     for mm in _QTY_RE.finditer(text):
@@ -105,6 +92,25 @@ def parse_quantity(quantity: Optional[str], serving_size: Optional[str]) -> Tupl
     weight_g = max(grams) if grams else None
     volume_ml = max(mls) if mls else None
     return (weight_g, volume_ml, None)
+
+
+def parse_quantity(
+    quantity: Optional[str],
+    serving_size: Optional[str],
+) -> Tuple[Optional[float], Optional[float], Optional[int], str]:
+    """
+    Return (weight_g, volume_ml, count, source)
+
+    Pricing MUST be driven by OFF 'quantity' (package size) only.
+    Serving size is not package size; treat it as 'none' for pricing/debug.
+    """
+    if isinstance(quantity, str) and quantity.strip():
+        g, ml, count = _parse_text_for_qty(quantity)
+        if g is not None or ml is not None or count is not None:
+            return (g, ml, count, "quantity")
+
+    # Explicitly ignore serving_size as a package size proxy.
+    return (None, None, None, "none")
 
 
 # ----------------------------
@@ -153,7 +159,9 @@ def load_pricing_config(path: Path) -> PricingConfig:
         )
 
     if "default" not in buckets:
-        buckets["default"] = Bucket(name="default", unit="kg", median_unit_price=10.0, sigma=0.55, default_qty_g=250, default_qty_ml=500)
+        buckets["default"] = Bucket(
+            name="default", unit="kg", median_unit_price=10.0, sigma=0.55, default_qty_g=250, default_qty_ml=500
+        )
 
     return PricingConfig(
         currency=currency,
@@ -165,12 +173,18 @@ def load_pricing_config(path: Path) -> PricingConfig:
     )
 
 
-def bucket_from_categories(primary_category: str, categories: Iterable[str]) -> str:
+def bucket_from_categories(primary_category: str, categories: Iterable[str], title: Optional[str] = None) -> str:
     """
-    Heuristic mapping from your humanized OFF categories to pricing buckets.
-    Tune as needed.
+    Heuristic mapping to pricing buckets.
+
+    IMPORTANT CHANGE:
+    - Include title (product_name) in the classifier so items like "Extra virgin olive oil..."
+      reliably map to olive_oil even when OFF categories are broad.
     """
-    hay = " | ".join([primary_category, *categories]).lower()
+    parts = [primary_category, *categories]
+    if isinstance(title, str) and title.strip():
+        parts.append(title)
+    hay = " | ".join(parts).lower()
 
     if any(k in hay for k in ["snack", "confection", "candy", "chocolate", "sweet", "biscuit", "cookie", "gummies"]):
         return "snacks_sweets"
@@ -178,7 +192,11 @@ def bucket_from_categories(primary_category: str, categories: Iterable[str]) -> 
     if any(k in hay for k in ["condiment", "sauce", "vinegar", "dressing", "marinade", "ketchup", "mustard"]):
         return "condiments_sauces"
 
-    if any(k in hay for k in ["oil", "olive oil", "sesame oil", "fat"]):
+    # EVOO / olive oil must be checked BEFORE generic oils_fats
+    if "olive oil" in hay or ("extra virgin" in hay and "olive" in hay):
+        return "olive_oil"
+
+    if any(k in hay for k in ["oil", "sesame oil", "fat"]):
         return "oils_fats"
 
     if any(k in hay for k in ["sweetener", "syrup", "maple", "honey"]):
@@ -215,16 +233,11 @@ def _seeded_rng(*parts: str) -> random.Random:
 
 
 def _lognormal_with_median(rng: random.Random, median: float, sigma: float) -> float:
-    # lognormal: exp(N(mu, sigma)), median = exp(mu) => mu = ln(median)
     mu = math.log(max(median, 1e-9))
     return math.exp(rng.gauss(mu, sigma))
 
 
 def _apply_retail_rounding(price: float, endings: tuple[float, ...]) -> float:
-    """
-    Round down to nearest retail-ish ending within the current dollar.
-    Uses endings like .99, .49, .29, etc.
-    """
     if price <= 0:
         return 0.0
 
@@ -253,98 +266,75 @@ def estimate_price(
     labels_tags: Optional[list[str]],
     brand: Optional[str],
     config: PricingConfig,
+    title: Optional[str] = None,  # NEW (safe default)
 ) -> Tuple[float, str, str]:
+    
     """
     Returns (price, bucket_name, unit_price_debug_string).
-
-    Price is deterministic for a given (gtin, bucket, quantity-ish).
     """
-    bucket_name = bucket_from_categories(primary_category, categories)
+    bucket_name = bucket_from_categories(primary_category, categories, title=title)
     bucket = config.buckets.get(bucket_name, config.buckets["default"])
 
-    # Parse sizes
-    weight_g, volume_ml, _count = parse_quantity(quantity, serving_size)
+    weight_g, volume_ml, _count, qty_source = parse_quantity(quantity, serving_size)
 
-    # Determine quantity in bucket unit
-    qty_in_unit: Optional[float] = None
-    qty_debug = ""
+    def _default_qty_for_bucket() -> Tuple[float, str]:
+        if bucket.unit == "kg":
+            if bucket.default_qty_g is not None:
+                return (bucket.default_qty_g / 1000.0, f"default {bucket.default_qty_g:.0f}g")
+            return (0.25, "fallback 250g")
+        if bucket.unit == "l":
+            if bucket.default_qty_ml is not None:
+                return (bucket.default_qty_ml / 1000.0, f"default {bucket.default_qty_ml:.0f}ml")
+            return (0.5, "fallback 500ml")
+        return (1.0, "fallback unit")
 
-    if bucket.unit == "kg":
-        if weight_g is not None:
-            qty_in_unit = weight_g / 1000.0
-            qty_debug = f"{weight_g:.0f}g"
-        elif bucket.default_qty_g is not None:
-            qty_in_unit = bucket.default_qty_g / 1000.0
-            qty_debug = f"default {bucket.default_qty_g:.0f}g"
-        else:
-            qty_in_unit = 0.25
-            qty_debug = "fallback 250g"
-    elif bucket.unit == "l":
-        if volume_ml is not None:
-            qty_in_unit = volume_ml / 1000.0
-            qty_debug = f"{volume_ml:.0f}ml"
-        elif bucket.default_qty_ml is not None:
-            qty_in_unit = bucket.default_qty_ml / 1000.0
-            qty_debug = f"default {bucket.default_qty_ml:.0f}ml"
-        else:
-            qty_in_unit = 0.5
-            qty_debug = "fallback 500ml"
+    if bucket.unit == "kg" and qty_source == "quantity" and weight_g is not None:
+        qty_in_unit = weight_g / 1000.0
+        qty_debug = f"{weight_g:.0f}g"
+    elif bucket.unit == "l" and qty_source == "quantity" and volume_ml is not None:
+        qty_in_unit = volume_ml / 1000.0
+        qty_debug = f"{volume_ml:.0f}ml"
     else:
-        qty_in_unit = 1.0
-        qty_debug = "fallback unit"
+        qty_in_unit, qty_debug = _default_qty_for_bucket()
+        qty_debug = f"{qty_debug} (no package qty)"
 
-    # Deterministic RNG: tie to gtin + bucket + qty_debug
     rng = _seeded_rng(gtin, bucket.name, qty_debug)
 
-    # Sample unit price (USD per kg or per L)
     unit_price = _lognormal_with_median(rng, bucket.median_unit_price, bucket.sigma)
 
-    # Economy of scale:
-    # - larger packs: meaningfully cheaper per unit
-    # - smaller packs: modestly more expensive per unit
-    # Keep neutral if quantity was a bucket default (we don't want fake pack-size effects).
+    # OPTIONAL: prevent absurdly low EVOO pricing (keeps tails realistic for demos)
+    if bucket.name == "olive_oil":
+        unit_price = max(unit_price, 0.60 * bucket.median_unit_price)
+
+    # Economy of scale only when quantity is explicit
     scale_debug = ""
-    if "default" not in qty_debug:
-        ref = 0.25 if bucket.unit == "kg" else 0.5  # 250g or 500ml reference
-        ratio = qty_in_unit / ref
+    if qty_source == "quantity":
+        ref = 0.25 if bucket.unit == "kg" else 0.5
+        ratio = max(0.15, min(10.0, qty_in_unit / ref))
 
-        # Clamp ratio range to avoid extreme effects on very large/small packs
-        ratio = max(0.15, min(10.0, ratio))
+        alpha_large = 0.22
+        alpha_small = 0.10
 
-        alpha_large = 0.22  # stronger discount for bulk
-        alpha_small = 0.10  # mild premium for small packs
-
-        if ratio >= 1.0:
-            scale = ratio ** (-alpha_large)
-        else:
-            scale = ratio ** (-alpha_small)
-
-        # Clamp final multiplier so the per-unit discount/premium stays plausible
+        scale = ratio ** (-alpha_large) if ratio >= 1.0 else ratio ** (-alpha_small)
         scale = max(0.55, min(1.35, scale))
         unit_price *= scale
         scale_debug = f", scale={scale:.2f}, ratio={ratio:.2f}"
 
-    # Apply label premiums
     mult = 1.0
     if labels_tags:
         for t in labels_tags:
             if t in config.premium_multipliers:
                 mult *= config.premium_multipliers[t]
 
-    # Brand presence: slight premium for branded items
-    if brand and brand.strip():
-        mult *= 1.05
-    else:
-        mult *= 0.97
-
+    mult *= 1.05 if (brand and brand.strip()) else 0.97
     unit_price *= mult
 
-    # Pack price
     price = unit_price * qty_in_unit
-
-    # Clamp and round
     price = max(config.min_price, min(config.max_price, price))
     price = _apply_retail_rounding(price, config.rounding_endings)
 
-    unit_debug = f"{unit_price:.2f} {config.currency}/{bucket.unit} ({qty_debug}, bucket={bucket.name}{scale_debug})"
+    unit_debug = (
+        f"{unit_price:.2f} {config.currency}/{bucket.unit} "
+        f"({qty_debug}, source={qty_source}, bucket={bucket.name}{scale_debug})"
+    )
     return price, bucket.name, unit_debug
