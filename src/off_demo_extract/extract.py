@@ -17,6 +17,7 @@ IMAGE_BASE = "https://images.openfoodfacts.org/images/products"
 
 # Values we should treat as "not meaningful" and avoid emitting in attrs/description.
 _UNDEFINED_LIKE = {"undefined", "unknown", "null", "none", "n/a", "na", ""}
+MAX_NUM_CATEGORIES = 20
 
 
 # ----------------------------
@@ -258,7 +259,7 @@ def prettify_category(tag: str) -> str:
     return t[0].upper() + t[1:]
 
 
-def build_categories_list(primary_tag: Optional[str], tags_filtered: list[str], max_n: int = 3) -> list[str]:
+def build_categories_list(primary_tag: Optional[str], tags_filtered: list[str], max_n: int = MAX_NUM_CATEGORIES) -> list[str]:
     seen: Set[str] = set()
     out: list[str] = []
 
@@ -668,7 +669,7 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
                 c.missing_category += 1
                 continue
 
-            categories = build_categories_list(primary_tag, tags_filtered, max_n=3)
+            categories = build_categories_list(primary_tag, tags_filtered, max_n=MAX_NUM_CATEGORIES)
             primary_category_label = categories[0] if categories else None
 
             attrs = build_attrs(product, primary_category_tag=primary_tag, primary_category_label=primary_category_label)
