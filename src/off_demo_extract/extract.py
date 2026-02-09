@@ -190,16 +190,16 @@ def compute_image_url(
 
 
 # ----------------------------
-# English-only fields
+# Language-filtered fields
 # ----------------------------
 
-def get_english_title(product: Dict[str, Any]) -> Optional[str]:
-    t = product.get("product_name_en")
+def get_title(product: Dict[str, Any], lang: str = "en") -> Optional[str]:
+    t = product.get(f"product_name_{lang}")
     if isinstance(t, str) and t.strip():
         return _deshout_text(t)
 
-    lang = product.get("lang") or product.get("lc")
-    if lang == "en":
+    prod_lang = product.get("lang") or product.get("lc")
+    if prod_lang == lang:
         t2 = product.get("product_name")
         if isinstance(t2, str) and t2.strip():
             return _deshout_text(t2)
@@ -207,14 +207,14 @@ def get_english_title(product: Dict[str, Any]) -> Optional[str]:
     return None
 
 
-def get_english_description(product: Dict[str, Any], max_len: int = 600) -> Optional[str]:
-    for k in ("generic_name_en", "ingredients_text_en"):
+def get_description(product: Dict[str, Any], lang: str = "en", max_len: int = 600) -> Optional[str]:
+    for k in (f"generic_name_{lang}", f"ingredients_text_{lang}"):
         v = product.get(k)
         if isinstance(v, str) and v.strip():
             return _deshout_text(v.strip()[:max_len])
 
-    lang = product.get("lang") or product.get("lc")
-    if lang == "en":
+    prod_lang = product.get("lang") or product.get("lc")
+    if prod_lang == lang:
         for k in ("generic_name", "ingredients_text"):
             v = product.get(k)
             if isinstance(v, str) and v.strip():
@@ -502,8 +502,8 @@ class Counters:
     written: int = 0
     bad_json: int = 0
     missing_code: int = 0
-    missing_title_en: int = 0
-    missing_desc_en: int = 0
+    missing_title: int = 0
+    missing_desc: int = 0
     missing_image: int = 0
     missing_category: int = 0
 
@@ -519,7 +519,7 @@ def _progress_line(c: Counters, elapsed_s: float) -> str:
         f"Elapsed {elapsed_s:,.1f}s | "
         f"Read {_fmt_int(c.read)} ({rps:,.0f}/s) | "
         f"Wrote {_fmt_int(c.written)} ({wps:,.0f}/s) | "
-        f"Skipped: title {_fmt_int(c.missing_title_en)}, desc {_fmt_int(c.missing_desc_en)}, "
+        f"Skipped: title {_fmt_int(c.missing_title)}, desc {_fmt_int(c.missing_desc)}, "
         f"image {_fmt_int(c.missing_image)}, cat {_fmt_int(c.missing_category)}"
     )
 
@@ -541,8 +541,7 @@ def build_parser(
     p.add_argument("--output", type=Path, default=default_output)
     p.add_argument("--report", type=Path, default=default_report)
 
-    p.add_argument("--prefer-lang", default="en")
-    p.add_argument("--require-front-lang", default="")
+    p.add_argument("--lang", default="en", help="Language code for titles, descriptions, and front images (e.g. en, fr, de).")
 
     p.add_argument("--require-category", action="store_true")
 
@@ -617,15 +616,14 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
     t0 = time.time()
     last_progress_t = t0
 
-    req_front_lang = args.require_front_lang.strip() or None
+    lang = args.lang.strip()
     cat_exclude = {x.strip() for x in args.category_exclude.split(",") if x.strip()}
 
     log(f"Input:          {args.input}")
     log(f"Output:         {args.output}")
     log(f"Report:         {args.report}")
     log(f"Pricing config: {args.pricing_config}")
-    if req_front_lang:
-        log(f"Images: require front_{req_front_lang}")
+    log(f"Language:       {lang}")
     if args.require_category:
         log(f"Categories: require real category (exclude={sorted(cat_exclude)})")
     log("Starting extraction...")
@@ -646,17 +644,17 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
                 c.missing_code += 1
                 continue
 
-            title = get_english_title(product)
+            title = get_title(product, lang)
             if not title:
-                c.missing_title_en += 1
+                c.missing_title += 1
                 continue
 
-            desc = get_english_description(product)
+            desc = get_description(product, lang)
             if not desc:
-                c.missing_desc_en += 1
+                c.missing_desc += 1
                 continue
 
-            image_url = compute_image_url(product, prefer_lang=args.prefer_lang, require_front_lang=req_front_lang)
+            image_url = compute_image_url(product, require_front_lang=lang)
             if not image_url:
                 c.missing_image += 1
                 continue
@@ -747,9 +745,10 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
         "elapsed_seconds": elapsed,
         "counters": c.__dict__,
         "filters": {
-            "english_title": "product_name_en OR (lang==en AND product_name)",
-            "english_description": "generic_name_en OR ingredients_text_en OR (lang==en AND generic_name/ingredients_text)",
-            "image": f"computed from images/front_{req_front_lang} + rev/imgid" if req_front_lang else "computed from images/front_* + rev/imgid",
+            "lang": lang,
+            "title": f"product_name_{lang} OR (lang=={lang} AND product_name)",
+            "description": f"generic_name_{lang} OR ingredients_text_{lang} OR (lang=={lang} AND generic_name/ingredients_text)",
+            "image": f"computed from images/front_{lang} + rev/imgid",
             "category": "required" if args.require_category else "optional",
             "price": "category baseline unit model + deterministic noise + label premiums + retail rounding",
             "dietary_restrictions": "keyword list derived from labels_tags and ingredients_analysis_tags (positive-only)",
