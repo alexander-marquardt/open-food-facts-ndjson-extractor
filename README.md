@@ -149,9 +149,9 @@ The output is a clean, flat JSON object, ready to be indexed into a search engin
 
 ## Clean data definition
 
-- English title: `product_name_en` OR (`lang == en` AND `product_name`)
-- English description: `generic_name_en` OR `ingredients_text_en` OR (`lang == en` AND `generic_name`/`ingredients_text`)
-- A front image in English: `images.front_en` (via `--require-front-lang en`)
+- Title in target language: `product_name_{lang}` OR (`lang == {lang}` AND `product_name`) — controlled by `--lang`
+- Description in target language: `generic_name_{lang}` OR `ingredients_text_{lang}` OR (`lang == {lang}` AND `generic_name`/`ingredients_text`)
+- A front image matching the target language: `images.front_{lang}`
 - If `--require-category` is enabled: at least one meaningful category (placeholder/empty categories excluded)
 - Synthetic deterministic price (see Price Estimation)
 
@@ -197,7 +197,7 @@ Create and run a small sample (recommended first step):
 
 ```bash
 uv run -m off_demo_extract.extract \
-  --require-front-lang en \
+  --lang en \
   --require-category \
   --output data/products/sample_2k_front_en.ndjson \
   --report data/products/sample_2k_front_en_report.json \
@@ -211,7 +211,7 @@ Run full extraction (no arbitrary cutoff; reads to EOF):
 
 ```bash
 uv run -m off_demo_extract.extract \
-  --require-front-lang en \
+  --lang en \
   --require-category \
   --output data/products/off_en_clean_categorized.ndjson \
   --report data/products/report_categorized.json \
