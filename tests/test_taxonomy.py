@@ -44,6 +44,25 @@ TAXONOMY = {
 EXCLUDE = {"en:null", "en:unknown", "en:undefined"}
 
 
+def test_chain_steps_are_real_parent_child_edges() -> None:
+    """Every adjacent pair in the emitted chain is a real taxonomy parent→child
+    edge, so the breadcrumb order always matches the category tree (e.g. Oranges
+    can never appear above Citrus). Guaranteed by construction; asserted here so
+    a future change to the walk can't silently break the ordering."""
+    tags = ["en:beverages", "en:hot-beverages", "en:teas", "en:tea-bags"]
+    chain = category_chain(tags, TAXONOMY, EXCLUDE, keep_prefixes={"en"})
+    assert len(chain) >= 2
+    for parent, child in zip(chain, chain[1:]):
+        assert parent in TAXONOMY[child]["parents"], (
+            f"{child!r} is not a taxonomy child of {parent!r}: "
+            "the path order does not match the tree"
+        )
+    # The cumulative display path preserves that same root→leaf order.
+    path = build_category_path(tags, TAXONOMY, EXCLUDE, "en")
+    labels = [p.split("/")[-1] for p in path]
+    assert labels == [TAXONOMY[c]["name"]["en"] for c in chain]
+
+
 def test_single_clean_chain_from_dag() -> None:
     """A product's flat tag union collapses to ONE cumulative root→leaf path."""
     tags = [
