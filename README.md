@@ -21,7 +21,8 @@ This tool transforms raw, complex Open Food Facts data into a flattened, search-
 | `price` | float | Synthetic, deterministic price for e-commerce simulation. |
 | `currency` | string | Currency code (default: USD). |
 | `image_url` | string | Computed primary product image URL. |
-| `categories` | list | Cleaned list of category tags. |
+| `categories` | list | Cleaned, flat list of category tags (de-duplicated, prettified). |
+| `category_path` | list | **Hierarchical** category path — a single root→leaf chain as cumulative `/`-joined strings (e.g. `["Snacks", "Snacks/Salty snacks", "Snacks/Salty snacks/Crisps"]`), reconstructed from the Open Food Facts category taxonomy graph. Powers breadcrumb-style, drill-down category facets. |
 | `attrs` | object | **Flattened Dictionary** of key-value attributes (e.g., Nutri-Score, Energy). |
 | `attr_keys` | list | List of all keys available in `attrs` for faceting. |
 | `dietary_restrictions` | list | Extracted dietary tags (e.g., vegan, vegetarian). |
@@ -37,6 +38,7 @@ This script transforms the raw data into a clean, consistent, and search-ready f
 *   **Synthesizes a full description:** It combines the title, generic name, and key attributes into a comprehensive `description` field.
 *   **Generates a synthetic price:** It creates a deterministic, plausible price to enable e-commerce simulations.
 *   **Flattens the structure:** It extracts key attributes into a simple key-value `attrs` object.
+*   **Reconstructs a category hierarchy:** It resolves the product's categories against the Open Food Facts category taxonomy graph to emit a single clean root→leaf `category_path` (see [Category hierarchy](#category-hierarchy)).
 
 ### Before: Raw Open Food Facts Data Example
 
@@ -102,6 +104,13 @@ The output is a clean, flat JSON object, ready to be indexed into a search engin
     "Plant based foods",
     "Fats"
   ],
+  "category_path": [
+    "Plant-based foods and beverages",
+    "Plant-based foods and beverages/Fats",
+    "Plant-based foods and beverages/Fats/Vegetable fats",
+    "Plant-based foods and beverages/Fats/Vegetable fats/Olive oils",
+    "Plant-based foods and beverages/Fats/Vegetable fats/Olive oils/Extra-virgin olive oils"
+  ],
   "attrs": {
     "Serving size": "15 ml",
     "Nutri-Score": "B",
@@ -147,6 +156,49 @@ The output is a clean, flat JSON object, ready to be indexed into a search engin
 }
 ```
 
+## Category hierarchy
+
+Open Food Facts ships `categories_tags` (and an identical `categories_hierarchy`)
+on every product, but **those are not a single path** — they are the flattened
+*union of every ancestor category* drawn from the Open Food Facts category
+taxonomy, which is a directed acyclic graph (a category can have several
+parents). Naively joining the tags with `/` mixes parallel roots and sibling
+branches and yields a nonsense path.
+
+To produce a real tree — the same cumulative-path shape merchandising tools use
+for drill-down facets — the extractor loads the public OFF category taxonomy and
+walks a single canonical chain:
+
+1. Keep the product's tags that exist in the taxonomy (drops noise and
+   foreign-language-only nodes for the target language).
+2. Induce the subgraph of just that product's tags, so the result is faithful to
+   how the product is actually filed rather than to the global graph.
+3. Pick the most specific leaf and walk parents upward, choosing the chain that
+   reaches furthest toward a root.
+4. Emit cumulative `/`-joined path strings using the taxonomy's localized display
+   names.
+
+```text
+raw tags:   en:plant-based-foods-and-beverages, en:beverages, en:hot-beverages,
+            en:plant-based-beverages, en:teas, en:tea-bags        (a flat DAG union)
+
+category_path:
+  [ "Beverages",
+    "Beverages/Hot beverages",
+    "Beverages/Hot beverages/Teas" ]                              (one clean chain)
+```
+
+The flat `categories` list is still emitted (it drives pricing-bucket matching
+and the `attrs.Category` field); `category_path` is the additional hierarchical
+field.
+
+The taxonomy file is fetched once from
+[`https://static.openfoodfacts.org/data/taxonomies/categories.json`](https://static.openfoodfacts.org/data/taxonomies/categories.json)
+and cached at `data/taxonomy/categories.json`. Override its location with
+`--taxonomy <path>`, or skip hierarchy extraction entirely with `--no-taxonomy`
+(which emits an empty `category_path`). Display names follow `--lang`, so the
+French and Spanish personas get localized category labels.
+
 ## Clean data definition
 
 - Title in target language: `product_name_{lang}` OR (`lang == {lang}` AND `product_name`) — controlled by `--lang`
@@ -183,10 +235,16 @@ ecommerce-open-food-facts/
 ├── data/                  # All data lives here (ignored by git)
 │   ├── json_source/       # Raw OFF data dump
 │   │   └── openfoodfacts-products.jsonl.gz
+│   ├── taxonomy/          # Cached OFF category taxonomy (auto-downloaded)
+│   │   └── categories.json
 │   └── products/          # Processed NDJSON files (The "Output")
 ├── src/
 │   └── off_demo_extract/  # Python Package
-│       └── extract.py
+│       ├── extract.py     # Main extraction pipeline
+│       ├── taxonomy.py    # OFF taxonomy graph → hierarchical category_path
+│       └── pricing.py     # Synthetic price model
+├── tests/
+│   └── test_taxonomy.py   # Regression tests for the hierarchy builder
 ├── pyproject.toml         # Dependencies
 └── README.md
 ```
