@@ -10,7 +10,12 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, Iterable, Iterator, Optional, Set, TextIO
 
-from off_demo_extract.pricing import load_pricing_config, estimate_price
+from off_demo_extract.pricing import load_pricing_config, estimate_price, _seeded_rng
+from off_demo_extract.taxonomy import (
+    ensure_taxonomy,
+    load_taxonomy,
+    build_category_path,
+)
 
 
 IMAGE_BASE = "https://images.openfoodfacts.org/images/products"
@@ -319,6 +324,23 @@ def dietary_restrictions_from_off(product: Dict[str, Any]) -> list[str]:
 
 
 # ----------------------------
+# Margin & popularity (for function_score boosting)
+# ----------------------------
+
+def generate_margin_and_popularity(gtin: str) -> tuple[int, int]:
+    """Generate deterministic random margin (0-200) and popularity (0-10000).
+
+    These fields support Elasticsearch function_score queries using
+    field_value_factor with ln1p modifier, as described in the Elastic
+    blog on boosting by profit and popularity.
+    """
+    rng = _seeded_rng(gtin, "margin_popularity")
+    margin = rng.randint(0, 200)
+    popularity = rng.randint(0, 10000)
+    return margin, popularity
+
+
+# ----------------------------
 # Attributes extraction (OFF -> attrs)
 # ----------------------------
 
@@ -506,6 +528,7 @@ class Counters:
     missing_desc: int = 0
     missing_image: int = 0
     missing_category: int = 0
+    with_category_path: int = 0
 
 
 def _fmt_int(n: int) -> str:
@@ -550,6 +573,21 @@ def build_parser(
 
     p.add_argument("--pricing-config", type=Path, default=default_pricing, help="Path to pricing_buckets.json")
 
+    # Category taxonomy: drives the hierarchical ``category_path`` field. When the
+    # file is missing it is downloaded from the public Open Food Facts taxonomy.
+    p.add_argument(
+        "--taxonomy",
+        type=Path,
+        default=None,
+        help="Path to the Open Food Facts categories taxonomy JSON "
+        "(default: data/taxonomy/categories.json; downloaded if absent).",
+    )
+    p.add_argument(
+        "--no-taxonomy",
+        action="store_true",
+        help="Disable hierarchical category_path extraction (emit it empty).",
+    )
+
     # Debug/perf controls
     p.add_argument("--max-input-lines", type=int, default=0)
     p.add_argument("--max-output-records", type=int, default=0)
@@ -585,6 +623,7 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
     default_output = root / "data" / "products" / "off_common.ndjson"
     default_report = root / "data" / "products" / "report.json"
     default_pricing = root / "config" / "pricing_buckets.json"
+    default_taxonomy = root / "data" / "taxonomy" / "categories.json"
 
     args = build_parser(default_input, default_output, default_report, default_pricing).parse_args(
         list(argv) if argv is not None else None
@@ -608,6 +647,19 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
         return 2
 
     pricing_cfg = load_pricing_config(args.pricing_config)
+
+    taxonomy: Optional[Dict[str, Any]] = None
+    if not args.no_taxonomy:
+        taxonomy_path = args.taxonomy or default_taxonomy
+        try:
+            ensure_taxonomy(taxonomy_path, log=log)
+            taxonomy = load_taxonomy(taxonomy_path)
+            log(f"Category taxonomy: {len(taxonomy):,} nodes from {taxonomy_path}")
+        except Exception as exc:  # noqa: BLE001 — degrade gracefully, never abort the run
+            log(f"WARNING: could not load category taxonomy ({exc}); category_path will be empty.")
+            taxonomy = None
+    else:
+        log("Category taxonomy disabled (--no-taxonomy); category_path will be empty.")
 
     ensure_parent_dir(args.output)
     ensure_parent_dir(args.report)
@@ -670,6 +722,17 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
             categories = build_categories_list(primary_tag, tags_filtered, max_n=MAX_NUM_CATEGORIES)
             primary_category_label = categories[0] if categories else None
 
+            # Hierarchical, musgrave-style category path derived from the OFF
+            # taxonomy graph (a single clean root→leaf chain as cumulative path
+            # strings). The flat ``categories`` list above is still used for
+            # pricing-bucket matching and attrs; ``category_path`` is the field
+            # PRISM's hierarchical category facet renders.
+            category_path = (
+                build_category_path(tags_raw, taxonomy, cat_exclude, lang)
+                if taxonomy is not None
+                else []
+            )
+
             attrs = build_attrs(product, primary_category_tag=primary_tag, primary_category_label=primary_category_label)
 
             dietary_restrictions = dietary_restrictions_from_off(product)
@@ -697,22 +760,31 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
             attrs["Pricing bucket"] = bucket_name
             attrs["Estimated unit price"] = unit_debug
 
+            gtin = pad_gtin13(code)
+            margin, popularity = generate_margin_and_popularity(gtin)
+
             attr_keys = sorted(attrs.keys())
             description = build_description(title=title, desc=desc, attrs=attrs, single_line=True)
 
             doc = {
-                "id": pad_gtin13(code),
+                "id": gtin,
                 "title": title,
                 "brand": brand or "",
                 "description": description,
                 "image_url": image_url,
                 "price": price,
+                "margin": margin,
+                "popularity": popularity,
                 "currency": pricing_cfg.currency,
                 "categories": categories,
+                "category_path": category_path,
                 "attrs": attrs,
                 "attr_keys": attr_keys,
                 "dietary_restrictions": dietary_restrictions,
             }
+
+            if category_path:
+                c.with_category_path += 1
 
             out.write(json.dumps(doc, ensure_ascii=False) + "\n")
             c.written += 1
@@ -750,6 +822,12 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
             "description": f"generic_name_{lang} OR ingredients_text_{lang} OR (lang=={lang} AND generic_name/ingredients_text)",
             "image": f"computed from images/front_{lang} + rev/imgid",
             "category": "required" if args.require_category else "optional",
+            "category_path": (
+                "disabled"
+                if args.no_taxonomy
+                else f"hierarchical root->leaf path from OFF taxonomy "
+                f"(written for {c.with_category_path:,}/{c.written:,} records)"
+            ),
             "price": "category baseline unit model + deterministic noise + label premiums + retail rounding",
             "dietary_restrictions": "keyword list derived from labels_tags and ingredients_analysis_tags (positive-only)",
             "progress": f"every {args.progress_every} records and/or {args.progress_seconds}s",
