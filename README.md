@@ -199,12 +199,20 @@ and cached at `data/taxonomy/categories.json`. Override its location with
 (which emits an empty `category_path`). Display names follow `--lang`, so the
 French and Spanish personas get localized category labels.
 
+By default the extractor **drops products whose `category_path` cannot be
+reconstructed**, so the catalog is uniformly drill-down-faceted. This is a small
+tail — roughly 2–6% of otherwise-clean records in the EN/FR/ES full runs. Pass
+`--no-require-category-path` to keep those products with an empty `category_path`
+instead. The gate is automatically disabled when the taxonomy is unavailable
+(e.g. `--no-taxonomy`), since no product could resolve a path in that case.
+
 ## Clean data definition
 
 - Title in target language: `product_name_{lang}` OR (`lang == {lang}` AND `product_name`) — controlled by `--lang`
 - Description in target language: `generic_name_{lang}` OR `ingredients_text_{lang}` OR (`lang == {lang}` AND `generic_name`/`ingredients_text`)
 - A front image matching the target language: `images.front_{lang}`
 - If `--require-category` is enabled: at least one meaningful category (placeholder/empty categories excluded)
+- By default, a `category_path` that resolves against the OFF taxonomy — products whose hierarchy can't be reconstructed are excluded (disable with `--no-require-category-path`)
 - Synthetic deterministic price (see Price Estimation)
 
 ## A small sample of cleaned NDJSON files
