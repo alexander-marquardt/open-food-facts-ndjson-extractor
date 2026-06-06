@@ -195,16 +195,38 @@ field.
 The taxonomy file is fetched once from
 [`https://static.openfoodfacts.org/data/taxonomies/categories.json`](https://static.openfoodfacts.org/data/taxonomies/categories.json)
 and cached at `data/taxonomy/categories.json`. Override its location with
-`--taxonomy <path>`, or skip hierarchy extraction entirely with `--no-taxonomy`
-(which emits an empty `category_path`). Display names follow `--lang`, so the
-French and Spanish personas get localized category labels.
+`--taxonomy <path>`. Display names follow `--lang`, so the French and Spanish
+personas get localized category labels.
 
-By default the extractor **drops products whose `category_path` cannot be
-reconstructed**, so the catalog is uniformly drill-down-faceted. This is a small
-tail — roughly 2–6% of otherwise-clean records in the EN/FR/ES full runs. Pass
-`--no-require-category-path` to keep those products with an empty `category_path`
-instead. The gate is automatically disabled when the taxonomy is unavailable
-(e.g. `--no-taxonomy`), since no product could resolve a path in that case.
+### Category-hierarchy flags
+
+Two separate flags control the hierarchy. They are easy to confuse, so here is
+exactly what each does:
+
+- **`--no-taxonomy`** — turns the hierarchy feature *off entirely*. The extractor
+  does **not** load (or download) the taxonomy, and every product is written with
+  an empty `category_path` (`[]`). The flat `categories` field is unaffected. Use
+  this to skip the download when you don't need the hierarchy.
+- **`--require-category-path`** *(default: on)* — **drops products whose
+  `category_path` can't be reconstructed**, so the catalog is uniformly
+  drill-down-faceted. This is a small tail — roughly 2–6% of otherwise-clean
+  records in the EN/FR/ES full runs. Pass `--no-require-category-path` to keep
+  those products with an empty `category_path` instead.
+
+The interaction is the part to watch: with `--no-taxonomy` *every* path is empty,
+so naively "requiring a path" would drop **every** product and produce an empty
+file. To prevent that, **`--no-taxonomy` automatically disables the
+require-path gate** (a log line notes this). The same graceful handling applies
+if the taxonomy simply fails to load (e.g. no network on first run): paths come
+out empty, the gate is disabled, and the run continues rather than crashing or
+silently emitting an empty dataset.
+
+| Flags | `category_path` | Products dropped for an empty path? |
+| :--- | :--- | :--- |
+| *(default)* | populated from the taxonomy | **Yes** — the ~2–6% unresolved tail |
+| `--no-require-category-path` | populated from the taxonomy | No |
+| `--no-taxonomy` | always `[]` | No (gate auto-disabled) |
+| taxonomy fails to load | always `[]` | No (gate auto-disabled, with a warning) |
 
 ## Clean data definition
 
