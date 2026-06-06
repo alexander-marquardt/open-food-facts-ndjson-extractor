@@ -529,6 +529,7 @@ class Counters:
     missing_image: int = 0
     missing_category: int = 0
     with_category_path: int = 0
+    missing_category_path: int = 0
 
 
 def _fmt_int(n: int) -> str:
@@ -567,6 +568,16 @@ def build_parser(
     p.add_argument("--lang", default="en", help="Language code for titles, descriptions, and front images (e.g. en, fr, de).")
 
     p.add_argument("--require-category", action="store_true")
+    p.add_argument(
+        "--require-category-path",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Drop products whose hierarchical category_path does not resolve "
+        "against the taxonomy, for a cleaner fully-faceted catalog (default: on). "
+        "Use --no-require-category-path to keep them. Automatically disabled when "
+        "the taxonomy is unavailable (e.g. --no-taxonomy), which always emits an "
+        "empty path.",
+    )
 
     # Include en:undefined by default so "Undefined" does not become the primary category.
     p.add_argument("--category-exclude", default="en:null,en:unknown,en:undefined")
@@ -661,6 +672,15 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
     else:
         log("Category taxonomy disabled (--no-taxonomy); category_path will be empty.")
 
+    # Resolve the clean-data gate. It only makes sense with a loaded taxonomy;
+    # when there is none, emitting an empty path for every record means the gate
+    # would drop the entire dataset, so disable it instead.
+    require_category_path = args.require_category_path
+    if require_category_path and taxonomy is None:
+        log("Category_path gate disabled: taxonomy unavailable, so no product "
+            "can resolve a path (keeping all records).")
+        require_category_path = False
+
     ensure_parent_dir(args.output)
     ensure_parent_dir(args.report)
 
@@ -732,6 +752,12 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
                 if taxonomy is not None
                 else []
             )
+
+            # Optional clean-data gate: skip products whose hierarchy doesn't
+            # resolve. Done before the pricing model so dropped records are cheap.
+            if require_category_path and not category_path:
+                c.missing_category_path += 1
+                continue
 
             attrs = build_attrs(product, primary_category_tag=primary_tag, primary_category_label=primary_category_label)
 
@@ -826,7 +852,13 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
                 "disabled"
                 if args.no_taxonomy
                 else f"hierarchical root->leaf path from OFF taxonomy "
-                f"(written for {c.with_category_path:,}/{c.written:,} records)"
+                f"(written for {c.with_category_path:,}/{c.written:,} records"
+                + (
+                    f"; {c.missing_category_path:,} unresolved products dropped"
+                    if require_category_path
+                    else ""
+                )
+                + ")"
             ),
             "price": "category baseline unit model + deterministic noise + label premiums + retail rounding",
             "dietary_restrictions": "keyword list derived from labels_tags and ingredients_analysis_tags (positive-only)",
