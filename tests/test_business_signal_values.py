@@ -17,21 +17,16 @@ migrated there.
 
 from __future__ import annotations
 
-import sys
-from pathlib import Path
-
 import pytest
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
-
-from off_demo_extract.extract import (  # noqa: E402
+from off_demo_extract.extract import (
     BUCKET_BASE_MARGIN_PCT,
     LABEL_UPLIFT_CAP,
     POPULARITY_MAX,
     derive_margin,
     derive_popularity,
 )
-from off_demo_extract.pricing import _seeded_rng  # noqa: E402
+from off_demo_extract.pricing import _seeded_rng
 
 
 @pytest.mark.parametrize(
