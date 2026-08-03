@@ -8,17 +8,13 @@ reproduces the structural traps of the real Open Food Facts taxonomy:
 * parallel roots in the same product's tag union;
 * a foreign-language-only node that must be excluded from an English path.
 
-Run with ``pytest tests/`` or directly: ``python tests/test_taxonomy.py``.
+Run with ``pytest tests/``. ``tests/conftest.py`` puts ``src`` on ``sys.path``,
+so the import below is an ordinary top-of-file import.
 """
 
 from __future__ import annotations
 
-import sys
-from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
-
-from off_demo_extract.taxonomy import build_category_path, category_chain  # noqa: E402
+from off_demo_extract.taxonomy import build_category_path, category_chain
 
 
 def _n(name: str, parents: list[str]) -> dict:
@@ -114,21 +110,3 @@ def test_localized_node_kept_for_matching_persona() -> None:
 def test_no_known_category_returns_empty() -> None:
     assert build_category_path(["en:null"], TAXONOMY, EXCLUDE, lang="en") == []
     assert build_category_path(["en:not-in-taxonomy"], TAXONOMY, EXCLUDE, lang="en") == []
-
-
-def _run() -> int:
-    tests = [v for k, v in sorted(globals().items()) if k.startswith("test_")]
-    failures = 0
-    for fn in tests:
-        try:
-            fn()
-            print(f"PASS {fn.__name__}")
-        except AssertionError as exc:
-            failures += 1
-            print(f"FAIL {fn.__name__}: {exc}")
-    print(f"\n{len(tests) - failures}/{len(tests)} passed")
-    return 1 if failures else 0
-
-
-if __name__ == "__main__":
-    raise SystemExit(_run())
