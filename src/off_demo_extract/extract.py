@@ -388,8 +388,10 @@ def dietary_restrictions_from_off(product: Dict[str, Any]) -> list[str]:
 # arms with an ``ln1p`` modifier. They used to be a uniform random draw seeded
 # on the GTIN, which exercised that code path but demonstrated nothing: moving
 # the popularity weight reordered the results and the new order could not be
-# explained to anyone watching, because the number underneath was noise
-# (elastic/prism#5027).
+# explained to anyone watching, because the number underneath was noise. The
+# draw was diagnosed from its signature — its mean landed on the midpoint of the
+# range on every published catalog, which is what a uniform fill looks like and
+# what a real signal never does. The test suite reproduces that measurement.
 #
 # They are now derived, and they are NOT equally honest — which is why each
 # product records where its number came from:
@@ -1036,7 +1038,9 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
 
             # Business-signal values, with their provenance recorded next to the
             # existing "Price source" stamp so a demo viewer can tell the
-            # observed signal from the modelled one (elastic/prism#5027).
+            # observed signal from the modelled one. Without the stamps the two
+            # are indistinguishable in the index, and a modelled number gets
+            # discussed as if it were measured.
             unique_scans_n = product.get("unique_scans_n")
             popularity = derive_popularity(unique_scans_n)
             margin, margin_detail = derive_margin(bucket_name, labels_tags)
