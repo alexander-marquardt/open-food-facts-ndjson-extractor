@@ -1,0 +1,395 @@
+{
+ "_source": "Open Food Facts (openfoodfacts.org), ODbL. Real product category tags from the public JSONL export, and the ancestor closure of those tags from the public category taxonomy. The closure is complete upward, so a node is a root in this fixture exactly when it is a root in the full taxonomy. Name dictionaries are trimmed to en/fr/es/xx; nothing else is edited.",
+ "taxonomy": {
+  "en:biscuits": {
+   "name": {
+    "en": "Biscuits",
+    "fr": "biscuits",
+    "es": "Galletas"
+   },
+   "parents": [
+    "en:biscuits-and-cakes",
+    "en:biscuits-and-crackers"
+   ]
+  },
+  "en:biscuits-and-cakes": {
+   "name": {
+    "fr": "Biscuits et gâteaux",
+    "es": "Galletas y pasteles",
+    "en": "Biscuits and cakes"
+   },
+   "parents": [
+    "en:sweet-snacks"
+   ]
+  },
+  "en:biscuits-and-crackers": {
+   "name": {
+    "fr": "Biscuits sucrés & biscuits apéritifs",
+    "en": "Biscuits and crackers"
+   },
+   "parents": []
+  },
+  "en:chicken-and-its-products": {
+   "name": {
+    "fr": "Poulet et dérivés",
+    "en": "Chicken and its products",
+    "es": "Pollo y sus productos"
+   },
+   "parents": [
+    "en:meats-and-their-products"
+   ]
+  },
+  "en:chinese-dumplings": {
+   "name": {
+    "fr": "Bouchées à la vapeur chinoises cuites",
+    "en": "Chinese dumplings"
+   },
+   "parents": [
+    "xx:dumplings"
+   ]
+  },
+  "en:cooked-chicken-breast-slices": {
+   "name": {
+    "fr": "Blancs de poulet en tranches",
+    "en": "Cooked chicken breast slices",
+    "es": "Fiambre de pechuga de pollo"
+   },
+   "parents": [
+    "en:poultry-hams",
+    "en:prepared-chicken-meats"
+   ]
+  },
+  "en:country-style-pates": {
+   "name": {
+    "en": "Country-style Pâtés",
+    "fr": "Pâtés de campagne"
+   },
+   "parents": [
+    "en:pork-pates"
+   ]
+  },
+  "en:dairies": {
+   "name": {
+    "es": "Lácteos",
+    "fr": "Produits laitiers",
+    "en": "Dairies"
+   },
+   "parents": []
+  },
+  "en:fats": {
+   "name": {
+    "en": "Fats",
+    "fr": "Matières grasses",
+    "es": "Aceites y grasas"
+   },
+   "parents": []
+  },
+  "en:fried-rice": {
+   "name": {
+    "en": "Fried rice",
+    "es": "Arroz frito",
+    "fr": "Riz cantonais"
+   },
+   "parents": [
+    "en:prepared-rices"
+   ]
+  },
+  "en:meals": {
+   "name": {
+    "es": "Comidas preparadas",
+    "fr": "Plats préparés",
+    "en": "Meals"
+   },
+   "parents": []
+  },
+  "en:meats": {
+   "name": {
+    "en": "Meats",
+    "fr": "Viandes",
+    "es": "Carnes"
+   },
+   "parents": [
+    "en:meats-and-their-products"
+   ]
+  },
+  "en:meats-and-their-products": {
+   "name": {
+    "es": "Productos a base de carne",
+    "fr": "Viandes et dérivés",
+    "en": "Meats and their products"
+   },
+   "parents": []
+  },
+  "en:pate": {
+   "name": {
+    "es": "Paté",
+    "fr": "Pâté",
+    "en": "Pâté"
+   },
+   "parents": [
+    "fr:charcuteries-diverses"
+   ]
+  },
+  "en:plant-based-foods": {
+   "name": {
+    "en": "Plant-based foods",
+    "fr": "Aliments d'origine végétale",
+    "es": "Alimentos de origen vegetal"
+   },
+   "parents": [
+    "en:plant-based-foods-and-beverages"
+   ]
+  },
+  "en:plant-based-foods-and-beverages": {
+   "name": {
+    "fr": "Aliments et boissons à base de végétaux",
+    "es": "Alimentos y bebidas de origen vegetal",
+    "en": "Plant-based foods and beverages"
+   },
+   "parents": []
+  },
+  "en:pork": {
+   "name": {
+    "fr": "Porc",
+    "es": "Carne de cerdo",
+    "en": "Pork"
+   },
+   "parents": [
+    "en:meats",
+    "en:pork-and-its-products"
+   ]
+  },
+  "en:pork-and-its-products": {
+   "name": {
+    "es": "Carne de cerdo y sus productos",
+    "fr": "Porc et dérivés",
+    "en": "Pork and its products"
+   },
+   "parents": [
+    "en:meats-and-their-products"
+   ]
+  },
+  "en:pork-pates": {
+   "name": {
+    "fr": "Pâtés de porc",
+    "en": "Pork Pâtés",
+    "es": "Patés de cerdo"
+   },
+   "parents": [
+    "en:pate",
+    "en:prepared-pork-meats"
+   ]
+  },
+  "en:poultry-hams": {
+   "name": {
+    "fr": "Blancs de volaille en tranches",
+    "en": "Poultry hams"
+   },
+   "parents": [
+    "fr:charcuteries-cuites"
+   ]
+  },
+  "en:prepared-chicken-meats": {
+   "name": {
+    "en": "Prepared chicken meats",
+    "fr": "Charcuteries de poulet"
+   },
+   "parents": [
+    "en:chicken-and-its-products",
+    "en:prepared-poultry-meats"
+   ]
+  },
+  "en:prepared-meats": {
+   "name": {
+    "en": "Prepared meats",
+    "es": "Embutidos",
+    "fr": "Charcuteries"
+   },
+   "parents": [
+    "en:meats-and-their-products"
+   ]
+  },
+  "en:prepared-pork-meats": {
+   "name": {
+    "en": "Prepared pork meats",
+    "fr": "Charcuteries de porc"
+   },
+   "parents": [
+    "en:pork-and-its-products",
+    "en:prepared-meats"
+   ]
+  },
+  "en:prepared-poultry-meats": {
+   "name": {
+    "en": "Prepared poultry meats",
+    "fr": "Charcuteries de volaille"
+   },
+   "parents": [
+    "en:prepared-meats"
+   ]
+  },
+  "en:prepared-rices": {
+   "name": {
+    "en": "Prepared rices",
+    "fr": "Riz préparés"
+   },
+   "parents": [
+    "fr:cereales-preparees"
+   ]
+  },
+  "en:rice-dishes": {
+   "name": {
+    "en": "Rice dishes",
+    "es": "Platos de arroz",
+    "fr": "Plats à base de riz"
+   },
+   "parents": [
+    "en:meals"
+   ]
+  },
+  "en:snacks": {
+   "name": {
+    "en": "Snacks",
+    "es": "Botanas",
+    "fr": "Snacks"
+   },
+   "parents": []
+  },
+  "en:sweet-snacks": {
+   "name": {
+    "en": "Sweet snacks",
+    "fr": "Snacks sucrés",
+    "es": "Snacks dulces"
+   },
+   "parents": [
+    "en:snacks"
+   ]
+  },
+  "en:vegetable-fats": {
+   "name": {
+    "en": "Vegetable fats",
+    "fr": "Matières grasses végétales",
+    "es": "Grasas vegetales"
+   },
+   "parents": [
+    "en:fats",
+    "en:plant-based-foods"
+   ]
+  },
+  "en:vegetable-oils": {
+   "name": {
+    "en": "Vegetable oils",
+    "es": "Aceites vegetales",
+    "fr": "Huiles"
+   },
+   "parents": [
+    "en:vegetable-fats"
+   ]
+  },
+  "fr:cereales-preparees": {
+   "name": {
+    "fr": "Céréales préparées"
+   },
+   "parents": [
+    "en:meals"
+   ]
+  },
+  "fr:charcuteries-cuites": {
+   "name": {
+    "fr": "Charcuteries cuites"
+   },
+   "parents": [
+    "en:prepared-meats"
+   ]
+  },
+  "fr:charcuteries-diverses": {
+   "name": {
+    "fr": "Charcuteries diverses"
+   },
+   "parents": [
+    "en:prepared-meats"
+   ]
+  },
+  "xx:dumplings": {
+   "name": {
+    "en": "Dumplings",
+    "xx": "Dumplings"
+   },
+   "parents": [
+    "en:meals"
+   ]
+  }
+ },
+ "products": [
+  {
+   "code": "0055652001899",
+   "categories_tags": [
+    "en:meats-and-their-products",
+    "en:meats",
+    "en:prepared-meats",
+    "en:pork-and-its-products",
+    "fr:charcuteries-diverses",
+    "en:pate",
+    "en:pork",
+    "en:pork-pates",
+    "en:country-style-pates"
+   ]
+  },
+  {
+   "code": "0044700079195",
+   "categories_tags": [
+    "en:meats-and-their-products",
+    "en:meats",
+    "en:prepared-meats",
+    "fr:charcuteries-cuites",
+    "en:poultry-hams",
+    "en:cooked-chicken-breast-slices"
+   ]
+  },
+  {
+   "code": "0017400140328",
+   "categories_tags": [
+    "en:meals",
+    "en:rice-dishes",
+    "fr:cereales-preparees",
+    "en:prepared-rices",
+    "en:fried-rice"
+   ]
+  },
+  {
+   "code": "0087703021877",
+   "categories_tags": [
+    "en:meals",
+    "en:chinese-dumplings",
+    "en:dumplings",
+    "en:korean-dumplings",
+    "en:mandu"
+   ]
+  },
+  {
+   "code": "0000168175589",
+   "categories_tags": [
+    "en:snacks",
+    "en:sweet-snacks",
+    "en:biscuits-and-cakes",
+    "en:biscuits"
+   ]
+  },
+  {
+   "code": "0000111301201",
+   "categories_tags": [
+    "en:dairies"
+   ]
+  },
+  {
+   "code": "0000111048403",
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:plant-based-foods",
+    "en:fats",
+    "en:vegetable-fats",
+    "en:vegetable-oils"
+   ]
+  }
+ ]
+}

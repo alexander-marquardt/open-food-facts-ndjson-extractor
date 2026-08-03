@@ -24,7 +24,10 @@ from off_demo_extract.taxonomy import (
     category_path_entries,
     default_keep_prefixes,
     display_label,
+    global_roots,
+    unanchored_head,
     AddressAudit,
+    RootAnchorAudit,
 )
 
 
@@ -672,6 +675,7 @@ class Counters:
     missing_category: int = 0
     with_category_path: int = 0
     missing_category_path: int = 0
+    unanchored_category_path: int = 0
     categories_at_multiple_addresses: int = 0
     categories_under_multiple_labels: int = 0
     labels_shared_by_multiple_categories: int = 0
@@ -721,6 +725,9 @@ def build_parser(
         default=True,
         help="Drop products whose hierarchical category_path does not resolve "
         "against the taxonomy, for a cleaner fully-faceted catalog (default: on). "
+        "A path resolves when it is non-empty AND anchored to a global taxonomy "
+        "root: a chain that starts mid-taxonomy was cut short by the language "
+        "filter and files its categories at addresses no other catalog shares. "
         "Use --no-require-category-path to keep them. Automatically disabled when "
         "the taxonomy is unavailable (e.g. --no-taxonomy), which always emits an "
         "empty path.",
@@ -853,6 +860,16 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
             f"Canonical category parents: {len(canonical_parents):,} nodes, "
             f"{roots:,} roots (fewest hops to a root; ties by canonical id)"
         )
+    # The taxonomy's real roots, before this run's language filter pruned
+    # anything. The two counts are logged together because their gap *is* the
+    # truncation the category_path gate refuses: every root of the pruned map
+    # that is missing from here heads a chain whose true ancestors were dropped.
+    taxonomy_roots: Set[str] = global_roots(taxonomy) if taxonomy is not None else set()
+    if taxonomy is not None:
+        log(
+            f"Taxonomy roots: {len(taxonomy_roots):,} global "
+            "(a chain must reach one of these to count as resolved)"
+        )
     # The flat ``categories`` field draws on exactly the ids the hierarchical
     # path may walk — the canonical parent map is that set, so it is reused
     # rather than re-derived. ``None`` when no taxonomy was loaded.
@@ -862,6 +879,7 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
 
     address_audit = AddressAudit()
     tag_audit = TagCurationAudit()
+    root_audit = RootAnchorAudit()
 
     log(f"Input:          {args.input}")
     log(f"Output:         {args.output}")
@@ -950,10 +968,29 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
             )
             category_path = [path for _node, path in path_entries]
 
+            # A chain is walked to a root of *this run's* parent map, which is a
+            # global taxonomy root only when the language filter left the head's
+            # ancestry intact. When it did not, the chain is truncated: en:pate
+            # really hangs under fr:charcuteries-diverses under en:prepared-meats
+            # and shows up in an English catalog as a top-level "Pâté". Recorded
+            # for every record, gate or no gate, so the number exists in the
+            # report of a run that keeps them.
+            truncated_at = unanchored_head(
+                [node for node, _path in path_entries], taxonomy_roots
+            )
+            if truncated_at is not None:
+                root_audit.record(truncated_at)
+
             # Optional clean-data gate: skip products whose hierarchy doesn't
             # resolve. Done before the pricing model so dropped records are cheap.
+            # "Resolve" means anchored, not merely non-empty — a path that starts
+            # mid-taxonomy files its categories at addresses that exist nowhere
+            # else, which is the defect the gate is supposed to promise against.
             if require_category_path and not category_path:
                 c.missing_category_path += 1
+                continue
+            if require_category_path and truncated_at is not None:
+                c.unanchored_category_path += 1
                 continue
 
             attrs = build_attrs(product, primary_category_label=primary_category_label)
@@ -1049,6 +1086,8 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
 
     for line in tag_audit.log_lines():
         log(line)
+    for line in root_audit.log_lines(dropped=require_category_path):
+        log(line)
 
     c.categories_at_multiple_addresses = address_audit.conflict_count
     c.categories_under_multiple_labels = address_audit.label_conflict_count
@@ -1099,6 +1138,10 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
         # records what never got in. Without it the unresolvable-tag rate is only
         # discoverable by reverse-mapping a built index against the taxonomy.
         "category_tag_curation": tag_audit.summary(),
+        # Chains that resolved but stopped short of a global taxonomy root. The
+        # gate refuses these; this is where a run that keeps them (or a run that
+        # wants to know what it lost) reads the number and the offending heads.
+        "category_path_anchoring": root_audit.summary(),
         "filters": {
             "lang": lang,
             "title": f"product_name_{lang} OR (lang=={lang} AND product_name)",
@@ -1119,6 +1162,8 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
                 f"(written for {c.with_category_path:,}/{c.written:,} records"
                 + (
                     f"; {c.missing_category_path:,} unresolved products dropped"
+                    f", {c.unanchored_category_path:,} more dropped for a path "
+                    "that stops short of a taxonomy root"
                     if require_category_path
                     else ""
                 )
