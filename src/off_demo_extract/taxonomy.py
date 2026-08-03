@@ -35,9 +35,12 @@ taxonomy — never per product:
 2. :func:`category_chain` then takes the product's own tags only to choose the
    **leaf**, and walks the canonical parent map from that leaf all the way to a
    **global** root — materialising ancestors the product never tagged.
-3. Each canonical id maps to a display label (taxonomy ``name`` in the requested
-   language, falling back to English, then ``xx``, then a prettified slug) and
-   the chain is emitted as cumulative ``/``-joined paths.
+3. :func:`display_label` maps each canonical id to a display label (taxonomy
+   ``name`` in the requested language, falling back to English, then ``xx``, then
+   a prettified slug) and the chain is emitted as cumulative ``/``-joined paths.
+   That function is the single place a category's label is decided — the flat
+   ``categories`` field calls it too, so the two fields can never disagree about
+   what one node is called.
 
 Why global anchoring, and not just a DAG-to-tree projection
 -----------------------------------------------------------
@@ -128,8 +131,28 @@ def _prettify_slug(canonical_id: str) -> str:
     return t[0].upper() + t[1:]
 
 
-def _display_name(taxonomy: Dict[str, Any], canonical_id: str, lang: str) -> str:
-    """Human label for a category, preferring ``lang`` then English then ``xx``."""
+def display_label(taxonomy: Dict[str, Any], canonical_id: str, lang: str = "en") -> str:
+    """The label a category node renders under — **the only** place that decides it.
+
+    Every emitted field that shows a category to a human must call this: the
+    hierarchical ``category_path`` segments and the flat ``categories`` values
+    alike. Two renderings of the same node used to be produced by two rules — the
+    taxonomy ``name`` here, and a mechanical de-slug of the tag id over in the
+    extractor — so the same node read ``Plant-based foods`` in one field and
+    ``Plant based foods`` in the other, and the two fields could not be joined on
+    string (39% of products carried at least one such pair).
+
+    Preference order is ``lang`` → English → ``xx`` → a prettified slug. The
+    taxonomy ``name`` wins over the slug because it is the upstream-authored
+    human label: it carries correct hyphenation (``Plant-based foods``),
+    disambiguating parentheticals (``Crackers (Appetizers)``) and casing that a
+    mechanical de-slug destroys — and, unlike the slug, it is **localised**, so a
+    Spanish or French catalog renders Spanish or French rather than English.
+    Every one of the taxonomy's 8,939 ``en:``-prefixed nodes has an ``en`` name,
+    so on the English backbone the slug fallback never fires; it remains for
+    localised-only nodes and for runs with no taxonomy at all (``--no-taxonomy``,
+    which passes an empty mapping here).
+    """
     node = taxonomy.get(canonical_id) or {}
     names = node.get("name") if isinstance(node.get("name"), dict) else {}
     for key in (lang, "en", "xx"):
@@ -359,7 +382,7 @@ def category_path_entries(
     entries: List[Tuple[str, str]] = []
     prefix = ""
     for node in chain:
-        label = _display_name(taxonomy, node, lang)
+        label = display_label(taxonomy, node, lang)
         prefix = label if not prefix else f"{prefix}{PATH_SEPARATOR}{label}"
         entries.append((node, prefix))
     return entries
@@ -395,38 +418,106 @@ def build_category_path(
 
 
 class AddressAudit:
-    """Records where each category node landed, so a run can prove property 2.
+    """Records where each category node landed and what it was called.
 
     Property 2 — one address per category — holds by construction once the chain
     walks a run-wide canonical parent map, but "by construction" is exactly the
     kind of claim that quietly stops being true. Feeding every emitted chain
     through here turns a regression into a line in the extraction report rather
     than a hand audit of the built index.
+
+    The same argument applies to the node's *label*, in both directions, so this
+    audits three things over every record written:
+
+    * **one address per node** — a node's cumulative path is the same everywhere;
+    * **one label per node** — the node reads identically in ``category_path``
+      and in the flat ``categories`` list. Holds by construction now that both
+      come from :func:`display_label`, and this is what proves it stayed true;
+    * **one node per label** — the inverse. Two distinct nodes rendering the same
+      string make the two fields ambiguous to join even with the labels unified,
+      so it is a defect of the same join even though nothing is misspelled. It is
+      zero among the nodes a path may contain — the taxonomy's 8,939
+      English-backbone labels are all distinct, and so are the English/Spanish
+      and English/French eligible sets — but *not* zero over the flat
+      ``categories`` field, which carries the product's tags whatever their
+      language prefix: upstream holds duplicate nodes such as
+      ``en:capsicum-frutescens`` and ``fr:capsicum-frutescens`` that render to one
+      string. A real English run over the first 200,000 export lines reports 2;
+      French reports 6. The count is surfaced rather than suppressed because it
+      bounds how far a label-to-segment join can be trusted.
     """
 
     def __init__(self) -> None:
         self.address: Dict[str, str] = {}
         self.conflicts: Dict[str, Set[str]] = {}
+        self.label: Dict[str, str] = {}
+        self.label_conflicts: Dict[str, Set[str]] = {}
+        self.label_owners: Dict[str, Set[str]] = {}
 
-    def record(self, entries: Iterable[Tuple[str, str]]) -> None:
-        for node, path in entries:
+    def record(
+        self,
+        path_entries: Iterable[Tuple[str, str]],
+        flat_entries: Iterable[Tuple[str, str]] = (),
+    ) -> None:
+        """Take one product's ``(id, path)`` chain and its ``(id, label)`` tags.
+
+        The chain's label for a node is the last segment of its cumulative path —
+        :func:`display_label` neutralises the separator inside a label, so that
+        split is exact and does not need the label passed in a second time.
+        """
+        for node, path in path_entries:
             seen = self.address.setdefault(node, path)
             if seen != path:
                 self.conflicts.setdefault(node, {seen}).add(path)
+            self._record_label(node, path.rsplit(PATH_SEPARATOR, 1)[-1])
+        for node, label in flat_entries:
+            self._record_label(node, label)
+
+    def _record_label(self, node: str, label: str) -> None:
+        seen = self.label.setdefault(node, label)
+        if seen != label:
+            self.label_conflicts.setdefault(node, {seen}).add(label)
+        self.label_owners.setdefault(label, set()).add(node)
 
     @property
     def conflict_count(self) -> int:
         return len(self.conflicts)
+
+    @property
+    def label_conflict_count(self) -> int:
+        """Nodes that rendered under more than one label. Must be zero."""
+        return len(self.label_conflicts)
+
+    @property
+    def shared_label_count(self) -> int:
+        """Labels claimed by more than one node — the join is ambiguous there."""
+        return sum(1 for owners in self.label_owners.values() if len(owners) > 1)
 
     def summary(self, max_examples: int = 5) -> Dict[str, Any]:
         examples = [
             {"category": node, "addresses": sorted(paths)}
             for node, paths in sorted(self.conflicts.items())[:max_examples]
         ]
+        label_examples = [
+            {"category": node, "labels": sorted(labels)}
+            for node, labels in sorted(self.label_conflicts.items())[:max_examples]
+        ]
+        shared = sorted(
+            (label, owners)
+            for label, owners in self.label_owners.items()
+            if len(owners) > 1
+        )[:max_examples]
         return {
             "categories_seen": len(self.address),
             "categories_at_multiple_addresses": self.conflict_count,
             "examples": examples,
+            "labels_seen": len(self.label_owners),
+            "categories_under_multiple_labels": self.label_conflict_count,
+            "label_examples": label_examples,
+            "labels_shared_by_multiple_categories": self.shared_label_count,
+            "shared_label_examples": [
+                {"label": label, "categories": sorted(owners)} for label, owners in shared
+            ],
         }
 
 
