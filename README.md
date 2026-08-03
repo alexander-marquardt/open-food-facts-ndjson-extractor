@@ -274,10 +274,9 @@ ecommerce-open-food-facts/
 │       ├── taxonomy.py    # OFF taxonomy graph → hierarchical category_path
 │       └── pricing.py     # Synthetic price model
 ├── tests/
-│   ├── test_taxonomy.py            # Regression tests for the hierarchy builder
-│   └── test_category_path_gate.py  # End-to-end tests for the category_path gate
 │   ├── conftest.py        # Puts src/ on sys.path so tests import normally
 │   ├── test_business_signal_values.py  # margin / popularity derivation
+│   ├── test_category_path_gate.py      # End-to-end tests for the category_path gate
 │   └── test_taxonomy.py   # Regression tests for the hierarchy builder
 ├── pyproject.toml         # Dependencies
 └── README.md
