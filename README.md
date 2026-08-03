@@ -548,6 +548,50 @@ exception explicit, and the tolerance in force is printed in the report. What no
 tolerance can authorise is a run that applied **nothing** — that is what pointing
 at the wrong index looks like, and it always fails.
 
+### Copying an index to a new generation
+
+`scripts/reindex_v7_to_v8.py` copies a catalog index server-side with **no
+ingest pipeline**, so the embedding vectors already in `_source` are carried
+over verbatim instead of being recomputed, and adds the `category_path` field to
+the new mapping.
+
+The copy is asynchronous: the cluster answers the `_reindex` with a task id and
+does the work afterwards. So this tool has the same honesty problem as the
+injector above — it can report success for work it has not seen happen.
+
+```bash
+python scripts/reindex_v7_to_v8.py --source catalog_en_v7 --dest catalog_en_v8
+```
+
+| Exit | Meaning |
+| :--- | :--- |
+| 0 | the copy completed and the destination holds the source's documents (within any tolerance named on the command line) |
+| 1 | the copy completed and its outcome fails a gate |
+| 2 | the run could not complete — a request failed, or the destination exists and `--recreate` was not given |
+| 3 | `--no-wait` only: the task was started and **nothing about it has been verified** |
+
+The fourth status is what `--no-wait` is for. Firing a long reindex and polling
+separately is a legitimate thing to want, so the flag stays — but a run that has
+only submitted a task knows nothing about the copy, and returning `0` for it
+made "submitted" indistinguishable from "copied and counted" to an `&&` chain.
+`3` is neither a success nor an error: it says the verification is owed, and the
+run prints and records the task id to discharge it with.
+
+A source holding **0 documents** fails before the destination is created.
+`dst_count == src_count` is satisfied by `0 == 0`, so an empty or misnamed source
+used to report a clean copy — the same vacuous pass the injector's "a run that
+sent nothing fails" rule closes. `--allow-empty-source` names the exception when
+an empty index really is the intended input.
+
+Everything the finished task reports is read and named, including
+`version_conflicts`: with `op_type: create` into a freshly created destination a
+conflict means the id was already there, so each one is a document that was not
+copied. Misses are gated at zero by default, with `--allow-missing N` /
+`--allow-missing-fraction F` (floored) as the named exception and the tolerance
+in force printed with the result; `--json` writes the whole record, including
+whether the copy was verified at all. What no tolerance can authorise is a
+non-empty source whose destination ends up holding nothing.
+
 ## Clean data definition
 
 - Title in target language: `product_name_{lang}` OR (`lang == {lang}` AND `product_name`) — controlled by `--lang`
@@ -599,8 +643,11 @@ ecommerce-open-food-facts/
 │   │                      #   and fails on every one that does not hold
 │   ├── build_manifest.py  # Pins dump / taxonomy / commit by checksum
 │   ├── verify_index.py    # Checks a live index against that manifest (read-only)
-│   └── inject_category_path.py  # Adds category_path to an already-loaded index,
-│                                #   and fails when the updates miss their documents
+│   ├── inject_category_path.py  # Adds category_path to an already-loaded index,
+│   │                            #   and fails when the updates miss their documents
+│   └── reindex_v7_to_v8.py  # Copies an index to a new generation without
+│                            #   re-embedding, and reports success only for a
+│                            #   copy it has polled to completion and counted
 ├── builds/                # Per-build manifests, reports and verification notes
 ├── tests/
 │   ├── conftest.py        # Puts src/ on sys.path so tests import normally
