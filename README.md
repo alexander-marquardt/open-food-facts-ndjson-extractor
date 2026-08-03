@@ -438,6 +438,53 @@ something concrete: `catalog_fr_v13` held 195,209 documents where its extract ha
 222,955 distinct ids, and the 12.5% shortfall survived months and three index
 generations because no check ever put the two numbers side by side.
 
+### Checking the catalog on disk
+
+```bash
+python scripts/verify_catalog.py \
+    --ndjson data/products/off_en_v14.ndjson \
+    --taxonomy data/taxonomy/categories.json \
+    --lang en --json builds/2026-08-03/verify_en_v14.json
+```
+
+stdout is the JSON result and nothing else, so a build can capture it straight to
+a file; the summary, the tolerance in force and any failure reason go to stderr.
+
+| Exit | Meaning |
+| :--- | :--- |
+| 0 | every property holds (within any tolerance named on the command line) |
+| 1 | the catalog fails a gate — every failing one is named in `failed` and on stderr |
+| 2 | the verification could not be carried out: a file is missing, or a line is not a JSON object |
+
+**Every property it measures is fatal, at zero tolerance.** That is a change:
+`values_outside_pinned_snapshot` used to be measured and printed and then left
+out of the sum that became the exit status, so a catalog none of whose values the
+pinned snapshot explains exited 0 — while `verify_index.py` treats the same
+condition on the index side as a failure, leaving the two ends of one rule
+disagreeing about whether it was fatal.
+
+An exception is named rather than budgeted for: `--allow-values-outside-snapshot
+N`, or `--allow-values-outside-snapshot-fraction F` of the distinct values
+actually checked. The fraction is **floored** to a whole number of values, so it
+can never round up into permitting one more, and the tolerance in force is
+recorded in the JSON (`values_outside_snapshot_tolerance` and
+`..._tolerance_source`) rather than only printed — a record that says
+"0 values outside the snapshot" is worth what the tolerance beside it says.
+
+Two further rules follow from the same reasoning:
+
+* **A run that verified nothing does not report clean.** An empty catalog, or one
+  in which no record carries a `categories` value or a `category_path` segment,
+  passes every count-based gate vacuously. It is also the denominator a fraction
+  tolerance divides by.
+* **Duplicate ids are reported, and fatal only under `--require-unique-ids`.**
+  Two records sharing an id is a property of the upstream dump, not of anything
+  the extractor constructs, and the index is keyed by id, so the duplicate
+  resolves to a single document — which is exactly why `verify_index.py` compares
+  `_count` against `distinct_ids` rather than against the record count. The
+  duplicates are accounted for downstream rather than unexplained. The 2026-08-03
+  build carries 1 / 3 / 81 of them in en / es / fr, and all three pass.
+
 ```bash
 export PRISM_ELASTICSEARCH_URL=...  PRISM_ELASTICSEARCH_API_KEY=...
 
@@ -548,7 +595,8 @@ ecommerce-open-food-facts/
 │       ├── category_tags.py  # Curated aliases/drops + validation of product tags
 │       └── pricing.py     # Synthetic price model
 ├── scripts/
-│   ├── verify_catalog.py  # Re-derives the catalog's properties from the NDJSON
+│   ├── verify_catalog.py  # Re-derives the catalog's properties from the NDJSON,
+│   │                      #   and fails on every one that does not hold
 │   ├── build_manifest.py  # Pins dump / taxonomy / commit by checksum
 │   ├── verify_index.py    # Checks a live index against that manifest (read-only)
 │   └── inject_category_path.py  # Adds category_path to an already-loaded index,
