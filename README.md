@@ -312,13 +312,28 @@ ecommerce-open-food-facts/
 │       ├── taxonomy.py    # OFF taxonomy graph → hierarchical category_path
 │       └── pricing.py     # Synthetic price model
 ├── tests/
+│   ├── conftest.py        # Puts src/ on sys.path so tests import normally
+│   ├── test_business_signal_values.py  # margin / popularity derivation
+│   ├── test_canonical_parents.py       # Canonical parent map and its tie-break
+│   ├── test_category_addressing.py     # One address per category, one path per product
+│   ├── test_category_path_gate.py      # End-to-end tests for the category_path gate
 │   ├── test_taxonomy.py   # Regression tests for the hierarchy builder
-│   ├── test_canonical_parents.py    # Canonical parent map and its tie-break
-│   ├── test_category_addressing.py  # One address per category, one path per product
 │   └── fixtures/          # Real OFF products + pruned taxonomy, checked in
 ├── pyproject.toml         # Dependencies
 └── README.md
 ```
+
+### Running the tests
+
+The tests need no network and no data dump — they build a synthetic taxonomy and
+a two-record input on the fly:
+
+```bash
+uv run --with pytest python -m pytest tests/ -v
+```
+
+Each test file is also runnable on its own (`python tests/test_taxonomy.py`).
+CI runs the same suite on every push and pull request.
 
 ## Quickstart (uv)
 

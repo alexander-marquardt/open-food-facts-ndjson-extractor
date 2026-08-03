@@ -4,13 +4,14 @@ import argparse
 import gzip
 import io
 import json
+import math
 import sys
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Iterable, Iterator, Optional, Set, TextIO
+from typing import Any, Dict, Iterable, Iterator, Optional, Set, TextIO, Tuple
 
-from off_demo_extract.pricing import load_pricing_config, estimate_price, _seeded_rng
+from off_demo_extract.pricing import load_pricing_config, estimate_price
 from off_demo_extract.taxonomy import (
     ensure_taxonomy,
     load_taxonomy,
@@ -329,18 +330,103 @@ def dietary_restrictions_from_off(product: Dict[str, Any]) -> list[str]:
 # ----------------------------
 # Margin & popularity (for function_score boosting)
 # ----------------------------
+#
+# Both fields feed Elasticsearch ``function_score`` / ``field_value_factor``
+# arms with an ``ln1p`` modifier. They used to be a uniform random draw seeded
+# on the GTIN, which exercised that code path but demonstrated nothing: moving
+# the popularity weight reordered the results and the new order could not be
+# explained to anyone watching, because the number underneath was noise
+# (elastic/prism#5027).
+#
+# They are now derived, and they are NOT equally honest — which is why each
+# product records where its number came from:
+#
+#   popularity  OBSERVED   ``unique_scans_n`` from this very dump: how many
+#                          distinct people scanned the barcode with the Open
+#                          Food Facts app. Real per-product behavioural data.
+#   margin      MODELLED   a per-category rate lifted by the product's real
+#                          premium / free-from label tags. Open Food Facts
+#                          carries no cost data, so nothing can make this one
+#                          observed; it is labelled rather than dressed up.
+#
+# Deriving margin from the estimated unit price was rejected: that price is
+# itself a seeded lognormal draw around the bucket median (see pricing.py), so a
+# margin derived from it would launder the same randomness into something that
+# merely looked principled.
 
-def generate_margin_and_popularity(gtin: str) -> tuple[int, int]:
-    """Generate deterministic random margin (0-200) and popularity (0-10000).
+POPULARITY_SCALE = 1000.0
+POPULARITY_MAX = 10000
 
-    These fields support Elasticsearch function_score queries using
-    field_value_factor with ln1p modifier, as described in the Elastic
-    blog on boosting by profit and popularity.
+BUCKET_BASE_MARGIN_PCT: Dict[str, int] = {
+    "bakery": 42,
+    "snacks_sweets": 38,
+    "coffee_tea": 35,
+    "produce": 35,
+    "beverages_soft": 30,
+    "condiments_sauces": 30,
+    "meals_chilled_frozen": 28,
+    "sweeteners_syrups": 28,
+    "default": 25,
+    "oils_fats": 24,
+    "olive_oil": 22,
+    "dairy": 20,
+}
+
+LABEL_MARGIN_UPLIFT: Dict[str, float] = {
+    "en:organic": 1.25,
+    "en:usda-organic": 1.25,
+    "en:eu-organic": 1.25,
+    "en:fair-trade": 1.15,
+    "en:rainforest-alliance": 1.15,
+    "en:no-gluten": 1.10,
+    "en:no-lactose": 1.10,
+}
+
+LABEL_UPLIFT_CAP = 1.40
+
+MARGIN_SOURCE_STAMP = "modelled_category_margin"
+POPULARITY_SOURCE_STAMP = "open_food_facts_unique_scans"
+
+
+def derive_popularity(unique_scans_n: Optional[int]) -> int:
+    """``1000 * ln(1 + unique_scans_n)``, capped at the 0..10000 envelope.
+
+    One sentence explains it to a demo audience: every e-fold of real scanners
+    is worth a thousand points, and the cap is reached at 22,026 scanners. Scan
+    counts are heavy-tailed over four orders of magnitude, so a raw count would
+    leave almost the whole catalogue at a value the envelope cannot tell from
+    zero. Monotone, so it never reorders two products against their true counts.
+
+    No scans derives 0, which is exactly the field map's ``missing: 0``: an
+    unscanned product keeps its unmodified relevance score, never a demotion.
     """
-    rng = _seeded_rng(gtin, "margin_popularity")
-    margin = rng.randint(0, 200)
-    popularity = rng.randint(0, 10000)
-    return margin, popularity
+    if not unique_scans_n or unique_scans_n <= 0:
+        return 0
+    return min(POPULARITY_MAX, round(POPULARITY_SCALE * math.log1p(unique_scans_n)))
+
+
+def derive_margin(bucket_name: str, labels_tags: Optional[list]) -> Tuple[int, str]:
+    """Return ``(margin_pct, breakdown)`` from the pricing bucket and real labels.
+
+    The breakdown is stored on the product as ``Modelled margin`` so the
+    derivation is legible in the record itself, the way the estimated unit price
+    already ships its own debug string.
+    """
+    key = bucket_name if bucket_name in BUCKET_BASE_MARGIN_PCT else "default"
+    base = BUCKET_BASE_MARGIN_PCT[key]
+    uplift = 1.0
+    matched: list[str] = []
+    for tag in labels_tags or []:
+        rate = LABEL_MARGIN_UPLIFT.get(tag)
+        if rate is not None:
+            uplift *= rate
+            matched.append(tag[3:] if tag.startswith("en:") else tag)
+    uplift = min(uplift, LABEL_UPLIFT_CAP)
+    margin = round(base * uplift)
+    detail = f"bucket={key} base={base}%"
+    if matched:
+        detail += f", labels={'+'.join(matched)} x{uplift:.2f}"
+    return margin, f"{margin}% ({detail})"
 
 
 # ----------------------------
@@ -815,7 +901,17 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
             attrs["Estimated unit price"] = unit_debug
 
             gtin = pad_gtin13(code)
-            margin, popularity = generate_margin_and_popularity(gtin)
+
+            # Business-signal values, with their provenance recorded next to the
+            # existing "Price source" stamp so a demo viewer can tell the
+            # observed signal from the modelled one (elastic/prism#5027).
+            unique_scans_n = product.get("unique_scans_n")
+            popularity = derive_popularity(unique_scans_n)
+            margin, margin_detail = derive_margin(bucket_name, labels_tags)
+            attrs["Margin source"] = MARGIN_SOURCE_STAMP
+            attrs["Modelled margin"] = margin_detail
+            attrs["Popularity source"] = POPULARITY_SOURCE_STAMP
+            attrs["Unique scans (Open Food Facts)"] = str(unique_scans_n or 0)
 
             attr_keys = sorted(attrs.keys())
             description = build_description(title=title, desc=desc, attrs=attrs, single_line=True)
