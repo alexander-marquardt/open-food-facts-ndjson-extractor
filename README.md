@@ -276,10 +276,23 @@ ecommerce-open-food-facts/
 ├── tests/
 │   ├── conftest.py        # Puts src/ on sys.path so tests import normally
 │   ├── test_business_signal_values.py  # margin / popularity derivation
+│   ├── test_category_path_gate.py      # End-to-end tests for the category_path gate
 │   └── test_taxonomy.py   # Regression tests for the hierarchy builder
 ├── pyproject.toml         # Dependencies
 └── README.md
 ```
+
+### Running the tests
+
+The tests need no network and no data dump — they build a synthetic taxonomy and
+a two-record input on the fly:
+
+```bash
+uv run --with pytest python -m pytest tests/ -v
+```
+
+Each test file is also runnable on its own (`python tests/test_taxonomy.py`).
+CI runs the same suite on every push and pull request.
 
 ## Quickstart (uv)
 

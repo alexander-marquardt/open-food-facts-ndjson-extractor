@@ -1,0 +1,26 @@
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # The package itself has no runtime dependencies (see pyproject.toml), so
+      # pytest is the only thing to install. The tests run entirely offline:
+      # they pass an explicit --taxonomy file, which stops the extractor from
+      # reaching out to the Open Food Facts taxonomy URL.
+      - name: Install pytest
+        run: python -m pip install --upgrade pip pytest
+
+      - name: Run tests
+        run: python -m pytest tests/ -v
