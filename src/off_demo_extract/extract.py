@@ -11,6 +11,11 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, Iterable, Iterator, Optional, Set, TextIO, Tuple
 
+from off_demo_extract.category_tags import (
+    CategoryVocabulary,
+    TagCurationAudit,
+    curate_category_tags,
+)
 from off_demo_extract.pricing import load_pricing_config, estimate_price
 from off_demo_extract.taxonomy import (
     ensure_taxonomy,
@@ -248,15 +253,16 @@ def extract_categories_tags(product: Dict[str, Any]) -> list[str]:
     return []
 
 
-def filter_category_tags(tags: list[str], exclude: Set[str]) -> list[str]:
-    return [t for t in tags if t not in exclude]
+def pick_primary_category_tag(tags: list[str]) -> Optional[str]:
+    """The product's primary category: the first tag the run accepted.
 
-
-def pick_primary_category_tag(tags: list[str], exclude: Set[str]) -> Optional[str]:
-    for t in tags:
-        if t not in exclude:
-            return t
-    return None
+    ``tags`` must already have been through
+    :func:`off_demo_extract.category_tags.curate_category_tags`, which is what
+    keeps a refused tag out of ``attrs["Category"]`` and out of the generated
+    description — both of which are indexed and searchable, so validating only
+    the ``categories`` list would leave the same junk searchable by another route.
+    """
+    return tags[0] if tags else None
 
 
 def build_category_label_entries(
@@ -265,6 +271,7 @@ def build_category_label_entries(
     taxonomy: Optional[Dict[str, Any]],
     lang: str = "en",
     max_n: int = MAX_NUM_CATEGORIES,
+    vocabulary: Optional[CategoryVocabulary] = None,
 ) -> list[tuple[str, str]]:
     """``(tag_id, label)`` for the flat ``categories`` field, primary tag first.
 
@@ -278,12 +285,28 @@ def build_category_label_entries(
 
     Ids ride along so a run can audit the two fields against each other. Callers
     that only want the strings want :func:`build_categories_list`.
+
+    ``vocabulary`` is the set of ids this run may emit. Every tag is checked
+    against it before it is labelled, because this function is what writes the
+    searchable field and an unvalidated tag reaching it is precisely the defect:
+    ``Groceries`` was searchable on 6,299 documents of the built English catalog
+    with no node in the taxonomy, no path, and no possible policy value. Callers
+    in this module hand over already-curated tags, so the check is normally a
+    no-op — it is the last line of defence, not the first. Note that a tag with
+    no taxonomy node has no ``name`` for :func:`display_label` to render either,
+    so there is nothing to label it *with* that would not be a second, divergent
+    labelling rule — the thing #17 removed.
+
+    ``vocabulary`` of ``None`` means no taxonomy was loaded, so there is nothing
+    to validate against and the labels are emitted as before.
     """
     tax = taxonomy if taxonomy is not None else {}
     seen: Set[str] = set()
     out: list[tuple[str, str]] = []
 
     def add(tag: str) -> None:
+        if vocabulary is not None and tag not in vocabulary.eligible:
+            return
         label = display_label(tax, tag, lang)
         # Suppress "Undefined"/"Unknown"/etc from appearing as categories.
         if _is_undefined_like(label):
@@ -309,11 +332,12 @@ def build_categories_list(
     taxonomy: Optional[Dict[str, Any]] = None,
     lang: str = "en",
     max_n: int = MAX_NUM_CATEGORIES,
+    vocabulary: Optional[CategoryVocabulary] = None,
 ) -> list[str]:
     return [
         label
         for _tag, label in build_category_label_entries(
-            primary_tag, tags_filtered, taxonomy, lang, max_n
+            primary_tag, tags_filtered, taxonomy, lang, max_n, vocabulary
         )
     ]
 
@@ -651,6 +675,8 @@ class Counters:
     categories_at_multiple_addresses: int = 0
     categories_under_multiple_labels: int = 0
     labels_shared_by_multiple_categories: int = 0
+    products_with_refused_category_tags: int = 0
+    refused_category_tags: int = 0
 
 
 def _fmt_int(n: int) -> str:
@@ -827,7 +853,15 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
             f"Canonical category parents: {len(canonical_parents):,} nodes, "
             f"{roots:,} roots (fewest hops to a root; ties by canonical id)"
         )
+    # The flat ``categories`` field draws on exactly the ids the hierarchical
+    # path may walk — the canonical parent map is that set, so it is reused
+    # rather than re-derived. ``None`` when no taxonomy was loaded.
+    vocabulary: Optional[CategoryVocabulary] = None
+    if taxonomy is not None and canonical_parents is not None:
+        vocabulary = CategoryVocabulary.from_canonical_parents(canonical_parents, taxonomy)
+
     address_audit = AddressAudit()
+    tag_audit = TagCurationAudit()
 
     log(f"Input:          {args.input}")
     log(f"Output:         {args.output}")
@@ -869,16 +903,31 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
                 c.missing_image += 1
                 continue
 
+            # Alias renamed ids, refuse the ones that are not categories of this
+            # catalog's taxonomy, and count what was refused. A refused *value*
+            # never refuses its *record*: 19.6% of tagged products carry at least
+            # one unresolvable tag, but only 2.5% have nothing else, so dropping
+            # the record would throw away a clean lineage over one junk tag.
             tags_raw = extract_categories_tags(product)
-            tags_filtered = filter_category_tags(tags_raw, cat_exclude)
-            primary_tag = pick_primary_category_tag(tags_raw, cat_exclude)
+            curated = curate_category_tags(tags_raw, vocabulary, cat_exclude)
+            tag_audit.record(curated)
+            if curated.rejected:
+                c.products_with_refused_category_tags += 1
+                c.refused_category_tags += len(curated.rejected)
+            tags_curated = curated.accepted
+            primary_tag = pick_primary_category_tag(tags_curated)
 
             if args.require_category and not primary_tag:
                 c.missing_category += 1
                 continue
 
             flat_entries = build_category_label_entries(
-                primary_tag, tags_filtered, taxonomy, lang, max_n=MAX_NUM_CATEGORIES
+                primary_tag,
+                tags_curated,
+                taxonomy,
+                lang,
+                max_n=MAX_NUM_CATEGORIES,
+                vocabulary=vocabulary,
             )
             categories = [label for _tag, label in flat_entries]
             primary_category_label = categories[0] if categories else None
@@ -890,7 +939,7 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
             # PRISM's hierarchical category facet renders.
             path_entries = (
                 category_path_entries(
-                    tags_raw,
+                    tags_curated,
                     taxonomy,
                     cat_exclude,
                     lang,
@@ -998,6 +1047,9 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
     elapsed = time.time() - t0
     log(_progress_line(c, elapsed))
 
+    for line in tag_audit.log_lines():
+        log(line)
+
     c.categories_at_multiple_addresses = address_audit.conflict_count
     c.categories_under_multiple_labels = address_audit.label_conflict_count
     c.labels_shared_by_multiple_categories = address_audit.shared_label_count
@@ -1041,12 +1093,25 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
         # it). Reported per run so a regression shows up here rather than in a
         # hand audit of the built index.
         "category_path_addresses": audit_summary,
+        # Every product tag that did not survive curation, by reason, with the
+        # worst offenders named. Separate from the address audit above on
+        # purpose: that one records where an *accepted* category landed, this one
+        # records what never got in. Without it the unresolvable-tag rate is only
+        # discoverable by reverse-mapping a built index against the taxonomy.
+        "category_tag_curation": tag_audit.summary(),
         "filters": {
             "lang": lang,
             "title": f"product_name_{lang} OR (lang=={lang} AND product_name)",
             "description": f"generic_name_{lang} OR ingredients_text_{lang} OR (lang=={lang} AND generic_name/ingredients_text)",
             "image": f"computed from images/front_{lang} + rev/imgid",
             "category": "required" if args.require_category else "optional",
+            "category_tags": (
+                "aliased through the curated rename map, then refused unless the "
+                "id is a taxonomy node this catalog may place in a path; refused "
+                "values are dropped, never their records"
+                if taxonomy is not None
+                else "no taxonomy loaded: tags aliased and curated-dropped only, not validated"
+            ),
             "category_path": (
                 "disabled"
                 if args.no_taxonomy
