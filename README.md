@@ -367,6 +367,21 @@ exactly what each does:
   records in the EN/FR/ES full runs. Pass `--no-require-category-path` to keep
   those products with an empty `category_path` instead.
 
+  "Reconstructed" means **anchored**, not merely non-empty. A chain is walked to
+  a root of the parent map built for *this* run, and that map holds only the
+  languages this catalog may place in a path — so a node whose only parent is
+  foreign is promoted to a root of the map while staying a child of the taxonomy.
+  90 of the 161 roots an English run sees are manufactured that way. `en:pate`
+  really sits under `fr:charcuteries-diverses` under `en:prepared-meats`, so an
+  English catalog would file it as a top-level `Pâté` that no other catalog
+  agrees with. Those chains are refused too, and counted separately from the
+  empty ones. It is a thin slice: over the first 300,000 records of the January
+  2026 dump an English run resolves 455 unanchored chains (French, 2), of which
+  6 also clear the title/description/image filters and would otherwise have been
+  written — 16,847 records out instead of 16,853. Every refusal is named in the
+  report's `category_path_anchoring` block, which is populated whether or not the
+  gate is on.
+
 The interaction is the part to watch: with `--no-taxonomy` *every* path is empty,
 so naively "requiring a path" would drop **every** product and produce an empty
 file. To prevent that, **`--no-taxonomy` automatically disables the
@@ -375,10 +390,10 @@ if the taxonomy simply fails to load (e.g. no network on first run): paths come
 out empty, the gate is disabled, and the run continues rather than crashing or
 silently emitting an empty dataset.
 
-| Flags | `category_path` | Products dropped for an empty path? |
+| Flags | `category_path` | Products dropped for an unresolved path? |
 | :--- | :--- | :--- |
-| *(default)* | populated from the taxonomy | **Yes** — the ~2–6% unresolved tail |
-| `--no-require-category-path` | populated from the taxonomy | No |
+| *(default)* | populated from the taxonomy | **Yes** — the ~2–6% empty tail, plus the thin unanchored slice |
+| `--no-require-category-path` | populated from the taxonomy | No (both are still counted in the report) |
 | `--no-taxonomy` | always `[]` | No (gate auto-disabled) |
 | taxonomy fails to load | always `[]` | No (gate auto-disabled, with a warning) |
 
@@ -388,7 +403,7 @@ silently emitting an empty dataset.
 - Description in target language: `generic_name_{lang}` OR `ingredients_text_{lang}` OR (`lang == {lang}` AND `generic_name`/`ingredients_text`)
 - A front image matching the target language: `images.front_{lang}`
 - If `--require-category` is enabled: at least one meaningful category (placeholder/empty categories excluded)
-- By default, a `category_path` that resolves against the OFF taxonomy — products whose hierarchy can't be reconstructed are excluded (disable with `--no-require-category-path`)
+- By default, a `category_path` that resolves against the OFF taxonomy **and reaches one of its 92 global roots** — products whose hierarchy can't be reconstructed, and products whose chain starts mid-taxonomy because the language filter severed its ancestry, are both excluded (disable with `--no-require-category-path`)
 - Synthetic deterministic price (see Price Estimation)
 
 ## A small sample of cleaned NDJSON files
