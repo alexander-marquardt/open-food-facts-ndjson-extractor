@@ -1,0 +1,559 @@
+{
+  "schema": "off-catalog-build-manifest/1",
+  "generated_utc": "2026-08-03T10:34:52Z",
+  "extractor": {
+    "commit": "9e8a4c6f38e7f03d7f42dc4fbc97601210285d83",
+    "described": "9e8a4c6",
+    "tracked_files_clean": true
+  },
+  "dump": {
+    "name": "openfoodfacts-products.jsonl.gz",
+    "bytes": 10489757443,
+    "modified_utc": "2026-01-09T20:46:03Z",
+    "sha256": "f06f34f7ecd19405bf3e91a31d638d96ba91cd364bee69f9530a6c6380dd2f5f",
+    "source": "https://static.openfoodfacts.org/data/openfoodfacts-products.jsonl.gz"
+  },
+  "taxonomy": {
+    "name": "categories.json",
+    "bytes": 4532475,
+    "modified_utc": "2026-06-02T11:31:41Z",
+    "sha256": "74717ecc001cf8661f6ec0bb3fc8c7a0cf317a6355a245004e892348fe575ec5",
+    "nodes": 14457,
+    "global_roots": 92
+  },
+  "locales": [
+    {
+      "lang": "en",
+      "catalog": {
+        "name": "off_en_v14.ndjson",
+        "bytes": 271865424,
+        "modified_utc": "2026-08-03T10:31:57Z",
+        "sha256": "06cb9b1a1cd4af706aa9c35b9e5cf7e6a87fb9bfa6913bb5679ed9f6b44e7c87"
+      },
+      "elapsed_seconds": 498.862996339798,
+      "counters": {
+        "read": 4241020,
+        "written": 108380,
+        "bad_json": 0,
+        "missing_code": 2,
+        "missing_title": 2550429,
+        "missing_desc": 1058724,
+        "missing_image": 479775,
+        "missing_category": 43710,
+        "with_category_path": 108380,
+        "missing_category_path": 0,
+        "unanchored_category_path": 0,
+        "categories_at_multiple_addresses": 0,
+        "categories_under_multiple_labels": 0,
+        "labels_shared_by_multiple_categories": 0,
+        "products_with_refused_category_tags": 20789,
+        "refused_category_tags": 23982
+      },
+      "category_path_anchoring": {
+        "taxonomy_roots": 92,
+        "traversal_roots": 92,
+        "phantom_roots": 0,
+        "top_phantom_roots": [],
+        "products_with_unanchored_path": 0,
+        "distinct_unanchored_heads": 0,
+        "top_unanchored_heads": []
+      },
+      "category_path_addresses": {
+        "categories_seen": 3977,
+        "categories_at_multiple_addresses": 0,
+        "examples": [],
+        "labels_seen": 4605,
+        "categories_under_multiple_labels": 0,
+        "label_examples": [],
+        "labels_shared_by_multiple_categories": 0,
+        "shared_label_examples": []
+      },
+      "refusals": {
+        "tag_instances": 576185,
+        "accepted_instances": 552203,
+        "aliased_instances": 2362,
+        "rejected_instances": 23982,
+        "rejected_rate": 0.041622,
+        "rejected_by_reason": {
+          "curated_drop": 6685,
+          "not_in_taxonomy": 16060,
+          "out_of_language": 1237
+        },
+        "unknown_tag_instances": 16060,
+        "unknown_tag_rate": 0.027873,
+        "distinct_unknown_tags": 9805,
+        "products_with_rejected_tags": 20789,
+        "products_with_no_accepted_tag": 5973,
+        "top_unknown_tags": [
+          {
+            "tag": "en:juice",
+            "instances": 86
+          },
+          {
+            "tag": "en:rice",
+            "instances": 80
+          },
+          {
+            "tag": "en:vegan",
+            "instances": 79
+          },
+          {
+            "tag": "en:protein-supplement",
+            "instances": 71
+          },
+          {
+            "tag": "en:crackers",
+            "instances": 68
+          },
+          {
+            "tag": "en:baking",
+            "instances": 67
+          },
+          {
+            "tag": "en:snack-bar",
+            "instances": 60
+          },
+          {
+            "tag": "en:couscous",
+            "instances": 54
+          },
+          {
+            "tag": "en:beans",
+            "instances": 51
+          },
+          {
+            "tag": "en:margherita-pizza",
+            "instances": 49
+          },
+          {
+            "tag": "en:protein",
+            "instances": 49
+          },
+          {
+            "tag": "en:fruit-snack",
+            "instances": 46
+          },
+          {
+            "tag": "en:nuts-and-dried-fruits",
+            "instances": 44
+          },
+          {
+            "tag": "en:salsa",
+            "instances": 44
+          },
+          {
+            "tag": "en:curry-powder",
+            "instances": 44
+          },
+          {
+            "tag": "en:baby-formula",
+            "instances": 44
+          },
+          {
+            "tag": "en:nutritionally-complete-food",
+            "instances": 43
+          },
+          {
+            "tag": "en:sports-drink",
+            "instances": 42
+          },
+          {
+            "tag": "en:beet",
+            "instances": 40
+          },
+          {
+            "tag": "en:fruit-puree",
+            "instances": 39
+          }
+        ]
+      },
+      "artifact_verification": {
+        "ndjson": "/Users/alexandermarquardt/Documents/off-catalogs-2026-08-03/off_en_v14.ndjson",
+        "lang": "en",
+        "records": 108380,
+        "with_category_path": 108380,
+        "empty_category_path": 0,
+        "distinct_ids": 108379,
+        "duplicate_id_instances": 1,
+        "distinct_categories_in_paths": 3977,
+        "property_3_single_chain_violations": 0,
+        "property_3_examples": [],
+        "property_2_categories_at_multiple_addresses": 0,
+        "property_2_examples": [],
+        "unanchored_chains": 0,
+        "unanchored_examples": [],
+        "taxonomy_root_labels": 92,
+        "values_outside_pinned_snapshot": 0,
+        "value_instances_outside_pinned_snapshot": 0,
+        "top_values_outside_pinned_snapshot": [],
+        "path_depth_histogram": {
+          "1": 8786,
+          "2": 15276,
+          "3": 32440,
+          "4": 27337,
+          "5": 15367,
+          "6": 6098,
+          "7": 2795,
+          "8": 263,
+          "9": 17,
+          "10": 1
+        }
+      }
+    },
+    {
+      "lang": "es",
+      "catalog": {
+        "name": "off_es_v14.ndjson",
+        "bytes": 81518709,
+        "modified_utc": "2026-08-03T10:31:57Z",
+        "sha256": "c16e72d6b459a603875d5962a5179db0d9856e41d7f455a2fab9308de15940ee"
+      },
+      "elapsed_seconds": 498.863765001297,
+      "counters": {
+        "read": 4241020,
+        "written": 31913,
+        "bad_json": 0,
+        "missing_code": 2,
+        "missing_title": 3887273,
+        "missing_desc": 293734,
+        "missing_image": 24248,
+        "missing_category": 3850,
+        "with_category_path": 31913,
+        "missing_category_path": 0,
+        "unanchored_category_path": 0,
+        "categories_at_multiple_addresses": 0,
+        "categories_under_multiple_labels": 0,
+        "labels_shared_by_multiple_categories": 0,
+        "products_with_refused_category_tags": 6076,
+        "refused_category_tags": 7609
+      },
+      "category_path_anchoring": {
+        "taxonomy_roots": 92,
+        "traversal_roots": 92,
+        "phantom_roots": 0,
+        "top_phantom_roots": [],
+        "products_with_unanchored_path": 0,
+        "distinct_unanchored_heads": 0,
+        "top_unanchored_heads": []
+      },
+      "category_path_addresses": {
+        "categories_seen": 2721,
+        "categories_at_multiple_addresses": 0,
+        "examples": [],
+        "labels_seen": 3263,
+        "categories_under_multiple_labels": 0,
+        "label_examples": [],
+        "labels_shared_by_multiple_categories": 0,
+        "shared_label_examples": []
+      },
+      "refusals": {
+        "tag_instances": 212522,
+        "accepted_instances": 204913,
+        "aliased_instances": 597,
+        "rejected_instances": 7609,
+        "rejected_rate": 0.035803,
+        "rejected_by_reason": {
+          "curated_drop": 1740,
+          "not_in_taxonomy": 5207,
+          "out_of_language": 662
+        },
+        "unknown_tag_instances": 5207,
+        "unknown_tag_rate": 0.024501,
+        "distinct_unknown_tags": 2591,
+        "products_with_rejected_tags": 6076,
+        "products_with_no_accepted_tag": 1314,
+        "top_unknown_tags": [
+          {
+            "tag": "es:aliments-et-boissons-a-base-de-vegetaux",
+            "instances": 66
+          },
+          {
+            "tag": "es:aliments-d-origine-vegetale",
+            "instances": 59
+          },
+          {
+            "tag": "es:jugos",
+            "instances": 51
+          },
+          {
+            "tag": "fr:chips-de-pommes-de-terre-classiques",
+            "instances": 46
+          },
+          {
+            "tag": "en:canned-red-peppers",
+            "instances": 42
+          },
+          {
+            "tag": "es:verduras-en-conserva-y-tarro",
+            "instances": 41
+          },
+          {
+            "tag": "es:refrescos",
+            "instances": 41
+          },
+          {
+            "tag": "es:potitos-de-bebe",
+            "instances": 37
+          },
+          {
+            "tag": "es:sazonador",
+            "instances": 36
+          },
+          {
+            "tag": "es:aliments-a-base-de-fruits-et-de-legumes",
+            "instances": 31
+          },
+          {
+            "tag": "en:chocolate-covered-fruits",
+            "instances": 26
+          },
+          {
+            "tag": "es:surgeles",
+            "instances": 25
+          },
+          {
+            "tag": "es:conservas-y-tarros-de-pescado",
+            "instances": 24
+          },
+          {
+            "tag": "es:enlatados",
+            "instances": 23
+          },
+          {
+            "tag": "es:croquetas",
+            "instances": 22
+          },
+          {
+            "tag": "es:saborizantes",
+            "instances": 20
+          },
+          {
+            "tag": "en:chocolate-covered-almonds",
+            "instances": 20
+          },
+          {
+            "tag": "es:refresco",
+            "instances": 20
+          },
+          {
+            "tag": "en:comestibles",
+            "instances": 19
+          },
+          {
+            "tag": "es:tortillas",
+            "instances": 19
+          }
+        ]
+      },
+      "artifact_verification": {
+        "ndjson": "/Users/alexandermarquardt/Documents/off-catalogs-2026-08-03/off_es_v14.ndjson",
+        "lang": "es",
+        "records": 31913,
+        "with_category_path": 31913,
+        "empty_category_path": 0,
+        "distinct_ids": 31910,
+        "duplicate_id_instances": 3,
+        "distinct_categories_in_paths": 2721,
+        "property_3_single_chain_violations": 0,
+        "property_3_examples": [],
+        "property_2_categories_at_multiple_addresses": 0,
+        "property_2_examples": [],
+        "unanchored_chains": 0,
+        "unanchored_examples": [],
+        "taxonomy_root_labels": 92,
+        "values_outside_pinned_snapshot": 0,
+        "value_instances_outside_pinned_snapshot": 0,
+        "top_values_outside_pinned_snapshot": [],
+        "path_depth_histogram": {
+          "1": 730,
+          "2": 2584,
+          "3": 8532,
+          "4": 8934,
+          "5": 6327,
+          "6": 3447,
+          "7": 1271,
+          "8": 81,
+          "9": 7
+        }
+      }
+    },
+    {
+      "lang": "fr",
+      "catalog": {
+        "name": "off_fr_v14.ndjson",
+        "bytes": 584894152,
+        "modified_utc": "2026-08-03T10:31:34Z",
+        "sha256": "a97e1826e0d66f2cdf875b057cdae329289c5e304808118e521bffb5aa47574a"
+      },
+      "elapsed_seconds": 506.0304057598114,
+      "counters": {
+        "read": 4241020,
+        "written": 223036,
+        "bad_json": 0,
+        "missing_code": 2,
+        "missing_title": 2929198,
+        "missing_desc": 944596,
+        "missing_image": 110040,
+        "missing_category": 34148,
+        "with_category_path": 223036,
+        "missing_category_path": 0,
+        "unanchored_category_path": 0,
+        "categories_at_multiple_addresses": 0,
+        "categories_under_multiple_labels": 0,
+        "labels_shared_by_multiple_categories": 0,
+        "products_with_refused_category_tags": 40850,
+        "refused_category_tags": 49712
+      },
+      "category_path_anchoring": {
+        "taxonomy_roots": 92,
+        "traversal_roots": 92,
+        "phantom_roots": 0,
+        "top_phantom_roots": [],
+        "products_with_unanchored_path": 0,
+        "distinct_unanchored_heads": 0,
+        "top_unanchored_heads": []
+      },
+      "category_path_addresses": {
+        "categories_seen": 5582,
+        "categories_at_multiple_addresses": 0,
+        "examples": [],
+        "labels_seen": 6502,
+        "categories_under_multiple_labels": 0,
+        "label_examples": [],
+        "labels_shared_by_multiple_categories": 0,
+        "shared_label_examples": []
+      },
+      "refusals": {
+        "tag_instances": 1504955,
+        "accepted_instances": 1455243,
+        "aliased_instances": 6646,
+        "rejected_instances": 49712,
+        "rejected_rate": 0.033032,
+        "rejected_by_reason": {
+          "curated_drop": 14330,
+          "not_in_taxonomy": 34317,
+          "out_of_language": 1065
+        },
+        "unknown_tag_instances": 34317,
+        "unknown_tag_rate": 0.022803,
+        "distinct_unknown_tags": 14854,
+        "products_with_rejected_tags": 40850,
+        "products_with_no_accepted_tag": 4614,
+        "top_unknown_tags": [
+          {
+            "tag": "en:snacks-sucres",
+            "instances": 224
+          },
+          {
+            "tag": "fr:gaufres-liegeoises",
+            "instances": 141
+          },
+          {
+            "tag": "en:aliments-et-boissons-a-base-de-vegetaux",
+            "instances": 131
+          },
+          {
+            "tag": "fr:aliments-a-base-de-plantes-seches",
+            "instances": 128
+          },
+          {
+            "tag": "en:biscuits-et-gateaux",
+            "instances": 125
+          },
+          {
+            "tag": "fr:epicerie",
+            "instances": 121
+          },
+          {
+            "tag": "fr:legumes-en-conserve-et-bocal",
+            "instances": 120
+          },
+          {
+            "tag": "en:open-pies",
+            "instances": 119
+          },
+          {
+            "tag": "fr:epices-et-aromates",
+            "instances": 112
+          },
+          {
+            "tag": "en:chocolate-covered-fruits",
+            "instances": 108
+          },
+          {
+            "tag": "en:aliments-d-origine-vegetale",
+            "instances": 102
+          },
+          {
+            "tag": "en:two-crust-pies",
+            "instances": 100
+          },
+          {
+            "tag": "en:couscous",
+            "instances": 99
+          },
+          {
+            "tag": "en:margherita-pizza",
+            "instances": 96
+          },
+          {
+            "tag": "en:almond-meal",
+            "instances": 84
+          },
+          {
+            "tag": "en:pet-food",
+            "instances": 82
+          },
+          {
+            "tag": "en:epicerie",
+            "instances": 81
+          },
+          {
+            "tag": "en:vegetable-jams",
+            "instances": 80
+          },
+          {
+            "tag": "en:chicken-basque-style",
+            "instances": 80
+          },
+          {
+            "tag": "fr:tartinades",
+            "instances": 79
+          }
+        ]
+      },
+      "artifact_verification": {
+        "ndjson": "/Users/alexandermarquardt/Documents/off-catalogs-2026-08-03/off_fr_v14.ndjson",
+        "lang": "fr",
+        "records": 223036,
+        "with_category_path": 223036,
+        "empty_category_path": 0,
+        "distinct_ids": 222955,
+        "duplicate_id_instances": 81,
+        "distinct_categories_in_paths": 5582,
+        "property_3_single_chain_violations": 0,
+        "property_3_examples": [],
+        "property_2_categories_at_multiple_addresses": 0,
+        "property_2_examples": [],
+        "unanchored_chains": 0,
+        "unanchored_examples": [],
+        "taxonomy_root_labels": 92,
+        "values_outside_pinned_snapshot": 0,
+        "value_instances_outside_pinned_snapshot": 0,
+        "top_values_outside_pinned_snapshot": [],
+        "path_depth_histogram": {
+          "1": 4522,
+          "2": 15664,
+          "3": 54729,
+          "4": 63936,
+          "5": 49512,
+          "6": 24898,
+          "7": 8721,
+          "8": 998,
+          "9": 56
+        }
+      }
+    }
+  ],
+  "note": "Offline rebuild for issue #12. Built from the local 2026-01-09 dump; the 2026-08-03 upstream dump was not downloaded (see VERIFICATION.md). No index was written by this build."
+}

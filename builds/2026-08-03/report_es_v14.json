@@ -1,0 +1,254 @@
+{
+  "input": "/Users/alexandermarquardt/Documents/ecommerce-open-food-facts/data/json_source/openfoodfacts-products.jsonl.gz",
+  "output": "/Users/alexandermarquardt/Documents/off-catalogs-2026-08-03/off_es_v14.ndjson",
+  "pricing_config": "/private/tmp/wt-ext12-s26-a7f3/config/pricing_buckets.json",
+  "elapsed_seconds": 498.863765001297,
+  "counters": {
+    "read": 4241020,
+    "written": 31913,
+    "bad_json": 0,
+    "missing_code": 2,
+    "missing_title": 3887273,
+    "missing_desc": 293734,
+    "missing_image": 24248,
+    "missing_category": 3850,
+    "with_category_path": 31913,
+    "missing_category_path": 0,
+    "unanchored_category_path": 0,
+    "categories_at_multiple_addresses": 0,
+    "categories_under_multiple_labels": 0,
+    "labels_shared_by_multiple_categories": 0,
+    "products_with_refused_category_tags": 6076,
+    "refused_category_tags": 7609
+  },
+  "category_path_addresses": {
+    "categories_seen": 2721,
+    "categories_at_multiple_addresses": 0,
+    "examples": [],
+    "labels_seen": 3263,
+    "categories_under_multiple_labels": 0,
+    "label_examples": [],
+    "labels_shared_by_multiple_categories": 0,
+    "shared_label_examples": []
+  },
+  "category_tag_curation": {
+    "products_with_tags": 33227,
+    "products_with_rejected_tags": 6076,
+    "products_with_no_accepted_tag": 1314,
+    "tag_instances": 212522,
+    "accepted_instances": 204913,
+    "aliased_instances": 597,
+    "rejected_instances": 7609,
+    "rejected_rate": 0.035803,
+    "unknown_tag_instances": 5207,
+    "unknown_tag_rate": 0.024501,
+    "distinct_unknown_tags": 2591,
+    "rejected_by_reason": {
+      "curated_drop": 1740,
+      "not_in_taxonomy": 5207,
+      "out_of_language": 662
+    },
+    "top_unknown_tags": [
+      {
+        "tag": "es:aliments-et-boissons-a-base-de-vegetaux",
+        "instances": 66
+      },
+      {
+        "tag": "es:aliments-d-origine-vegetale",
+        "instances": 59
+      },
+      {
+        "tag": "es:jugos",
+        "instances": 51
+      },
+      {
+        "tag": "fr:chips-de-pommes-de-terre-classiques",
+        "instances": 46
+      },
+      {
+        "tag": "en:canned-red-peppers",
+        "instances": 42
+      },
+      {
+        "tag": "es:verduras-en-conserva-y-tarro",
+        "instances": 41
+      },
+      {
+        "tag": "es:refrescos",
+        "instances": 41
+      },
+      {
+        "tag": "es:potitos-de-bebe",
+        "instances": 37
+      },
+      {
+        "tag": "es:sazonador",
+        "instances": 36
+      },
+      {
+        "tag": "es:aliments-a-base-de-fruits-et-de-legumes",
+        "instances": 31
+      },
+      {
+        "tag": "en:chocolate-covered-fruits",
+        "instances": 26
+      },
+      {
+        "tag": "es:surgeles",
+        "instances": 25
+      },
+      {
+        "tag": "es:conservas-y-tarros-de-pescado",
+        "instances": 24
+      },
+      {
+        "tag": "es:enlatados",
+        "instances": 23
+      },
+      {
+        "tag": "es:croquetas",
+        "instances": 22
+      },
+      {
+        "tag": "es:saborizantes",
+        "instances": 20
+      },
+      {
+        "tag": "en:chocolate-covered-almonds",
+        "instances": 20
+      },
+      {
+        "tag": "es:refresco",
+        "instances": 20
+      },
+      {
+        "tag": "en:comestibles",
+        "instances": 19
+      },
+      {
+        "tag": "es:tortillas",
+        "instances": 19
+      }
+    ],
+    "top_out_of_language_tags": [
+      {
+        "tag": "fr:pates-a-tartiner",
+        "instances": 175
+      },
+      {
+        "tag": "fr:charcuteries-cuites",
+        "instances": 93
+      },
+      {
+        "tag": "xx:tofu",
+        "instances": 78
+      },
+      {
+        "tag": "fr:charcuteries-diverses",
+        "instances": 68
+      },
+      {
+        "tag": "fr:chips-de-pommes-de-terre-lisses",
+        "instances": 31
+      },
+      {
+        "tag": "fr:cereales-preparees",
+        "instances": 18
+      },
+      {
+        "tag": "fr:jambons-iberiques",
+        "instances": 17
+      },
+      {
+        "tag": "fr:fouets-catalans",
+        "instances": 15
+      },
+      {
+        "tag": "fr:jambons-iberiques-de-cebo",
+        "instances": 14
+      },
+      {
+        "tag": "fr:boudins",
+        "instances": 13
+      },
+      {
+        "tag": "fr:aromes-patisserie",
+        "instances": 13
+      },
+      {
+        "tag": "ca:cervesa-ipa",
+        "instances": 10
+      },
+      {
+        "tag": "it:fettuccine",
+        "instances": 8
+      },
+      {
+        "tag": "fr:preparations-pour-flans",
+        "instances": 7
+      },
+      {
+        "tag": "fr:cremes-legeres",
+        "instances": 6
+      },
+      {
+        "tag": "fr:farfalles",
+        "instances": 5
+      },
+      {
+        "tag": "fr:barres-aux-fruits",
+        "instances": 5
+      },
+      {
+        "tag": "fr:panettone-au-chocolat",
+        "instances": 5
+      },
+      {
+        "tag": "fr:pains-multicereales",
+        "instances": 5
+      },
+      {
+        "tag": "fr:arome-de-vanille",
+        "instances": 4
+      }
+    ],
+    "curated_drops": [
+      {
+        "tag": "en:groceries",
+        "instances": 1592,
+        "reason": "contentless catch-all — every product in a grocery catalog is groceries. 36.6% of all unresolvable tag instances, and only 58 of its 18,291 carriers have no other tag, so refusing it costs essentially nothing."
+      },
+      {
+        "tag": "en:salads",
+        "instances": 117,
+        "reason": "unresolvable — 901 instances, no node in the pinned snapshot or upstream and no rename kept it as a synonym. The nearest node, en:prepared-salads, is a narrower sibling rather than a successor, and 'salads' is ambiguous between a leaf salad and a prepared one; 24 of its 901 carriers keep no other usable tag."
+      },
+      {
+        "tag": "en:raw-cured-ham",
+        "instances": 31,
+        "reason": "unresolvable — 340 instances. en:cured-hams exists and keeps 'cured ham' as a synonym, but not this id: aliasing there would silently discard 'raw', which is the distinction the tag exists to make. Every carrier keeps a valid lineage, so refusing the value costs no records."
+      }
+    ]
+  },
+  "category_path_anchoring": {
+    "taxonomy_roots": 92,
+    "traversal_roots": 92,
+    "phantom_roots": 0,
+    "top_phantom_roots": [],
+    "products_with_unanchored_path": 0,
+    "distinct_unanchored_heads": 0,
+    "top_unanchored_heads": []
+  },
+  "filters": {
+    "lang": "es",
+    "title": "product_name_es OR (lang==es AND product_name)",
+    "description": "generic_name_es OR ingredients_text_es OR (lang==es AND generic_name/ingredients_text)",
+    "image": "computed from images/front_es + rev/imgid",
+    "category": "required",
+    "category_tags": "aliased through the curated rename map, then refused unless the id is a taxonomy node this catalog may file a product under; refused values are dropped, never their records",
+    "category_path": "hierarchical root->leaf path from OFF taxonomy (written for 31,913/31,913 records; 0 unresolved products dropped, 0 more dropped for a path that stops short of a taxonomy root)",
+    "price": "category baseline unit model + deterministic noise + label premiums + retail rounding",
+    "dietary_restrictions": "keyword list derived from labels_tags and ingredients_analysis_tags (positive-only)",
+    "progress": "every 500000 records and/or 5.0s"
+  }
+}
