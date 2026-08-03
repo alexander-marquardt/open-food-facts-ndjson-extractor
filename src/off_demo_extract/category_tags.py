@@ -42,14 +42,21 @@ The three rejection reasons
 ``not_in_taxonomy``
     No node with this id, in the pinned snapshot or upstream. The long tail.
 ``out_of_language``
-    A real taxonomy node, but in a language this catalog does not place in a
-    path (see ``taxonomy.default_keep_prefixes``). ``fr:charcuteries-cuites`` is
+    A real taxonomy node, but in a language this catalog does not file products
+    under (see ``taxonomy.default_keep_prefixes``). ``fr:charcuteries-cuites`` is
     a genuine node and still has no business being a searchable English
-    category: ``category_path`` already refuses it, so leaving it in the flat
-    field produces a value that can be searched but never faceted or filtered —
-    the same defect ``en:groceries`` had. It costs 3 further products out of
-    218,239 to refuse it (measured), because a product with a French-only tag
-    almost always carries the English lineage too.
+    category: ``category_chain`` will not choose it as a leaf either, so leaving
+    it in the flat field produces a value that can be searched but never faceted
+    or filtered — the same defect ``en:groceries`` had. It costs 3 further
+    products out of 218,239 to refuse it (measured), because a product with a
+    French-only tag almost always carries the English lineage too.
+
+    Refused as a *value*, not erased from the hierarchy: the same node may still
+    appear as an intermediate ``category_path`` segment, because a path walks the
+    language-blind taxonomy graph. An English product tagged
+    ``fr:charcuteries-cuites`` is not filed under it, but a product filed under
+    ``en:poultry-hams`` does pass through it, which is where that node genuinely
+    sits.
 
 Aliases are canonicalisations, never generalisations
 ----------------------------------------------------
@@ -82,6 +89,8 @@ from __future__ import annotations
 from collections import Counter
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Sequence, Set, Tuple
+
+from .taxonomy import eligible_nodes
 
 # Rejection reason codes. Reported per run so a regression is a moving number in
 # the report rather than something rediscovered by hand against the built index.
@@ -166,23 +175,38 @@ TAG_DROPS: Dict[str, str] = {
 
 @dataclass(frozen=True)
 class CategoryVocabulary:
-    """The category ids a run is allowed to emit, and the ids that merely exist.
+    """The category ids a run is allowed to name, and the ids that merely exist.
 
-    ``eligible`` is the exact set the hierarchical path walks — pass
-    ``set(canonical_parents)`` so the flat ``categories`` field and
-    ``category_path`` cannot draw on different vocabularies. ``known`` is every
-    id in the loaded taxonomy, and exists only to tell an out-of-language node
-    apart from a tag that is not in the taxonomy at all.
+    ``eligible`` is the set a catalog may put a product *under*: exactly
+    ``taxonomy.eligible_nodes`` for this run's languages, which is the same set
+    ``category_chain`` picks its leaf from, so the flat ``categories`` field and
+    the tip of ``category_path`` cannot draw on different vocabularies.
+
+    It is deliberately **not** the set a path may walk *through*: the parent map
+    is language-blind, so a chain may pass through a foreign ancestor whose id
+    would be refused as a flat value. That is the point rather than a leak — the
+    path segment is the taxonomy's structure, which has no language, while a flat
+    value is a searchable claim about the product, which does.
+
+    ``known`` is every id in the loaded taxonomy, and exists only to tell an
+    out-of-language node apart from a tag that is not in the taxonomy at all.
     """
 
     eligible: Set[str]
     known: Set[str]
 
     @classmethod
-    def from_canonical_parents(
-        cls, canonical_parents: Dict[str, Optional[str]], taxonomy: Dict[str, Any]
+    def for_catalog(
+        cls,
+        taxonomy: Dict[str, Any],
+        keep_prefixes: Optional[Set[str]],
+        exclude: Optional[Set[str]] = None,
     ) -> "CategoryVocabulary":
-        return cls(eligible=set(canonical_parents), known=set(taxonomy))
+        """Build from the taxonomy directly, via the one eligibility rule."""
+        return cls(
+            eligible=eligible_nodes(taxonomy, keep_prefixes=keep_prefixes, exclude=exclude),
+            known=set(taxonomy),
+        )
 
 
 @dataclass

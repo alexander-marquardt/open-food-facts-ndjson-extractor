@@ -2,15 +2,27 @@
 
 Why this is a separate defect from an empty path
 ------------------------------------------------
-Every chain is walked to a root of the parent map built for *this* run, and that
-map holds only the languages the catalog may place in a path. A node whose only
-parent is foreign is therefore promoted to a root of the map while remaining a
-child of the taxonomy — 90 of the 161 roots an English run sees are manufactured
-that way. The chain that starts there is truncated: ``en:pate`` really hangs
-under ``fr:charcuteries-diverses`` under ``en:prepared-meats``, so an English
-catalog files it as a top-level ``Pâté`` and a French one does not. The path
+Every chain is walked to a root of the parent map built for *this* run. A node
+whose only parents were pruned out of that map is promoted to a root of it while
+remaining a child of the taxonomy, and the chain that starts there is truncated:
+it files its categories at an address that exists in no other catalog. The path
 itself is non-empty and perfectly well-formed, so the emptiness test the gate
 used to run cannot see it.
+
+What can prune a parent, and what no longer can
+-----------------------------------------------
+The language filter used to, and that was the bulk of it — 90 of the 161 roots
+an English run saw were manufactured that way, ``en:pate`` among them. Traversal
+is language-blind now (``tests/test_language_blind_traversal.py``), so a foreign
+parent is walked through rather than pruned and a default run has nothing left
+to refuse.
+
+``--category-exclude`` still prunes, and it is what these tests sever with. An
+operator naming a mid-taxonomy node orphans everything beneath it, which is the
+same defect from the chain's point of view and the reason the gate is still here.
+Severing deliberately, rather than relying on a filter that no longer severs, is
+also what keeps these tests honest: the rule is exercised by a mechanism that
+really exists.
 
 What is tested, and against what
 --------------------------------
@@ -18,16 +30,14 @@ Both halves drive the real ``extract.main()`` CLI, because the gate's effective
 value is resolved at runtime and only the full path proves it.
 
 * :data:`TAXONOMY` is a hand-built miniature that isolates the mechanism — one
-  branch severed by the language filter, one intact — so a failure points at the
-  rule rather than at the data.
+  branch severed by the exclusion, one intact — so a failure points at the rule
+  rather than at the data.
 * ``tests/fixtures/off_unanchored_chains.json`` is the same rule against **real
   records**: verbatim ``categories_tags`` from the public export and the complete
   upward closure of those tags from the public taxonomy. The closure is complete,
   so a node is a root in the fixture exactly when it is a root in the full
   taxonomy — which is the only property that makes the fixture able to reproduce
-  this defect at all. Its four unanchored products are the four worst heads
-  measured over the first 300,000 records of the January 2026 dump, where an
-  English run resolves 455 unanchored chains under six distinct heads.
+  this defect at all.
 
 Run with ``pytest tests/`` or directly: ``python tests/test_root_anchored_gate.py``.
 """
@@ -55,9 +65,10 @@ def _n(name: str, parents: List[str]) -> Dict[str, Any]:
 
 
 # Miniature taxonomy, shaped like the real defect. ``fr:charcuteries`` is a real
-# node with a real English parent, but an English run may not place it in a path,
-# so ``en:pate`` loses its ancestry and is promoted to a root of the run's map.
-# ``en:snacks`` is the control: a genuine taxonomy root, one segment, legitimate.
+# node with a real English parent; excluding it (see :data:`SEVER`) takes
+# ``en:pate``'s only ancestry with it and promotes ``en:pate`` to a root of the
+# run's map. ``en:snacks`` is the control: a genuine taxonomy root, one segment,
+# legitimate — and it is excluded from nothing, so it must survive.
 TAXONOMY = {
     "en:prepared-meats": _n("Prepared meats", []),
     "fr:charcuteries": _n("Charcuteries", ["en:prepared-meats"]),
@@ -65,6 +76,11 @@ TAXONOMY = {
     "en:pork-pates": _n("Pork pates", ["en:pate"]),
     "en:snacks": _n("Snacks", []),
 }
+
+# Cutting the one node that stands between en:pate and the taxonomy's root. The
+# default exclusion list is replaced wholesale, which is harmless here: none of
+# its ids is in this taxonomy.
+SEVER = ("--category-exclude", "fr:charcuteries")
 
 TRUNCATED_CODE = "3017620422003"
 ROOT_ONLY_CODE = "5449000000996"
@@ -137,11 +153,13 @@ def _tmpdir() -> Any:
 # The rule, in isolation
 # ---------------------------------------------------------------------------
 
-def test_global_roots_ignores_the_language_filter() -> None:
-    """A node with a foreign parent is not a root, however the run is configured.
+def test_global_roots_ignores_what_the_run_pruned() -> None:
+    """A node with a parent is not a root, however the run is configured.
 
-    This is the fact the gate rests on. ``build_canonical_parent_map`` would call
-    ``en:pate`` a root for an English run; the taxonomy does not.
+    This is the fact the gate rests on, and it has to be read off the taxonomy
+    file rather than off the run: ``build_canonical_parent_map`` calls
+    ``en:pate`` a root once ``fr:charcuteries`` is excluded. The taxonomy does
+    not, and that disagreement is precisely what the gate refuses.
     """
     roots = global_roots(TAXONOMY)
     assert roots == {"en:prepared-meats", "en:snacks"}, sorted(roots)
@@ -170,7 +188,7 @@ def test_truncated_chain_is_dropped_and_root_only_is_kept() -> None:
     the taxonomy can keep one and drop the other, so both are asserted together.
     """
     with _tmpdir() as d:
-        records, _report = _run_extract(Path(d), TAXONOMY, INPUT_PRODUCTS)
+        records, _report = _run_extract(Path(d), TAXONOMY, INPUT_PRODUCTS, *SEVER)
 
     ids = {r["id"] for r in records}
     assert ids == {ROOT_ONLY_CODE}, (
@@ -186,7 +204,7 @@ def test_the_drop_is_counted_and_the_head_is_named() -> None:
     the refusal is a work item rather than a percentage.
     """
     with _tmpdir() as d:
-        _records, report = _run_extract(Path(d), TAXONOMY, INPUT_PRODUCTS)
+        _records, report = _run_extract(Path(d), TAXONOMY, INPUT_PRODUCTS, *SEVER)
 
     counters = report["counters"]
     assert counters["unanchored_category_path"] == 1, counters
@@ -212,7 +230,7 @@ def test_override_keeps_the_truncated_record_but_still_reports_it() -> None:
     """
     with _tmpdir() as d:
         records, report = _run_extract(
-            Path(d), TAXONOMY, INPUT_PRODUCTS, "--no-require-category-path"
+            Path(d), TAXONOMY, INPUT_PRODUCTS, *SEVER, "--no-require-category-path"
         )
 
     by_id = {r["id"]: r for r in records}
@@ -233,7 +251,7 @@ def test_a_fully_anchored_run_reports_nothing_unanchored() -> None:
     """
     with _tmpdir() as d:
         _records, report = _run_extract(
-            Path(d), TAXONOMY, [_product(ROOT_ONLY_CODE, ["en:snacks"])]
+            Path(d), TAXONOMY, [_product(ROOT_ONLY_CODE, ["en:snacks"])], *SEVER
         )
 
     anchoring = report["category_path_anchoring"]
@@ -254,26 +272,33 @@ def _real_fixture() -> Tuple[Dict[str, Any], List[Dict[str, Any]]]:
     return data["taxonomy"], products
 
 
-# Measured over the first 300,000 records of the January 2026 dump: these four
-# heads carry 451 of the 455 products an English run leaves unanchored.
+# The two fixture products whose lineage runs through a node with no other
+# route to a root: excluding that node is the only way an operator can strand
+# them. The other five reach a root by an English path regardless, which is why
+# they stay anchored under the same exclusion and make the assertion two-sided.
+REAL_SEVER = ("--category-exclude", "fr:cereales-preparees,xx:dumplings")
 REAL_UNANCHORED = {
-    "0055652001899": "en:pate",
-    "0044700079195": "en:poultry-hams",
     "0017400140328": "en:prepared-rices",
     "0087703021877": "en:chinese-dumplings",
 }
-REAL_ANCHORED = {"0000168175589", "0000111301201", "0000111048403"}
+REAL_ANCHORED = {
+    "0000168175589",
+    "0000111301201",
+    "0000111048403",
+    "0055652001899",
+    "0044700079195",
+}
 
 
 def test_real_records_with_a_severed_ancestry_are_refused() -> None:
-    """Real tags, real taxonomy shape — the four measured worst heads are dropped.
+    """Real tags, real taxonomy shape — an excluded ancestor strands its subtree.
 
     The synthetic taxonomy above proves the rule fires; this proves it fires on
     the shape the export actually produces, which is where the defect was found.
     """
     taxonomy, products = _real_fixture()
     with _tmpdir() as d:
-        records, report = _run_extract(Path(d), taxonomy, products)
+        records, report = _run_extract(Path(d), taxonomy, products, *REAL_SEVER)
 
     kept = {r["id"] for r in records}
     assert kept == REAL_ANCHORED, f"unexpected survivors: {sorted(kept)}"
@@ -293,13 +318,13 @@ def test_real_records_would_have_passed_the_old_emptiness_test() -> None:
 
     This is what makes the defect a gate defect rather than a chain defect: the
     old rule is not merely weaker here, it is blind. Asserted on the paths the
-    permissive run actually emits, including the one-segment ``Chinese dumplings``
-    and the three-segment ``Pâté/…`` — length is no signal either.
+    permissive run actually emits, including the one-segment ``Chinese
+    dumplings`` — length is no signal either.
     """
     taxonomy, products = _real_fixture()
     with _tmpdir() as d:
         records, report = _run_extract(
-            Path(d), taxonomy, products, "--no-require-category-path"
+            Path(d), taxonomy, products, *REAL_SEVER, "--no-require-category-path"
         )
 
     by_id = {r["id"]: r for r in records}
@@ -311,10 +336,9 @@ def test_real_records_would_have_passed_the_old_emptiness_test() -> None:
         assert path, f"{code} has no path at all; it is the wrong fixture for this test"
         assert head not in roots, f"{head} is a taxonomy root; fixture no longer bites"
     assert by_id["0087703021877"]["category_path"] == ["Chinese dumplings"]
-    assert by_id["0055652001899"]["category_path"] == [
-        "Pâté",
-        "Pâté/Pork Pâtés",
-        "Pâté/Pork Pâtés/Country-style Pâtés",
+    assert by_id["0017400140328"]["category_path"] == [
+        "Prepared rices",
+        "Prepared rices/Fried rice",
     ]
 
     assert report["counters"]["missing_category_path"] == 0, (

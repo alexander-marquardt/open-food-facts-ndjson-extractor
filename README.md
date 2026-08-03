@@ -188,14 +188,32 @@ walks a single canonical chain:
 
 1. **Once per run**, collapse the whole taxonomy DAG to a spanning forest by
    giving every category one canonical parent (see [Canonical parents and the
-   tie-break](#canonical-parents-and-the-tie-break)).
+   tie-break](#canonical-parents-and-the-tie-break)). The whole taxonomy, in
+   every language — the same forest for every catalog.
 2. Keep the product's tags that exist in the taxonomy (drops noise and
    foreign-language-only nodes for the target language).
 3. Pick the most specific of those tags as the leaf, and walk the canonical
    parent map from it to a **global** taxonomy root — materialising ancestors the
-   product never tagged.
+   product never tagged, in whatever language the taxonomy files them under.
 4. Emit cumulative `/`-joined path strings using the taxonomy's localized display
    names.
+
+Note where the target language does and does not apply. It decides step 2 —
+which categories a product may be *filed under*, and which values the flat
+`categories` field may carry — and it decides the labels in step 4. It does not
+decide step 1. Filtering the *graph* by language used to delete every edge
+through a filtered node as well, which orphaned that node's children into roots
+of a locale-shaped forest: an English run walked a graph with **161** roots
+where the taxonomy has **92**, a Spanish one 161 and a French one 130, so the
+same category sat at a different depth in each catalog. Now one language-blind
+graph serves all three, and a chain crosses a foreign ancestor instead of being
+severed at it — `en:pate` reaches `Meats and their products/Prepared meats/
+Charcuteries diverses/Pâté` rather than being filed as a top-level `Pâté`.
+
+The visible cost is that one segment: of the 8,965 nodes an English path may
+contain, 26 are foreign and 20 of those have no English or `xx` name, so they
+render de-slugged from their own language. It applies to 0.9% of the categories
+an English catalog can file under, and it buys back their true lineage.
 
 ```text
 raw tags:   en:plant-based-foods-and-beverages, en:beverages, en:hot-beverages,
@@ -320,12 +338,16 @@ Each tag now goes through, in order:
    refused. `en:groceries` is 36.6% of all unresolvable instances on its own and
    is contentless in a grocery catalog; `en:aoc-cheeses` and `en:labeled-cheeses`
    are label *attributes* rather than places in a product hierarchy.
-3. **Membership in the run's category vocabulary** — the same node set the
-   hierarchical path is allowed to walk, so the two fields cannot draw on
+3. **Membership in the run's category vocabulary** — the same node set a product
+   may be *filed under*, so the flat field and the tip of the path cannot draw on
    different vocabularies. A tag that is a real node but in a language this
-   catalog does not place in a path (`fr:charcuteries-cuites` in an English
-   catalog) is refused here too: `category_path` already refuses it, so leaving
+   catalog does not file under (`fr:charcuteries-cuites` in an English catalog)
+   is refused here too: no English product is filed under it either, so leaving
    it in the flat field produces a value that is searchable but never facetable.
+   The same node can still appear as an intermediate *path segment*, because a
+   path walks the language-blind graph — an English product filed under
+   `en:poultry-hams` passes through `fr:charcuteries-cuites`, which is where that
+   category genuinely sits.
 
 **A refused value never refuses its record.** Dropping the record on an
 unresolvable tag would cost 19.6% of tagged products; dropping only the offending
@@ -367,20 +389,22 @@ exactly what each does:
   records in the EN/FR/ES full runs. Pass `--no-require-category-path` to keep
   those products with an empty `category_path` instead.
 
-  "Reconstructed" means **anchored**, not merely non-empty. A chain is walked to
-  a root of the parent map built for *this* run, and that map holds only the
-  languages this catalog may place in a path — so a node whose only parent is
-  foreign is promoted to a root of the map while staying a child of the taxonomy.
-  90 of the 161 roots an English run sees are manufactured that way. `en:pate`
-  really sits under `fr:charcuteries-diverses` under `en:prepared-meats`, so an
-  English catalog would file it as a top-level `Pâté` that no other catalog
-  agrees with. Those chains are refused too, and counted separately from the
-  empty ones. It is a thin slice: over the first 300,000 records of the January
-  2026 dump an English run resolves 455 unanchored chains (French, 2), of which
-  6 also clear the title/description/image filters and would otherwise have been
-  written — 16,847 records out instead of 16,853. Every refusal is named in the
-  report's `category_path_anchoring` block, which is populated whether or not the
-  gate is on.
+  "Reconstructed" means **anchored**, not merely non-empty: the chain has to
+  reach one of the taxonomy's 92 global roots, not just start somewhere. A path
+  that starts mid-taxonomy files its categories at an address no other catalog
+  agrees with, and it is non-empty and well-formed, so an emptiness test cannot
+  see it.
+
+  On a default run this refuses nothing — the graph the chain walks is the whole
+  taxonomy, so its roots *are* the 92. (Before traversal went language-blind,
+  the language filter severed 455 chains per 300,000 records of the January 2026
+  dump for English and 2 for French, 6 of which also cleared the
+  title/description/image filters and were dropped.) What can still strand a
+  chain is `--category-exclude` naming a mid-taxonomy node, which orphans
+  everything beneath it. Every refusal is named in the report's
+  `category_path_anchoring` block, which is populated whether or not the gate is
+  on — the standing zero is what shows the forest still has exactly the
+  taxonomy's roots.
 
 The interaction is the part to watch: with `--no-taxonomy` *every* path is empty,
 so naively "requiring a path" would drop **every** product and produce an empty
@@ -392,7 +416,7 @@ silently emitting an empty dataset.
 
 | Flags | `category_path` | Products dropped for an unresolved path? |
 | :--- | :--- | :--- |
-| *(default)* | populated from the taxonomy | **Yes** — the ~2–6% empty tail, plus the thin unanchored slice |
+| *(default)* | populated from the taxonomy | **Yes** — the ~2–6% empty tail, plus anything `--category-exclude` stranded |
 | `--no-require-category-path` | populated from the taxonomy | No (both are still counted in the report) |
 | `--no-taxonomy` | always `[]` | No (gate auto-disabled) |
 | taxonomy fails to load | always `[]` | No (gate auto-disabled, with a warning) |
@@ -403,7 +427,7 @@ silently emitting an empty dataset.
 - Description in target language: `generic_name_{lang}` OR `ingredients_text_{lang}` OR (`lang == {lang}` AND `generic_name`/`ingredients_text`)
 - A front image matching the target language: `images.front_{lang}`
 - If `--require-category` is enabled: at least one meaningful category (placeholder/empty categories excluded)
-- By default, a `category_path` that resolves against the OFF taxonomy **and reaches one of its 92 global roots** — products whose hierarchy can't be reconstructed, and products whose chain starts mid-taxonomy because the language filter severed its ancestry, are both excluded (disable with `--no-require-category-path`)
+- By default, a `category_path` that resolves against the OFF taxonomy **and reaches one of its 92 global roots** — products whose hierarchy can't be reconstructed, and products whose chain starts mid-taxonomy because `--category-exclude` stranded its ancestry, are both excluded (disable with `--no-require-category-path`)
 - Synthetic deterministic price (see Price Estimation)
 
 ## A small sample of cleaned NDJSON files
