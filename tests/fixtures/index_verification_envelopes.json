@@ -1,0 +1,227 @@
+{
+  "captured_utc": "2026-08-03T11:19:42Z",
+  "index": "catalog_es_v13",
+  "mapping_response": {
+    "catalog_es_v13": {
+      "mappings": {
+        "dynamic": "strict",
+        "_source": {
+          "excludes": [
+            "embedding",
+            "content",
+            "attrs_text"
+          ]
+        },
+        "properties": {
+          "id": {
+            "type": "keyword",
+            "fields": {
+              "concat": {
+                "type": "text",
+                "analyzer": "product_number"
+              },
+              "no_zeros": {
+                "type": "text",
+                "analyzer": "product_number_no_zeros"
+              },
+              "no_zeros_prefix": {
+                "type": "text",
+                "analyzer": "product_number_no_zeros_prefix",
+                "search_analyzer": "product_number_no_zeros"
+              },
+              "prefix": {
+                "type": "text",
+                "analyzer": "product_number_prefix",
+                "search_analyzer": "product_number"
+              }
+            }
+          },
+          "categories": {
+            "type": "keyword",
+            "fields": {
+              "normalized": {
+                "type": "keyword",
+                "normalizer": "keyword_normalizer"
+              },
+              "text": {
+                "type": "text",
+                "analyzer": "base"
+              }
+            },
+            "copy_to": [
+              "fulltext"
+            ]
+          },
+          "category_path": {
+            "type": "keyword",
+            "fields": {
+              "normalized": {
+                "type": "keyword",
+                "normalizer": "keyword_normalizer"
+              },
+              "text": {
+                "type": "text",
+                "analyzer": "base"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "search_response": {
+    "took": 19,
+    "timed_out": false,
+    "_shards": {
+      "total": 1,
+      "successful": 1,
+      "skipped": 0,
+      "failed": 0
+    },
+    "hits": {
+      "total": {
+        "value": 31910,
+        "relation": "eq"
+      },
+      "max_score": null,
+      "hits": []
+    },
+    "aggregations": {
+      "with_category_path": {
+        "doc_count": 31910
+      },
+      "categories": {
+        "doc_count_error_upper_bound": 0,
+        "sum_other_doc_count": 167983,
+        "buckets": [
+          {
+            "key": "Plant based foods and beverages",
+            "doc_count": 14053
+          },
+          {
+            "key": "Plant based foods",
+            "doc_count": 12444
+          },
+          {
+            "key": "Snacks",
+            "doc_count": 6690
+          },
+          {
+            "key": "Sweet snacks",
+            "doc_count": 5312
+          },
+          {
+            "key": "Cereals and potatoes",
+            "doc_count": 4422
+          }
+        ]
+      },
+      "category_path": {
+        "doc_count_error_upper_bound": 0,
+        "sum_other_doc_count": 105746,
+        "buckets": [
+          {
+            "key": "Alimentos y bebidas de origen vegetal",
+            "doc_count": 12105
+          },
+          {
+            "key": "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal",
+            "doc_count": 10591
+          },
+          {
+            "key": "Botanas",
+            "doc_count": 6210
+          },
+          {
+            "key": "Botanas/Snacks dulces",
+            "doc_count": 4980
+          },
+          {
+            "key": "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Cereales y patatas",
+            "doc_count": 3068
+          }
+        ]
+      }
+    }
+  },
+  "composite_page_response": {
+    "took": 7,
+    "timed_out": false,
+    "_shards": {
+      "total": 1,
+      "successful": 1,
+      "skipped": 0,
+      "failed": 0
+    },
+    "hits": {
+      "total": {
+        "value": 10000,
+        "relation": "gte"
+      },
+      "max_score": null,
+      "hits": []
+    },
+    "aggregations": {
+      "values": {
+        "after_key": {
+          "v": "Aceites y grasas/Grasas animales/Butter fat/Clarified butter/ghee"
+        },
+        "buckets": [
+          {
+            "key": {
+              "v": "Aceites y grasas"
+            },
+            "doc_count": 22
+          },
+          {
+            "key": {
+              "v": "Aceites y grasas/Grasas animales"
+            },
+            "doc_count": 5
+          },
+          {
+            "key": {
+              "v": "Aceites y grasas/Grasas animales/Butter fat"
+            },
+            "doc_count": 4
+          },
+          {
+            "key": {
+              "v": "Aceites y grasas/Grasas animales/Butter fat/Clarified butter"
+            },
+            "doc_count": 3
+          },
+          {
+            "key": {
+              "v": "Aceites y grasas/Grasas animales/Butter fat/Clarified butter/ghee"
+            },
+            "doc_count": 3
+          }
+        ]
+      }
+    }
+  },
+  "composite_terminal_response": {
+    "took": 5,
+    "timed_out": false,
+    "_shards": {
+      "total": 1,
+      "successful": 1,
+      "skipped": 0,
+      "failed": 0
+    },
+    "hits": {
+      "total": {
+        "value": 10000,
+        "relation": "gte"
+      },
+      "max_score": null,
+      "hits": []
+    },
+    "aggregations": {
+      "values": {
+        "buckets": []
+      }
+    }
+  }
+}
