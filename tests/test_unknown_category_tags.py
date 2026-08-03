@@ -1,4 +1,4 @@
-"""End-to-end tests: a non-taxonomy product tag must never reach ``categories``.
+"""End-to-end tests: a non-taxonomy product tag must never reach ``taxonomy_tags``.
 
 These run the real ``extract.main()`` CLI path over **real** Open Food Facts tag
 data. ``fixtures/off_unknown_category_tags.json`` holds the ``categories_tags``
@@ -179,18 +179,18 @@ def test_no_indexed_category_falls_outside_the_taxonomy() -> None:
         records, _ = _run_extract(Path(d))
 
     offenders = {
-        record_id: sorted(set(rec["categories"]) - ALLOWED_LABELS)
+        record_id: sorted(set(rec["taxonomy_tags"]) - ALLOWED_LABELS)
         for record_id, rec in records.items()
-        if set(rec["categories"]) - ALLOWED_LABELS
+        if set(rec["taxonomy_tags"]) - ALLOWED_LABELS
     }
     assert not offenders, (
-        "categories that do not reverse-map onto an eligible taxonomy node: "
+        "taxonomy_tags that do not reverse-map onto an eligible taxonomy node: "
         f"{json.dumps(offenders, ensure_ascii=False, indent=2)}"
     )
 
 
 def test_a_refused_tag_reaches_no_searchable_field() -> None:
-    """``categories`` is not the only indexed field a tag can leak into.
+    """``taxonomy_tags`` is not the only indexed field a tag can leak into.
 
     The primary tag also becomes ``attrs["Category"]``, which is folded into the
     generated ``description``. Validating only the flat list would leave the same
@@ -202,7 +202,7 @@ def test_a_refused_tag_reaches_no_searchable_field() -> None:
     for tag in MUST_BE_REFUSED:
         label = _label(tag)
         for record_id, rec in records.items():
-            assert label not in rec["categories"], f"{record_id}: {label!r} in categories"
+            assert label not in rec["taxonomy_tags"], f"{record_id}: {label!r} in taxonomy_tags"
             assert rec["attrs"].get("Category") != label, f"{record_id}: {label!r} in attrs"
             assert label not in rec["description"], f"{record_id}: {label!r} in description"
 
@@ -214,8 +214,8 @@ def test_the_record_survives_its_junk_tag() -> None:
 
     rec = records.get(_id("groceries_with_lineage"))
     assert rec is not None, "a product was dropped for carrying one junk tag"
-    assert _label("en:groceries") not in rec["categories"]
-    assert _label("en:spices") in rec["categories"], rec["categories"]
+    assert _label("en:groceries") not in rec["taxonomy_tags"]
+    assert _label("en:spices") in rec["taxonomy_tags"], rec["taxonomy_tags"]
     assert rec["category_path"], "the surviving record lost its hierarchy"
 
 
@@ -231,7 +231,7 @@ def test_a_renamed_tag_is_aliased_and_rescues_its_product() -> None:
 
     rec = records.get(_id("salted_snacks_only"))
     assert rec is not None, "the aliased product did not survive the category_path gate"
-    assert rec["categories"] == [_label(MUST_BE_ALIASED["en:salted-snacks"])], rec["categories"]
+    assert rec["taxonomy_tags"] == [_label(MUST_BE_ALIASED["en:salted-snacks"])], rec["taxonomy_tags"]
     assert rec["category_path"], "aliased product has no hierarchy"
 
     for case, successor in (
@@ -240,7 +240,7 @@ def test_a_renamed_tag_is_aliased_and_rescues_its_product() -> None:
     ):
         aliased = records.get(_id(case))
         assert aliased is not None, f"{case} was dropped"
-        assert _label(successor) in aliased["categories"], (case, aliased["categories"])
+        assert _label(successor) in aliased["taxonomy_tags"], (case, aliased["taxonomy_tags"])
 
 
 def test_only_a_product_with_nothing_left_is_lost() -> None:
@@ -304,7 +304,7 @@ def test_without_a_taxonomy_the_flat_field_is_not_emptied() -> None:
     """``--no-taxonomy`` has no vocabulary, so it must not refuse everything.
 
     Refusing every tag with nothing to validate against would blank the flat
-    ``categories`` field for the whole run — a worse outcome than the
+    ``taxonomy_tags`` field for the whole run — a worse outcome than the
     unvalidated field this change replaces. The curated drops still apply.
     """
     with _tmpdir() as d:
@@ -314,8 +314,8 @@ def test_without_a_taxonomy_the_flat_field_is_not_emptied() -> None:
     # With no taxonomy there is no ``name`` to render, so labels fall back to the
     # slug — ask the labeller itself rather than assuming the string.
     rec = records[_id("groceries_with_lineage")]
-    assert display_label({}, "en:spices", "en") in rec["categories"], rec["categories"]
-    assert display_label({}, "en:groceries", "en") not in rec["categories"], rec["categories"]
+    assert display_label({}, "en:spices", "en") in rec["taxonomy_tags"], rec["taxonomy_tags"]
+    assert display_label({}, "en:groceries", "en") not in rec["taxonomy_tags"], rec["taxonomy_tags"]
     assert report["category_tag_curation"]["rejected_by_reason"] == {"curated_drop": 7}
 
 

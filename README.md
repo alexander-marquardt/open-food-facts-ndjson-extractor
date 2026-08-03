@@ -21,7 +21,7 @@ This tool transforms raw, complex Open Food Facts data into a flattened, search-
 | `price` | float | Synthetic, deterministic price for e-commerce simulation. |
 | `currency` | string | Currency code (default: USD). |
 | `image_url` | string | Computed primary product image URL. |
-| `categories` | list | Cleaned, flat list of the product's own category tags, de-duplicated, **validated against the taxonomy** (see [Tags that are not taxonomy categories](#tags-that-are-not-taxonomy-categories)) and rendered with the taxonomy's display name for `--lang` — the **same** label the matching `category_path` segment carries, so the two fields can be joined on string. |
+| `taxonomy_tags` | list | Cleaned, flat list of the product's own category tags, de-duplicated, **validated against the taxonomy** (see [Tags that are not taxonomy categories](#tags-that-are-not-taxonomy-categories)) and rendered with the taxonomy's display name for `--lang` — the **same** label the matching `category_path` segment carries, so the two fields can be joined on string. |
 | `category_path` | list | **Hierarchical** category path — a single root→leaf chain as cumulative `/`-joined strings (e.g. `["Snacks", "Snacks/Salty snacks", "Snacks/Salty snacks/Crisps"]`), reconstructed from the Open Food Facts category taxonomy graph. Powers breadcrumb-style, drill-down category facets. |
 | `attrs` | object | **Flattened Dictionary** of key-value attributes (e.g., Nutri-Score, Energy). |
 | `attr_keys` | list | List of all keys available in `attrs` for faceting. |
@@ -101,7 +101,7 @@ The output is a clean, flat JSON object, ready to be indexed into a search engin
   "margin": 22,
   "popularity": 0,
   "currency": "USD",
-  "categories": [
+  "taxonomy_tags": [
     "Plant-based foods and beverages",
     "Plant-based foods",
     "Fats",
@@ -200,7 +200,7 @@ walks a single canonical chain:
 
 Note where the target language does and does not apply. It decides step 2 —
 which categories a product may be *filed under*, and which values the flat
-`categories` field may carry — and it decides the labels in step 4. It does not
+`taxonomy_tags` field may carry — and it decides the labels in step 4. It does not
 decide step 1. Filtering the *graph* by language used to delete every edge
 through a filtered node as well, which orphaned that node's children into roots
 of a locale-shaped forest: an English run walked a graph with **161** roots
@@ -264,7 +264,7 @@ three should always read zero; if any does not, the extraction log says so.
 
 ### One label per category
 
-The flat `categories` list is still emitted alongside the hierarchical
+The flat `taxonomy_tags` list is still emitted alongside the hierarchical
 `category_path` (it also drives pricing-bucket matching and the `attrs.Category`
 field). Both are derived from the product's `categories_tags`, and **both take a
 category's label from one function** — `display_label` in
@@ -279,14 +279,14 @@ and casing that a mechanical de-slug destroys — and, unlike a slug, it is
 localized. All 8,939 English-backbone nodes have an English name, so the slug
 fallback never fires on that backbone.
 
-`categories` used to de-slug the tag id itself. That gave the same node two
+`taxonomy_tags` used to de-slug the tag id itself. That gave the same node two
 spellings across the two fields (`Plant based foods` next to `Plant-based
 foods`), so nothing could relate a flat value to a path segment by string: over
 the first 200,000 lines of the public export, only 75.1% of products had every
-self-tagged chain node's label present verbatim in `categories`; it is now 100%.
+self-tagged chain node's label present verbatim in `taxonomy_tags`; it is now 100%.
 Because the de-slug worked off the `en:`-prefixed tag id, it also emitted English
 labels in **every** locale — a Spanish catalog rendered `Plant based foods` in
-`categories` and `Alimentos de origen vegetal` in `category_path`, in the same
+`taxonomy_tags` and `Alimentos de origen vegetal` in `category_path`, in the same
 document. Both fields are now localized together.
 
 Where the taxonomy has no translation the label falls back to English in both
@@ -296,9 +296,9 @@ and 34.6% a Spanish one.
 
 Note that the two fields are *relatable*, not identical: `category_path` is
 anchored to a global taxonomy root, so it materialises ancestors the product
-never tagged, and those ancestors are legitimately absent from `categories`.
+never tagged, and those ancestors are legitimately absent from `taxonomy_tags`.
 `tests/test_category_label_agreement.py` pins the direction that must hold —
-every chain node the product *did* tag appears verbatim in `categories` — by
+every chain node the product *did* tag appears verbatim in `taxonomy_tags` — by
 exact string, on real Open Food Facts records.
 
 ### Tags that are not taxonomy categories
@@ -318,7 +318,7 @@ sentinels `--category-exclude` already removes:
 | products carrying at least one | 42,727 (19.6%) |
 | products where *every* tag is one | 5,456 (2.50%) |
 
-Those tags used to be rendered into the searchable `categories` field as if they
+Those tags used to be rendered into the searchable `taxonomy_tags` field as if they
 were canonical. `Groceries` alone was searchable on 6,299 documents of the built
 English catalog — a value with no node in the hierarchy, so it can never be a
 `category_path` segment and can never be authored as a merchandising rule value.
@@ -365,7 +365,7 @@ The taxonomy file is fetched once from
 [`https://static.openfoodfacts.org/data/taxonomies/categories.json`](https://static.openfoodfacts.org/data/taxonomies/categories.json)
 and cached at `data/taxonomy/categories.json`. Override its location with
 `--taxonomy <path>`. Display names follow `--lang`, so the French and Spanish
-personas get localized category labels — in `categories` as well as in
+personas get localized category labels — in `taxonomy_tags` as well as in
 `category_path`.
 
 ### Category-hierarchy flags
@@ -375,7 +375,7 @@ exactly what each does:
 
 - **`--no-taxonomy`** — turns the hierarchy feature *off entirely*. The extractor
   does **not** load (or download) the taxonomy, and every product is written with
-  an empty `category_path` (`[]`). The flat `categories` field is still written,
+  an empty `category_path` (`[]`). The flat `taxonomy_tags` field is still written,
   but with no taxonomy there are no display names to read, so its labels fall
   back to a prettified slug of the tag id — English, and without the taxonomy's
   hyphenation or parentheticals. With no taxonomy there is also no vocabulary to
@@ -474,7 +474,7 @@ recorded in the JSON (`values_outside_snapshot_tolerance` and
 Two further rules follow from the same reasoning:
 
 * **A run that verified nothing does not report clean.** An empty catalog, or one
-  in which no record carries a `categories` value or a `category_path` segment,
+  in which no record carries a `taxonomy_tags` value or a `category_path` segment,
   passes every count-based gate vacuously. It is also the denominator a fraction
   tolerance divides by.
 * **Duplicate ids are reported, and fatal only under `--require-unique-ids`.**

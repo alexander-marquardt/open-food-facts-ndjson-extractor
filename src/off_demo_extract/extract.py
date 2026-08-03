@@ -35,7 +35,7 @@ IMAGE_BASE = "https://images.openfoodfacts.org/images/products"
 
 # Values we should treat as "not meaningful" and avoid emitting in attrs/description.
 _UNDEFINED_LIKE = {"undefined", "unknown", "null", "none", "n/a", "na", ""}
-MAX_NUM_CATEGORIES = 20
+MAX_NUM_TAXONOMY_TAGS = 20
 
 
 # ----------------------------
@@ -263,7 +263,7 @@ def pick_primary_category_tag(tags: list[str]) -> Optional[str]:
     :func:`off_demo_extract.category_tags.curate_category_tags`, which is what
     keeps a refused tag out of ``attrs["Category"]`` and out of the generated
     description — both of which are indexed and searchable, so validating only
-    the ``categories`` list would leave the same junk searchable by another route.
+    the ``taxonomy_tags`` list would leave the same junk searchable by another route.
     """
     return tags[0] if tags else None
 
@@ -273,10 +273,10 @@ def build_category_label_entries(
     tags_filtered: list[str],
     taxonomy: Optional[Dict[str, Any]],
     lang: str = "en",
-    max_n: int = MAX_NUM_CATEGORIES,
+    max_n: int = MAX_NUM_TAXONOMY_TAGS,
     vocabulary: Optional[CategoryVocabulary] = None,
 ) -> list[tuple[str, str]]:
-    """``(tag_id, label)`` for the flat ``categories`` field, primary tag first.
+    """``(tag_id, label)`` for the flat ``taxonomy_tags`` field, primary tag first.
 
     The label comes from :func:`off_demo_extract.taxonomy.display_label` — the
     same function that names a ``category_path`` segment. This field used to
@@ -287,7 +287,7 @@ def build_category_label_entries(
     field and not the other.
 
     Ids ride along so a run can audit the two fields against each other. Callers
-    that only want the strings want :func:`build_categories_list`.
+    that only want the strings want :func:`build_taxonomy_tags_list`.
 
     ``vocabulary`` is the set of ids this run may emit. Every tag is checked
     against it before it is labelled, because this function is what writes the
@@ -311,7 +311,7 @@ def build_category_label_entries(
         if vocabulary is not None and tag not in vocabulary.eligible:
             return
         label = display_label(tax, tag, lang)
-        # Suppress "Undefined"/"Unknown"/etc from appearing as categories.
+        # Suppress "Undefined"/"Unknown"/etc from appearing as taxonomy_tags.
         if _is_undefined_like(label):
             return
         if label not in seen:
@@ -329,12 +329,12 @@ def build_category_label_entries(
     return out
 
 
-def build_categories_list(
+def build_taxonomy_tags_list(
     primary_tag: Optional[str],
     tags_filtered: list[str],
     taxonomy: Optional[Dict[str, Any]] = None,
     lang: str = "en",
-    max_n: int = MAX_NUM_CATEGORIES,
+    max_n: int = MAX_NUM_TAXONOMY_TAGS,
     vocabulary: Optional[CategoryVocabulary] = None,
 ) -> list[str]:
     return [
@@ -572,7 +572,7 @@ def build_attrs(
     #
     # There is deliberately no second, tag-derived fallback here. One existed and
     # was unreachable: ``primary_category_label`` is the first entry of the flat
-    # ``categories`` list, which already dropped undefined-like labels, so it is
+    # ``taxonomy_tags`` list, which already dropped undefined-like labels, so it is
     # absent only when *every* tag was undefined-like — exactly the case a
     # fallback would have to suppress too. Reviving it would also mean a second
     # rule for naming a category, which is the defect this field's labelling was
@@ -873,7 +873,7 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
             "(a chain must reach one of these to count as resolved)"
         )
     # The ids this catalog may *name*: the leaf a product is filed under and the
-    # values of the flat ``categories`` field, which is where the language filter
+    # values of the flat ``taxonomy_tags`` field, which is where the language filter
     # belongs. Narrower than the graph above, which a path may walk through in
     # any language. ``None`` when no taxonomy was loaded.
     vocabulary: Optional[CategoryVocabulary] = None
@@ -958,15 +958,15 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
                 tags_curated,
                 taxonomy,
                 lang,
-                max_n=MAX_NUM_CATEGORIES,
+                max_n=MAX_NUM_TAXONOMY_TAGS,
                 vocabulary=vocabulary,
             )
-            categories = [label for _tag, label in flat_entries]
-            primary_category_label = categories[0] if categories else None
+            taxonomy_tags = [label for _tag, label in flat_entries]
+            primary_category_label = taxonomy_tags[0] if taxonomy_tags else None
 
             # Hierarchical category path derived from the OFF taxonomy graph, in
             # the shape retail catalogs typically expose (a single clean root→leaf
-            # chain as cumulative path strings). The flat ``categories`` list
+            # chain as cumulative path strings). The flat ``taxonomy_tags`` list
             # above is still used for pricing-bucket matching and attrs;
             # ``category_path`` is the field PRISM's hierarchical category facet
             # renders.
@@ -1021,7 +1021,7 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
             price, bucket_name, unit_debug = estimate_price(
                 gtin=pad_gtin13(code),
                 primary_category=primary_category_label or "",
-                categories=categories,
+                categories=taxonomy_tags,
                 quantity=quantity,
                 serving_size=serving_size,
                 labels_tags=labels_tags,
@@ -1052,6 +1052,16 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
             attr_keys = sorted(attrs.keys())
             description = build_description(title=title, desc=desc, attrs=attrs, single_line=True)
 
+            # ``taxonomy_tags`` is the flat, display-only tag set: the product's
+            # own category tags, validated against the taxonomy and labelled. It
+            # is deliberately NOT named ``tags``. PRISM's ingest
+            # (``sources.py``, ``normalized_json_resolve_row``) reads a row's
+            # ``tags`` key *in preference to* its ``dietary_restrictions`` key
+            # and assigns the result to the dietary field, so a catalog emitting
+            # ``tags`` would silently overwrite real dietary data with this
+            # category tag set. Do not "simplify" this name back to ``tags``.
+            # It is also not ``categories``: that is the hierarchy facet's name,
+            # which ``category_path`` below actually sources.
             doc = {
                 "id": gtin,
                 "title": title,
@@ -1062,7 +1072,7 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
                 "margin": margin,
                 "popularity": popularity,
                 "currency": pricing_cfg.currency,
-                "categories": categories,
+                "taxonomy_tags": taxonomy_tags,
                 "category_path": category_path,
                 "attrs": attrs,
                 "attr_keys": attr_keys,
@@ -1120,7 +1130,7 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
     if address_audit.label_conflict_count:
         log(
             f"WARNING: {address_audit.label_conflict_count:,} categories rendered "
-            "under more than one label in this run — category_path and categories "
+            "under more than one label in this run — category_path and taxonomy_tags "
             "can no longer be joined on string. See category_path_addresses in the "
             "report."
         )
@@ -1129,7 +1139,7 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
     if address_audit.shared_label_count:
         log(
             f"WARNING: {address_audit.shared_label_count:,} labels are shared by "
-            "more than one category in this run — joining categories to a "
+            "more than one category in this run — joining taxonomy_tags to a "
             "category_path segment on string is ambiguous for those. See "
             "category_path_addresses in the report."
         )

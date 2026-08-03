@@ -18,7 +18,7 @@ What it checks, per catalog:
 * **Anchoring.** Every chain's first segment must be the display label of one of
   the taxonomy's global roots. This is the artifact-side reading of the
   extractor's ``category_path_anchoring`` block.
-* **Vocabulary against the pinned snapshot.** Every ``categories`` value and
+* **Vocabulary against the pinned snapshot.** Every ``taxonomy_tags`` value and
   every path segment must be a display label of some node in the snapshot. Values
   present in the catalog but not in the snapshot are reported — the offline half
   of "compare the indexed vocabulary against the pinned snapshot", checked
@@ -210,7 +210,7 @@ def verify(ndjson: Path, taxonomy_path: Path, lang: str) -> Dict[str, Any]:
                 )
             ids[str(doc.get("id") or "")] += 1
             path = doc.get("category_path") or []
-            for value in doc.get("categories") or []:
+            for value in doc.get("taxonomy_tags") or []:
                 checked_values.add(value)
                 if value not in vocabulary:
                     off_vocabulary[value] += 1
@@ -296,7 +296,7 @@ def gate(
         reasons.append(
             (
                 "nothing_verified",
-                f"none of the {result['records']:,} records carried a categories value or a "
+                f"none of the {result['records']:,} records carried a taxonomy_tags value or a "
                 "category_path segment, so no value was checked against the snapshot",
             )
         )
