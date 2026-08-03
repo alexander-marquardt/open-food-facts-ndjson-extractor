@@ -54,6 +54,15 @@ VOCAB = CategoryVocabulary(
 
 TAG_ID = re.compile(r"^[a-z]{2,3}:[a-z0-9][a-z0-9-]*$")
 
+# The four tags of issue #19: real volume in the dump, plainly meant to be
+# categories, and no node in the pinned snapshot *or* current upstream.
+UNRESOLVABLE_WITH_VOLUME = (
+    "en:salads",
+    "en:mexican-dinner-mixes",
+    "en:raw-cured-ham",
+    "en:preparations-made-from-fish-meat",
+)
+
 
 def test_alias_targets_are_never_themselves_aliased() -> None:
     """No alias chains: one hop resolves a tag, or the map is wrong.
@@ -82,6 +91,47 @@ def test_every_drop_records_a_reason() -> None:
     missing = [tag for tag, reason in TAG_DROPS.items() if not reason.strip()]
     assert not missing, f"curated drops with no reason: {missing}"
     assert "en:groceries" in TAG_DROPS, "the largest single offender must be explicit"
+
+
+def test_high_volume_unresolvable_tags_carry_a_recorded_verdict() -> None:
+    """Each of these has real volume and no node anywhere; silence is a verdict too.
+
+    Re-verified against the current upstream taxonomy source before they were
+    listed: no name in any language line of ``taxonomies/food/categories.txt``
+    slugifies to any of these ids, so none of them is a retired id upstream kept
+    as a synonym. Left off the table they would sit in a 7,712-entry tail that
+    reads as un-examined rather than as decided.
+    """
+    missing = [tag for tag in UNRESOLVABLE_WITH_VOLUME if tag not in TAG_DROPS]
+    assert not missing, (
+        f"tags with measured volume and no successor and no recorded verdict: {missing}"
+    )
+
+
+def test_unresolvable_tags_are_dropped_rather_than_generalised() -> None:
+    """The near misses are all *broader* nodes, which the alias map must not encode.
+
+    ``en:cured-hams`` for ``en:raw-cured-ham`` loses "raw"; ``en:fish-preparations``
+    for ``en:preparations-made-from-fish-meat`` is a node whose upstream synonym is
+    ``Preparations made from fish``, without the ``meat``. Filing a product under a
+    broader node puts it in a category it never claimed.
+    """
+    generalised = [tag for tag in UNRESOLVABLE_WITH_VOLUME if tag in TAG_ALIASES]
+    assert not generalised, f"unverified successors encoded as aliases: {generalised}"
+
+
+def test_recorded_drops_leave_the_unknown_tail() -> None:
+    """The behavioural point: refused as a decision, not as an anonymous unknown.
+
+    Before they were listed these came back as ``not_in_taxonomy`` — the same
+    reason code as a contributor's typo. The value dropped is identical either
+    way; what changes is that the report can now name them as chosen.
+    """
+    curated = curate_category_tags(list(UNRESOLVABLE_WITH_VOLUME), VOCAB, EXCLUDE)
+    assert curated.accepted == []
+    assert dict(curated.rejected) == {
+        tag: REASON_CURATED_DROP for tag in UNRESOLVABLE_WITH_VOLUME
+    }, curated.rejected
 
 
 def test_table_keys_are_well_formed_tag_ids() -> None:
