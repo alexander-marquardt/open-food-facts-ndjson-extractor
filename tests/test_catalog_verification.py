@@ -61,17 +61,17 @@ TAXONOMY: Dict[str, Any] = {
 CLEAN_RECORDS: List[Dict[str, Any]] = [
     {
         "id": "1",
-        "categories": ["Foods", "Snacks", "Biscuits"],
+        "taxonomy_tags": ["Foods", "Snacks", "Biscuits"],
         "category_path": ["Foods", "Foods/Snacks", "Foods/Snacks/Biscuits"],
     },
     {
         "id": "2",
-        "categories": ["Foods", "Beverages", "Waters"],
+        "taxonomy_tags": ["Foods", "Beverages", "Waters"],
         "category_path": ["Foods", "Foods/Beverages", "Foods/Beverages/Waters"],
     },
     {
         "id": "3",
-        "categories": ["Foods", "Dairy", "Cheeses"],
+        "taxonomy_tags": ["Foods", "Dairy", "Cheeses"],
         "category_path": ["Foods", "Foods/Dairy", "Foods/Dairy/Cheeses"],
     },
 ]
@@ -81,7 +81,7 @@ CLEAN_RECORDS: List[Dict[str, Any]] = [
 # values checked go 7 -> 10 and the values outside the snapshot go 0 -> 3.
 OFF_SNAPSHOT_RECORD: Dict[str, Any] = {
     "id": "4",
-    "categories": ["Foods", "Rocket fuel", "Gravel", "Neon"],
+    "taxonomy_tags": ["Foods", "Rocket fuel", "Gravel", "Neon"],
     "category_path": ["Foods"],
 }
 
@@ -148,14 +148,14 @@ def test_value_outside_snapshot_exits_non_zero(tmp_path, monkeypatch, capsys):
 def test_off_snapshot_path_segment_also_fails(tmp_path, monkeypatch, capsys):
     """The other half of the same rule: a *path segment* outside the snapshot.
 
-    The flat ``categories`` values and the ``category_path`` segments are checked
+    The flat ``taxonomy_tags`` values and the ``category_path`` segments are checked
     against the same vocabulary and counted into the same number, so a catalog
     whose flat values are all fine can still be off-snapshot in its hierarchy.
     """
     taxonomy = write_taxonomy(tmp_path)
     record = {
         "id": "9",
-        "categories": ["Foods"],
+        "taxonomy_tags": ["Foods"],
         "category_path": ["Foods", "Foods/Sawdust"],
     }
     catalog = write_catalog(tmp_path, CLEAN_RECORDS + [record])
@@ -390,7 +390,7 @@ def test_broken_chain_still_fails(tmp_path, monkeypatch, capsys):
     taxonomy = write_taxonomy(tmp_path)
     record = {
         "id": "5",
-        "categories": ["Foods"],
+        "taxonomy_tags": ["Foods"],
         # Skips a level: the second element does not extend the first.
         "category_path": ["Foods", "Foods/Snacks/Biscuits"],
     }
@@ -409,12 +409,12 @@ def test_category_at_two_addresses_still_fails(tmp_path, monkeypatch, capsys):
     records = [
         {
             "id": "6",
-            "categories": ["Foods", "Waters"],
+            "taxonomy_tags": ["Foods", "Waters"],
             "category_path": ["Foods", "Foods/Beverages", "Foods/Beverages/Waters"],
         },
         {
             "id": "7",
-            "categories": ["Foods", "Waters"],
+            "taxonomy_tags": ["Foods", "Waters"],
             "category_path": ["Foods", "Foods/Snacks", "Foods/Snacks/Waters"],
         },
     ]
@@ -432,7 +432,7 @@ def test_unanchored_chain_still_fails(tmp_path, monkeypatch, capsys):
     taxonomy = write_taxonomy(tmp_path)
     record = {
         "id": "8",
-        "categories": ["Snacks"],
+        "taxonomy_tags": ["Snacks"],
         # Starts mid-taxonomy: "Snacks" is not the label of a global root.
         "category_path": ["Snacks", "Snacks/Biscuits"],
     }
@@ -454,11 +454,11 @@ def test_every_failing_gate_is_named_at_once(tmp_path, monkeypatch, capsys):
     """
     taxonomy = write_taxonomy(tmp_path)
     records = [
-        {"id": "a", "categories": ["Sawdust"], "category_path": ["Snacks", "Snacks/Biscuits"]},
-        {"id": "b", "categories": ["Foods"], "category_path": ["Foods", "Foods/Waters"]},
+        {"id": "a", "taxonomy_tags": ["Sawdust"], "category_path": ["Snacks", "Snacks/Biscuits"]},
+        {"id": "b", "taxonomy_tags": ["Foods"], "category_path": ["Foods", "Foods/Waters"]},
         {
             "id": "c",
-            "categories": ["Foods"],
+            "taxonomy_tags": ["Foods"],
             "category_path": ["Foods", "Foods/Beverages", "Foods/Beverages/Waters"],
         },
     ]
@@ -494,7 +494,7 @@ def test_empty_catalog_does_not_report_clean(tmp_path, monkeypatch, capsys):
     assert result["failed"] == ["nothing_verified"]
 
 
-def test_catalog_with_no_categories_at_all_does_not_report_clean(tmp_path, monkeypatch, capsys):
+def test_catalog_with_no_taxonomy_tags_at_all_does_not_report_clean(tmp_path, monkeypatch, capsys):
     """Records exist, but not one value was checked against the snapshot."""
     taxonomy = write_taxonomy(tmp_path)
     catalog = write_catalog(tmp_path, [{"id": "1"}, {"id": "2"}])

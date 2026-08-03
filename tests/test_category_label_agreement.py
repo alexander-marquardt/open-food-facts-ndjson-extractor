@@ -1,4 +1,4 @@
-"""A category node must read the same in ``category_path`` and in ``categories``.
+"""A category node must read the same in ``category_path`` and in ``taxonomy_tags``.
 
 Both fields are derived from the product's ``categories_tags``. They used to
 render a node's label with two different rules — the taxonomy's ``name`` for a
@@ -9,14 +9,14 @@ in the other, and the two fields could not be joined on string.
 Measured over the first 200,000 lines of the public Open Food Facts export
 (132,340 products with a resolved chain): under the de-slug rule only 75.10% of
 products had every self-tagged chain node's label present verbatim in
-``categories``; under the single-sourced rule, 100.00%. In a Spanish or French
+``taxonomy_tags``; under the single-sourced rule, 100.00%. In a Spanish or French
 run the two fields disagreed on *language* as well, because the de-slug only ever
 produced English no matter the catalog.
 
 What is asserted
 ----------------
 For every node on a product's emitted chain **that the product actually tagged**,
-the label in ``category_path`` must appear **verbatim** in ``categories``. The
+the label in ``category_path`` must appear **verbatim** in ``taxonomy_tags``. The
 comparison is deliberately exact. A normalised one (lowercase, hyphens to spaces)
 passed before the fix too — it cannot tell a fixed field from a broken one — and
 it is blind to the language half entirely.
@@ -24,7 +24,7 @@ it is blind to the language half entirely.
 The scope — nodes the product itself tagged — is what makes the assertion true
 rather than merely mostly-true. A chain is anchored to a *global* taxonomy root,
 so it materialises ancestors the product never tagged; those are legitimately
-absent from ``categories``, which lists only the product's own tags. Asserting
+absent from ``taxonomy_tags``, which lists only the product's own tags. Asserting
 plain containment of every chain node would fail on that structural difference
 while saying nothing about labelling. The self-tagged nodes are identified from
 :func:`category_chain`, which returns ids and never consults a label, so the
@@ -80,7 +80,7 @@ PRODUCTS: List[dict] = _FIXTURE["products"]
 
 
 def _deslug(tag: str) -> str:
-    """The rule ``categories`` used before the fix, kept only to prove the bite.
+    """The rule ``taxonomy_tags`` used before the fix, kept only to prove the bite.
 
     No production code calls this any more — that is the whole point of the fix.
     It survives here so :func:`test_fixture_still_exercises_the_divergence` can
@@ -188,11 +188,11 @@ def _agreement_failures(lang: str) -> Tuple[List[tuple], int]:
     checked = 0
     for product in PRODUCTS:
         record = records[product["code"].zfill(13)]
-        categories = set(record["categories"])
+        taxonomy_tags = set(record["taxonomy_tags"])
         for label in _self_tagged_labels(record, product["categories_tags"], lang):
             checked += 1
-            if label not in categories:
-                failures.append((record["id"], label, sorted(categories)))
+            if label not in taxonomy_tags:
+                failures.append((record["id"], label, sorted(taxonomy_tags)))
     return failures, checked
 
 
@@ -203,7 +203,7 @@ def _assert_agreement(lang: str) -> None:
         "is not exercising the join"
     )
     assert not failures, (
-        f"[{lang}] category_path segments missing verbatim from categories: "
+        f"[{lang}] category_path segments missing verbatim from taxonomy_tags: "
         + "; ".join(
             f"{code}: {label!r} not in {cats}" for code, label, cats in failures[:5]
         )
@@ -215,7 +215,7 @@ def test_labels_agree_in_english() -> None:
 
     This is the check the issue reports at 61% on the live English index. Before
     the fix it failed here on every hyphenated and parenthetical node in the
-    fixture: the chain said ``Plant-based foods``, ``categories`` said
+    fixture: the chain said ``Plant-based foods``, ``taxonomy_tags`` said
     ``Plant based foods``.
     """
     _assert_agreement("en")
@@ -225,7 +225,7 @@ def test_labels_agree_in_spanish() -> None:
     """The language half: a Spanish catalog must not disagree with itself.
 
     Before the fix ``category_path`` carried ``Alimentos de origen vegetal``
-    while ``categories`` carried the English-derived ``Plant based foods``, in
+    while ``taxonomy_tags`` carried the English-derived ``Plant based foods``, in
     the *same document* — 0% agreement, and no amount of string normalisation
     could have closed it.
     """
@@ -237,8 +237,8 @@ def test_labels_agree_in_french() -> None:
     _assert_agreement("fr")
 
 
-def test_categories_are_localised_not_english_derived() -> None:
-    """``categories`` must speak the catalog's language where the taxonomy does.
+def test_taxonomy_tags_are_localised_not_english_derived() -> None:
+    """``taxonomy_tags`` must speak the catalog's language where the taxonomy does.
 
     Agreement alone could be satisfied by dragging ``category_path`` down to the
     English de-slug. This pins the direction: the flat values carry the
@@ -251,16 +251,16 @@ def test_categories_are_localised_not_english_derived() -> None:
         localised = 0
         for product in PRODUCTS:
             record = records[product["code"].zfill(13)]
-            categories = set(record["categories"])
+            taxonomy_tags = set(record["taxonomy_tags"])
             for tag in product["categories_tags"]:
                 name = (TAXONOMY.get(tag, {}).get("name") or {}).get(lang)
                 if not name or name == _deslug(tag):
                     continue
-                assert _deslug(tag) not in categories, (
-                    f"[{lang}] {record['id']}: categories carries the "
+                assert _deslug(tag) not in taxonomy_tags, (
+                    f"[{lang}] {record['id']}: taxonomy_tags carries the "
                     f"English-derived {_deslug(tag)!r} instead of {name!r}"
                 )
-                if name in categories:
+                if name in taxonomy_tags:
                     localised += 1
         assert localised >= len(PRODUCTS), (
             f"[{lang}] only {localised} localised labels observed; the fixture "

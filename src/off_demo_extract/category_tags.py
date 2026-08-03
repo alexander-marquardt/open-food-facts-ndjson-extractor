@@ -18,7 +18,7 @@ products where *every* tag is one     5,456   (2.50%)
 ===============================  =========  =======
 
 Until this module existed those tags were prettified straight into the indexed,
-searchable ``categories`` field as if they were canonical. ``Groceries`` alone
+searchable ``taxonomy_tags`` field as if they were canonical. ``Groceries`` alone
 was searchable on 6,299 documents of the built English catalog — a value that
 has no place in the hierarchy, can never be a ``category_path`` segment, and
 cannot be authored as a policy value.
@@ -224,7 +224,7 @@ class CategoryVocabulary:
 
     ``eligible`` is the set a catalog may put a product *under*: exactly
     ``taxonomy.eligible_nodes`` for this run's languages, which is the same set
-    ``category_chain`` picks its leaf from, so the flat ``categories`` field and
+    ``category_chain`` picks its leaf from, so the flat ``taxonomy_tags`` field and
     the tip of ``category_path`` cannot draw on different vocabularies.
 
     It is deliberately **not** the set a path may walk *through*: the parent map
@@ -282,7 +282,7 @@ def curate_category_tags(
     ``vocabulary`` of ``None`` means no taxonomy was loaded (``--no-taxonomy``).
     There is then no vocabulary to validate against, so tags are aliased and
     excluded but never refused: refusing everything would empty the flat
-    ``categories`` field for the whole run, which is a worse outcome than the
+    ``taxonomy_tags`` field for the whole run, which is a worse outcome than the
     unvalidated field this module exists to replace. The curated drops still
     apply — they do not need a taxonomy to be wrong.
     """
