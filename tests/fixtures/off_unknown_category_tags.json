@@ -1,0 +1,1440 @@
+{
+ "_source": "Open Food Facts (openfoodfacts.org), ODbL. Real product category tags from the public JSONL export, and the ancestor closure of those tags from the public category taxonomy. Every tag list below is verbatim dump data, including the non-taxonomy tags that are the point of the fixture.",
+ "taxonomy": {
+  "en:beverage-preparations": {
+   "name": {
+    "fr": "Préparations pour boissons",
+    "en": "Beverage preparations",
+    "it": "Preparati per bevande",
+    "nl": "Drankbereidingen",
+    "hu": "Italkészítmények",
+    "es": "Preparaciones de bebidas",
+    "de": "Getränkezubereitungen",
+    "hr": "Pripravci za piće"
+   },
+   "parents": [
+    "en:beverages-and-beverages-preparations"
+   ]
+  },
+  "en:beverages": {
+   "name": {
+    "lt": "Gėrimai",
+    "da": "Drikkevarer",
+    "se": "Drycker",
+    "it": "Bevande",
+    "en": "Beverages",
+    "el": "Ποτά",
+    "hr": "Pića",
+    "th": "เครื่องดื่ม",
+    "zh": "饮料",
+    "hu": "Italok",
+    "cs": "Nápoje",
+    "et": "Joogid",
+    "rs": "Pića",
+    "lv": "Dzērieni",
+    "fi": "Juomat",
+    "tr": "İçecekler",
+    "de": "Getränke",
+    "no": "Drikkevarer",
+    "nl": "Dranken",
+    "ro": "Băuturi",
+    "pt": "Bebidas",
+    "uk": "Напої",
+    "ca": "Begudes",
+    "pl": "Napoje",
+    "he": "משקאות",
+    "es": "Bebidas",
+    "sl": "Pijače",
+    "bg": "Напитки",
+    "ja": "飲料",
+    "sk": "Nápoje",
+    "sv": "Dryckor",
+    "ko": "음료",
+    "fr": "Boissons",
+    "ru": "Напитки"
+   },
+   "parents": [
+    "en:beverages-and-beverages-preparations"
+   ]
+  },
+  "en:beverages-and-beverages-preparations": {
+   "name": {
+    "hr": "Pića i pripravci za piće",
+    "pl": "Napoje i składniki do napojów",
+    "de": "Getränke und Getränkezubereitungen",
+    "es": "Bebidas y preparaciones de bebidas",
+    "hu": "Italok és italalapú készítmények",
+    "nl": "Dranken en drankbereidingen",
+    "it": "Bevande e preparati per bevande",
+    "en": "Beverages and beverages preparations",
+    "fr": "Boissons et préparations de boissons"
+   },
+   "parents": []
+  },
+  "en:breakfasts": {
+   "name": {
+    "en": "Breakfasts",
+    "it": "Colazioni",
+    "da": "Morgenmad",
+    "nl": "Ontbijten",
+    "pt": "Pequenos alomoços",
+    "tr": "Kahvaltı ürünleri",
+    "de": "Frühstücke",
+    "lt": "Pusryčiai",
+    "fi": "aamupalat",
+    "ru": "На завтрак",
+    "fr": "Petit-déjeuners",
+    "sv": "Frukostmat",
+    "ja": "朝食",
+    "hu": "Reggelik",
+    "zh": "早餐",
+    "he": "ארוחות בוקר",
+    "es": "Desayunos",
+    "ca": "Esmorzars",
+    "hr": "Doručci",
+    "th": "อาหารเช้า",
+    "pl": "Produkty śniadaniowe"
+   },
+   "parents": []
+  },
+  "en:cheeses": {
+   "name": {
+    "an": "Queso",
+    "ht": "Fromaj",
+    "ay": "Kisu",
+    "et": "juust",
+    "fi": "juusto",
+    "bo": "ཆུར་བ།",
+    "eo": "fromaĝo",
+    "ar": "جبن",
+    "da": "ost",
+    "sv": "Ostar",
+    "fr": "Fromages",
+    "ko": "치즈",
+    "he": "גבינה",
+    "es": "Quesos",
+    "bs": "Sir",
+    "kk": "Ірімшік",
+    "pl": "Sery",
+    "be": "Сыр",
+    "gl": "Queixo",
+    "af": "Kaas",
+    "gu": "ચીઝ",
+    "cy": "Caws",
+    "de": "Käse",
+    "tr": "Peynir",
+    "ro": "Brânzeturi",
+    "nl": "Kazen",
+    "ka": "ყველი",
+    "fy": "tsiis",
+    "io": "Fromajo",
+    "br": "Keuz",
+    "zh": "奶酪",
+    "hr": "sirevi",
+    "th": "ชีส",
+    "eu": "Gazta",
+    "cs": "sýr",
+    "hu": "Sajt",
+    "bn": "পনির",
+    "hy": "Պանիր",
+    "en": "Cheeses",
+    "it": "Formaggi",
+    "el": "Τυρί",
+    "la": "Caseus",
+    "id": "keju",
+    "lt": "Sūriai",
+    "ia": "Caseo",
+    "ky": "Сыр",
+    "fa": "پنیر",
+    "ja": "チーズ",
+    "az": "Pendir",
+    "ru": "Сыры",
+    "gv": "Caashey",
+    "hi": "चीज़",
+    "ca": "formatge",
+    "bg": "Сирене и кашкавал",
+    "jv": "Kèju",
+    "lb": "Kéis",
+    "gd": "Càise",
+    "ga": "Cáis",
+    "is": "Ostur",
+    "cv": "Чăкăт",
+    "no": "Oster",
+    "pt": "Queijos",
+    "ku": "Penîr"
+   },
+   "parents": [
+    "en:fermented-milk-products"
+   ]
+  },
+  "en:chocolate-candies": {
+   "name": {
+    "en": "Chocolate candies",
+    "it": "Confetti al cioccolato",
+    "de": "Schokoladenkonfekt",
+    "lt": "Šokoladiniai saldainiai",
+    "pt": "Bombons de chocolate",
+    "nl": "Chocoladesnoep",
+    "fi": "suklaamakeiset",
+    "ru": "Шоколад и шоколадные конфеты",
+    "fr": "Confiseries chocolatées",
+    "sv": "Chokladgodis",
+    "he": "ממתקי שוקולד",
+    "zh": "巧克力糖果",
+    "es": "Dulces de chocolate",
+    "th": "ลูกอมช็อกโกแลต",
+    "pl": "Cukierki czekoladowe",
+    "ca": "Caramels de xocolata",
+    "hr": "Čokoladni bomboni",
+    "bg": "Шоколадови бонбони",
+    "hu": "Csokoládés cukorka"
+   },
+   "parents": [
+    "en:cocoa-and-its-products",
+    "en:confectioneries"
+   ]
+  },
+  "en:chocolate-spreads": {
+   "name": {
+    "ca": "Xocolata per untar",
+    "hr": "Čokoladni namazi",
+    "es": "Cremas de chocolate",
+    "he": "ממרחי שוקולד",
+    "hu": "Kenhető csokoládé",
+    "bg": "течен-шоколад",
+    "ja": "チョコスプレッド",
+    "fr": "Pâtes à tartiner au chocolat",
+    "fi": "suklaalevitteet",
+    "ru": "Шоколадные пасты",
+    "de": "Nougatcremes",
+    "tr": "Ekmeğe sürülen çikolata",
+    "pt": "Creme para barrar de chocolate",
+    "nl": "Chocopastas",
+    "it": "Crema con cacao",
+    "en": "Chocolate spreads"
+   },
+   "parents": [
+    "en:sweet-spreads",
+    "fr:pates-a-tartiner"
+   ]
+  },
+  "en:chocolates": {
+   "name": {
+    "fi": "suklaat",
+    "zh": "巧克力",
+    "hr": "čokolade",
+    "th": "ช็อกโกแลต",
+    "cs": "Čokolády",
+    "hu": "Csokoládék",
+    "en": "Chocolates",
+    "it": "Cioccolato",
+    "lt": "Šokoladai",
+    "da": "Chokolader",
+    "ja": "チョコレート",
+    "ru": "Шоколад",
+    "fr": "Chocolats",
+    "sv": "Choklad",
+    "es": "Chocolates",
+    "he": "שוקולדים",
+    "ca": "Xocolata",
+    "pl": "Czekolada",
+    "bg": "Шоколади",
+    "de": "Schokoladen",
+    "tr": "Çikolatalar",
+    "ro": "Ciocolată",
+    "nl": "Chocoladeproducten",
+    "pt": "Chocolates"
+   },
+   "parents": [
+    "en:cocoa-and-its-products",
+    "en:sweet-snacks"
+   ]
+  },
+  "en:cocoa-and-hazelnuts-spreads": {
+   "name": {
+    "es": "Cremas de cacao y avellanas",
+    "de": "Schoko- und Haselnussaufstriche",
+    "hr": "Namazi od kakaa i lješnjaka",
+    "nl": "Choco-hazelnootpastas",
+    "pt": "Creme para barrar de avelã e cacau",
+    "hu": "Kenhető csokoládé és mogyoró",
+    "ja": "ヘーゼルナッツチョコレートスプレッド",
+    "en": "Cocoa and hazelnuts spreads",
+    "it": "Crema con nocciole e cacao",
+    "fi": "suklaa- ja hasselpähkinälevitteet",
+    "fr": "Pâtes à tartiner aux noisettes et au cacao"
+   },
+   "parents": [
+    "en:chocolate-spreads",
+    "en:hazelnut-spreads"
+   ]
+  },
+  "en:cocoa-and-its-products": {
+   "name": {
+    "bg": "Какаови изделия",
+    "hr": "Kakao i njegovi proizvodi",
+    "ca": "Cacau i derivats",
+    "pl": "Kakao i produkty na bazie kakao",
+    "es": "Cacao y sus productos",
+    "fr": "Cacao et dérivés",
+    "nl": "Cacao en afgeleide producten",
+    "pt": "Cacau e derivados",
+    "lt": "Kakava ir jos produktai",
+    "de": "Kakao und Kakaoprodukte",
+    "tr": "Kakao ve kakao ürünleri",
+    "it": "Cacao e i suoi derivati",
+    "en": "Cocoa and its products"
+   },
+   "parents": []
+  },
+  "en:condiments": {
+   "name": {
+    "en": "Condiments",
+    "it": "Condimenti",
+    "pt": "Condimentos",
+    "nl": "Smaakmakers",
+    "da": "Krydderier",
+    "de": "Gewürzmittel",
+    "lt": "Pagardai",
+    "fi": "mausteet",
+    "fr": "Condiments",
+    "sv": "Smaktillsatser",
+    "ja": "調味料",
+    "hu": "Fűszerek",
+    "es": "Condimentos",
+    "zh": "调味品",
+    "he": "מתבלים",
+    "pl": "Przyprawy",
+    "ca": "Condiments",
+    "hr": "začini"
+   },
+   "parents": []
+  },
+  "en:confectioneries": {
+   "name": {
+    "hu": "Cukrász áruk",
+    "ca": "Llaminadures",
+    "hr": "Konditorski proizvodi",
+    "th": "ขนมหวาน",
+    "pl": "Cukiernie",
+    "he": "מתוקים",
+    "es": "Dulces",
+    "fr": "Confiseries",
+    "sv": "Konfekt",
+    "fi": "Sokerileipomotuotteet",
+    "ru": "Кондитерские изделия",
+    "da": "Konfekture",
+    "nl": "Zoetwaren",
+    "pt": "Confeitaria",
+    "lt": "Saldumynai",
+    "de": "Süßwaren",
+    "it": "Dolci",
+    "en": "Confectioneries"
+   },
+   "parents": [
+    "en:sweet-snacks"
+   ]
+  },
+  "en:dairies": {
+   "name": {
+    "da": "Mælkeprodukter",
+    "ar": "منتجات`الألبان",
+    "eo": "Laktoprodukto",
+    "oc": "Produch lachièr",
+    "fi": "Maitotuotteet",
+    "et": "Piimatoode",
+    "nl": "Zuivelproducten",
+    "ro": "Produse lactate",
+    "fy": "Suvel",
+    "tr": "Mandıra ürünü",
+    "de": "Milchprodukte",
+    "cy": "Cynnyrch llaeth",
+    "vi": "Chế phẩm sữa",
+    "gl": "Produtos lácteos",
+    "af": "Suiwelproduk",
+    "be": "Малочныя прадукты",
+    "pl": "Nabiał",
+    "kk": "Сүт тағамдары",
+    "es": "Lácteos",
+    "bs": "Mliječni proizvodi",
+    "he": "מוצרי חלב",
+    "fr": "Produits laitiers",
+    "sv": "Mejeriprodukt",
+    "ko": "유제품",
+    "mn": "Сүүн бүтээгдэхүүн",
+    "ur": "ڈیری مصنوعات",
+    "ms": "Produk tenusu",
+    "lt": "Pieno produktai",
+    "uz": "Sut mahsulotlari",
+    "id": "Produk susu",
+    "el": "Γαλακτοκομικά προϊόντα",
+    "it": "Latticini",
+    "si": "ගව කිරි ආශ්‍රිත නිෂ්පාදන",
+    "en": "Dairies",
+    "hy": "Կաթնամթերք",
+    "bn": "দুগ্ধজাত পণ্য",
+    "hu": "Tejtermékek",
+    "eu": "Esneki",
+    "cs": "Mléčné výrobky",
+    "hr": "mliječni proizvodi",
+    "th": "ผลิตภัณฑ์จากนม",
+    "br": "Boued-laezh",
+    "zh": "乳製品",
+    "lv": "Piena produkti",
+    "ta": "பால் பொருள்",
+    "no": "Meieriprodukter",
+    "pt": "laticínios",
+    "is": "Mjólkurafurð",
+    "pa": "ਡੇਅਰੀ ਉਤਪਾਦ",
+    "uk": "Молочні продукти",
+    "sr": "Млечни производи",
+    "sl": "Mlečni izdelek",
+    "bg": "Млечни продукти",
+    "ca": "Productes làctics",
+    "hi": "दुग्ध-उत्पाद",
+    "ru": "Молочные продукты",
+    "kn": "ಕ್ಷೀರೋತ್ಪನ್ನ",
+    "yi": "מילכיגס",
+    "fa": "فراورده لبنی",
+    "az": "Süd məhsulları",
+    "ja": "乳製品"
+   },
+   "parents": []
+  },
+  "en:easter-foods-and-drinks": {
+   "name": {
+    "sv": "Påskmat och -dryckor",
+    "fr": "Aliments de Pâques",
+    "fi": "Pääsiäisruoat",
+    "hr": "Uskrsna hrana",
+    "es": "Comida de Pascua",
+    "bg": "Великденска храна",
+    "it": "Cibi per Pasqua",
+    "en": "Easter foods and drinks",
+    "lt": "Velykų maistas",
+    "pt": "Alimentos da páscoa",
+    "nl": "Paasproducten",
+    "da": "Påskemad og -drikke"
+   },
+   "parents": [
+    "en:festive-foods"
+   ]
+  },
+  "en:fermented-foods": {
+   "name": {
+    "it": "Cibi fermentati",
+    "bn": "পাকস্থলীয় খাদ্য",
+    "en": "Fermented foods",
+    "ms": "Makanan Fermentasi",
+    "te": "ఆకుపచ్చ ఆహారాలు",
+    "lt": "Fermentuoti maisto produktai",
+    "id": "Makanan Fermentasi",
+    "hu": "Fermentált ételek",
+    "cs": "Kvašené potraviny",
+    "hr": "Fermentirana hrana",
+    "th": "อาหารหมัก",
+    "zh": "发酵食品",
+    "ga": "Bia fíonta",
+    "uk": "Ферментовані продукти",
+    "pa": "ਜ਼ਰੂਰਤ ਤੋਂ ਜ਼ਿਆਦਾ ਖਾਣ-ਪੀਣ",
+    "sr": "Ферментисана храна",
+    "ta": "பச்சையாக்கப்பட்ட உணவுகள்",
+    "no": "Fermentert mat",
+    "pt": "Alimentos Fermentados",
+    "as": "পাকস্থলীয় খাদ্য",
+    "ru": "Ферментированные пищевые продукты",
+    "kn": "ಕಂದಿತ ಆಹಾರ",
+    "fa": "غذاهای تخمیر شده",
+    "az": "Fermentlənmiş qida",
+    "ja": "発酵食品",
+    "bg": "Ферментирали продукти",
+    "ca": "Aliments fermentats",
+    "hi": "ज़रूरत से अधिक खाद्य",
+    "eo": "Fermentitaj manĝaĵoj",
+    "da": "Fermenterede fødevarer",
+    "ar": "الأطعمة المخمرة",
+    "fi": "Hapatetut ruoat",
+    "cy": "Bwydydd wedi'u fferyllu",
+    "vi": "Thực phẩm lên men",
+    "mr": "जवळचा अन्न",
+    "ro": "Alimente fermentate",
+    "nl": "Gefermenteerde levensmiddelen",
+    "de": "Fermentierte Lebensmittel",
+    "tr": "Fermente gıdalar",
+    "ko": "발효 식품",
+    "fr": "Produits fermentés",
+    "sv": "Fermenterad mat",
+    "tl": "Pagkaing Fermented",
+    "pl": "Żywność fermentowana",
+    "he": "מזון מותסס",
+    "es": "Comidas fermentadas"
+   },
+   "parents": []
+  },
+  "en:fermented-milk-products": {
+   "name": {
+    "fi": "Hapatetut maitotuotteet",
+    "hu": "Fermentált tejtermékek",
+    "zh": "发酵乳制品",
+    "th": "กลุ่มผลิตภัณฑ์นมเปรี้ยว",
+    "hr": "Fermentirani mliječni proizvodi",
+    "en": "Fermented milk products",
+    "it": "Prodotti lattiero-caseari fermentati",
+    "da": "Fermenterede mælkeprodukter",
+    "lt": "Rauginti pieno produktai",
+    "ru": "Кисломолочные продукты",
+    "sv": "Fermenterade mjölkprodukter",
+    "fr": "Produits laitiers fermentés",
+    "bg": "Ферментирали млечни продукти",
+    "es": "Productos fermentados de la leche",
+    "he": "מוצרי מזון מותססים",
+    "pl": "Fermentowane produkty mleczne",
+    "ca": "Productes làctics fermentats",
+    "pt": "Produtos lácteos fermentados",
+    "nl": "Gefermenteerde zuivelproducten",
+    "no": "Fermenterte melkeprodukter",
+    "tr": "Fermente süt ürünleri",
+    "de": "Fermentierte Milch"
+   },
+   "parents": [
+    "en:dairies",
+    "en:fermented-foods"
+   ]
+  },
+  "en:festive-foods": {
+   "name": {
+    "en": "Festive foods",
+    "fr": "Aliments festifs",
+    "fi": "Juhlaruoat",
+    "ru": "Праздничные продукты",
+    "hr": "Svečana jela",
+    "ca": "Aliments festius",
+    "lt": "Šventiniai maisto produktai",
+    "es": "Alimentos festivos",
+    "de": "Festtagsessen",
+    "nl": "Feestdagenproducten"
+   },
+   "parents": []
+  },
+  "en:food-decorations": {
+   "name": {
+    "fi": "ruuan koristeet",
+    "fr": "Décorations alimentaires",
+    "en": "Food decorations",
+    "it": "Decorazioni alimentari",
+    "nl": "Levensmiddeldecoraties",
+    "es": "Decoraciones alimentarias",
+    "zh": "食品装饰品",
+    "hr": "Ukrasi za hranu"
+   },
+   "parents": []
+  },
+  "en:hazelnut-spreads": {
+   "name": {
+    "ja": "ヘーゼルナッツスプレッド",
+    "fr": "Pâtes à tartiner aux noisettes",
+    "fi": "hasselpähkinälevitteet",
+    "ru": "Пасты из лесного ореха",
+    "hr": "Namazi od lješnjaka",
+    "ca": "Crema d'avellanes",
+    "pl": "Smarowidła z orzechów laskowych",
+    "es": "Cremas a base de avellanas",
+    "hu": "Kenhető mogyoró",
+    "it": "Crema con nocciole",
+    "en": "Hazelnut spreads",
+    "de": "Haselnusscremes",
+    "nl": "Hazelnootpastas",
+    "pt": "Creme para barrar de avelã"
+   },
+   "parents": [
+    "en:sweet-spreads",
+    "fr:pates-a-tartiner"
+   ]
+  },
+  "en:herbs-and-spices": {
+   "name": {
+    "da": "Urter og krydderier",
+    "sv": "Örter och kryddor",
+    "en": "Herbs and spices"
+   },
+   "parents": [
+    "en:condiments"
+   ]
+  },
+  "en:hot-beverages": {
+   "name": {
+    "en": "Hot beverages",
+    "it": "Bevande calde",
+    "de": "Heißgetränke",
+    "tr": "Sıcak içecekler",
+    "lt": "Karšti gėrimai",
+    "ro": "Băuturi calde",
+    "da": "Varme drikke",
+    "nl": "Warme dranken",
+    "pt": "Bebidas quentes",
+    "fi": "kuumat juomat",
+    "ru": "Горячие напитки",
+    "fr": "Boissons chaudes",
+    "zh": "热饮料",
+    "he": "משקאות חמים",
+    "es": "Bebidas para tomar calientes",
+    "ca": "Begudes calentes",
+    "hr": "Topli napitci",
+    "th": "เครื่องดื่มร้อน",
+    "pl": "Napoje gorące",
+    "bg": "Топли напитки",
+    "hu": "Forró italok"
+   },
+   "parents": [
+    "en:beverages"
+   ]
+  },
+  "en:hot-sauces": {
+   "name": {
+    "en": "Hot sauces",
+    "it": "Salse piccanti",
+    "nl": "Chilisauzen",
+    "de": "Scharfe Saucen",
+    "tr": "Acı sos",
+    "lt": "Aštrūs padažai",
+    "fi": "Tuliset kastikkeet",
+    "sv": "Chilisåser",
+    "fr": "Sauces chili",
+    "ja": "ホットソース",
+    "hu": "Csilimártások",
+    "he": "רטבים חריפים",
+    "es": "Salsas de chiles",
+    "hr": "Ljuti umaci",
+    "pl": "Pikantne sosy"
+   },
+   "parents": [
+    "en:sauces"
+   ]
+  },
+  "en:meals": {
+   "name": {
+    "de": "Fertiggerichte",
+    "tr": "Hazır yemek",
+    "pt": "Refeições",
+    "nl": "Kant-en-klaar maaltijden",
+    "no": "Måltider",
+    "he": "מנות",
+    "es": "Comidas preparadas",
+    "pl": "Posiłki",
+    "ca": "Menjar preparat",
+    "bg": "Готови ястия",
+    "ru": "Блюда готовые к употреблению",
+    "fr": "Plats préparés",
+    "sv": "Färdigmat",
+    "lt": "Patiekalai",
+    "da": "Måltider",
+    "en": "Meals",
+    "it": "Pasti",
+    "zh": "菜肴",
+    "th": "อาหารพร้อมกิน",
+    "hr": "pripremljena jela",
+    "hu": "Ételek",
+    "fi": "valmiit ateriat"
+   },
+   "parents": []
+  },
+  "en:meals-with-chicken": {
+   "name": {
+    "ru": "Блюда из курицы",
+    "fi": "Kana-ateriat",
+    "fr": "Plats au poulet",
+    "hu": "Csirkeételek",
+    "es": "Comidas con pollo",
+    "pl": "Dania z kurczakiem",
+    "ca": "Aliments amb pollastre",
+    "hr": "Jela s piletinom",
+    "en": "Meals with chicken",
+    "it": "Pasti con pollo",
+    "pt": "Refeições com frango",
+    "nl": "Kippevleesmaaltijden",
+    "de": "Hühnerfleischgerichte",
+    "lt": "Vištienos patiekalai"
+   },
+   "parents": [
+    "en:poultry-meals"
+   ]
+  },
+  "en:meals-with-meat": {
+   "name": {
+    "it": "Pasti con carne",
+    "en": "Meals with meat",
+    "nl": "Vleesmaaltijden",
+    "pt": "Refeições com carne",
+    "lt": "Patiekalai su mėsa",
+    "de": "Fleischgerichte",
+    "sv": "Rätter med kött",
+    "fr": "Plats préparés à la viande",
+    "ru": "Блюда с мясом",
+    "fi": "Liha-ateria",
+    "hu": "Ételek hússal",
+    "bg": "Ястия с месо",
+    "ca": "Aliments amb carn",
+    "hr": "Jela s mesom",
+    "pl": "Posiłki z mięsem",
+    "he": "מנות עם בשר",
+    "zh": "肉餐",
+    "es": "Comidas con carne"
+   },
+   "parents": [
+    "en:meals"
+   ]
+  },
+  "en:meats-and-their-products": {
+   "name": {
+    "de": "Auf Fleisch basierende Lebensmittel",
+    "tr": "Et ürünleri",
+    "nl": "Vleesproducten",
+    "no": "Kjøtt og kjøttprodukter",
+    "pt": "Produtos à base de carne",
+    "ca": "Productes amb base de carn",
+    "pl": "Produkty na bazie mięsa",
+    "es": "Productos a base de carne",
+    "he": "מוצרים מבוססי בשר",
+    "bg": "Месни продукти",
+    "ja": "肉とその製品、肉ベースの製品",
+    "fr": "Viandes et dérivés",
+    "ko": "고기와 그 제품",
+    "sv": "Kött och dess produkter",
+    "ru": "Продукты из мяса",
+    "lt": "Mėsos produktai",
+    "da": "Kødbaserede produkter",
+    "it": "Prodotti a base di carne",
+    "en": "Meats and their products",
+    "hr": "Mesa i njihovih proizvoda",
+    "zh": "肉制品",
+    "hu": "Hús alapú ételek",
+    "fi": "lihapohjaiset tuotteet"
+   },
+   "parents": []
+  },
+  "en:pickled-cucumbers": {
+   "name": {
+    "ja": "きゅうりのピクルス",
+    "sv": "Gurkor i lag",
+    "fr": "Pickles de concombres",
+    "ru": "Маринованые огурцы",
+    "fi": "säilötyt kurkut",
+    "hr": "Ukiseljeni krastavci",
+    "es": "Pepinos encurtidos",
+    "hu": "Savanyú uborka",
+    "bg": "Кисели краставици",
+    "it": "Cetrioli sottaceto",
+    "en": "Pickled cucumbers",
+    "de": "Eingelegte Gurken",
+    "tr": "Salatalık turşusu",
+    "nl": "Ingemaakte komkommer",
+    "da": "Syltede agurker"
+   },
+   "parents": [
+    "en:pickled-vegetables"
+   ]
+  },
+  "en:pickled-gherkins": {
+   "name": {
+    "bg": "Кисели краставички",
+    "hu": "Csemegeuborka",
+    "es": "Pepinillos",
+    "hr": "Kiseli krastavci",
+    "fi": "suolakurkut",
+    "fr": "Cornichons",
+    "sv": "Smågurkor i lag",
+    "nl": "Ingemaakte Augurken",
+    "de": "Essiggurken",
+    "en": "Pickled gherkins",
+    "it": "Cetriolini"
+   },
+   "parents": [
+    "en:pickled-cucumbers"
+   ]
+  },
+  "en:pickled-vegetables": {
+   "name": {
+    "pt": "Pickles vegetais",
+    "da": "Syltede grøntsager",
+    "nl": "Ingemaakte groentes",
+    "de": "Eingelegtes Gemüse",
+    "tr": "Sebze turşusu",
+    "it": "Verdure sottaceto",
+    "en": "Pickled vegetables",
+    "hu": "Zöldséges savanyúság",
+    "hr": "Ukiseljeno povrće",
+    "es": "Verduras y hortalizas encurtidas",
+    "fr": "Pickles de légumes",
+    "sv": "Inlagda grönsaker",
+    "fi": "kasvissäilykkeet",
+    "ru": "Маринованые овощи"
+   },
+   "parents": [
+    "en:plant-based-pickles",
+    "en:prepared-vegetables"
+   ]
+  },
+  "en:pickles": {
+   "name": {
+    "en": "Pickles",
+    "it": "Sottaceti",
+    "pt": "Picles",
+    "da": "Syltet mad",
+    "nl": "Tafelzuren",
+    "de": "Eingelegte Lebensmittel",
+    "tr": "Turşu",
+    "ru": "Солёные или маринованные огурцы",
+    "fi": "säilykkeet",
+    "fr": "Pickles",
+    "sv": "Inlagd mat",
+    "ja": "ピクルス",
+    "hu": "Savanyúságok",
+    "he": "חמוצים",
+    "es": "Encurtidos",
+    "pl": "Produkty marynowane",
+    "th": "ผักดอง",
+    "hr": "Pickles",
+    "ca": "Conserves"
+   },
+   "parents": [
+    "en:plant-based-foods"
+   ]
+  },
+  "en:plant-based-beverages": {
+   "name": {
+    "lt": "Augalinės kilmės gėrimai",
+    "da": "Plantebaserede drikkevarer",
+    "it": "Bevande a base di piante",
+    "en": "Plant-based beverages",
+    "hr": "Pića na biljnoj bazi",
+    "th": "เครื่องดื่มจากพืช",
+    "zh": "植物性饮料",
+    "hu": "Növényi alapú italok",
+    "fi": "Kasvipohjaiset juomat",
+    "tr": "Bitkisel içecekler",
+    "de": "Pflanzliche Getränke",
+    "nl": "Plantaardige dranken",
+    "ro": "Băuturi din plante",
+    "pt": "Bebidas à base de plantas",
+    "ca": "Begudes amb base vegetal",
+    "pl": "Napoje na bazie roślin",
+    "es": "Bebidas de origen vegetal",
+    "he": "משקאות מבוססי צמחים",
+    "bg": "Растителни напитки",
+    "ja": "植物ベースの飲み物",
+    "fr": "Boissons à base de végétaux",
+    "ko": "식물성 음료",
+    "sv": "Växtbaserade drycker",
+    "ru": "Напитки из растений"
+   },
+   "parents": [
+    "en:beverages",
+    "en:plant-based-foods-and-beverages"
+   ]
+  },
+  "en:plant-based-foods": {
+   "name": {
+    "fi": "Kasvipohjaiset ruoat",
+    "et": "Taimsed toidud",
+    "hu": "Növényialapú élelmiszerek",
+    "cs": "Rostlinné potraviny",
+    "hr": "Hranu biljnog podrijetla",
+    "th": "ผลิตภัณฑ์จากพืชทั้งหมด",
+    "zh": "植物性食物",
+    "eo": "Plant-bazitaj manĝaĵoj",
+    "el": "Τρόφιμα φυτικής προέλευσης",
+    "it": "Cibi a base vegetale",
+    "en": "Plant-based foods",
+    "ms": "Makanan berasaskan tumbuhan",
+    "da": "Plantebaserede fødevarer",
+    "lt": "Augalinės kilmės maisto produktai",
+    "id": "Makanan nabati",
+    "ar": "الأطعمة النباتية",
+    "fr": "Aliments d'origine végétale",
+    "sv": "Växtbaserad mat",
+    "ko": "식물성 식품",
+    "ru": "Еда из растительного сырья",
+    "fa": "غذاهای گیاهی",
+    "az": "Bitki mənşəli qidalar",
+    "sk": "Rastlinné potraviny",
+    "ja": "植物性食品",
+    "mk": "Храна од растително потекло",
+    "sl": "Rastlinska hrana",
+    "bg": "Растителни храни",
+    "ca": "Aliments amb base vegetal",
+    "pl": "Żywność na bazie roślin",
+    "hi": "पौधे आधारित खाद्य पदार्थ",
+    "es": "Alimentos de origen vegetal",
+    "he": "מזונות מהצומח",
+    "uk": "Їжа на рослинній основі",
+    "no": "Plantebasert mat",
+    "ro": "Alimente pe bază de plante",
+    "nl": "Plantaardige levensmiddelen",
+    "pt": "Alimentos à base de plantas",
+    "de": "Pflanzliche Lebensmittel",
+    "tr": "Bitkisel yiyecekler"
+   },
+   "parents": [
+    "en:plant-based-foods-and-beverages"
+   ]
+  },
+  "en:plant-based-foods-and-beverages": {
+   "name": {
+    "uk": "Їжа та напої на рослинній основі",
+    "pt": "Alimentos e bebidas à base de plantas",
+    "ro": "Alimente și băuturi pe bază de plante",
+    "no": "Plantebaserte matvarer og drikkevarer",
+    "nl": "Plantaardige levensmiddelen en dranken",
+    "tr": "Bitkisel yiyecek ve içecekler",
+    "de": "Pflanzliche Lebensmittel und Getränke",
+    "ko": "식물성 식품 및 음료",
+    "sv": "Växtbaserad mat och dryck",
+    "fr": "Aliments et boissons à base de végétaux",
+    "ru": "Еда и напитки из растительного сырья",
+    "ja": "植物性食品と飲料",
+    "sk": "Rastlinné potraviny a nápoje",
+    "az": "Bitki mənşəli qidalar və içkilər",
+    "fa": "غذاها و نوشیدنی‌های گیاهی",
+    "mk": "Храна и пијалоци од растително потекло",
+    "af": "Plantgebaseerde kosse en drankies",
+    "bg": "Растителни храни и напитки",
+    "sl": "Rastlinska hrana in pijače",
+    "be": "Раслінныя прадукты і напоі",
+    "pl": "Żywność i napoje na bazie roślin",
+    "ca": "Aliments i begudes amb base vegetal",
+    "es": "Alimentos y bebidas de origen vegetal",
+    "he": "מזונות ומשקאות על בסיס צמחי",
+    "hi": "पौधे आधारित खाद्य पदार्थ और पेय",
+    "el": "Τρόφιμα και ποτά φυτικής προέλευσης",
+    "eo": "Plant-bazitaj manĝaĵoj kaj trinkaĵoj",
+    "it": "Cibi e bevande a base vegetale",
+    "bn": "উদ্ভিদ-ভিত্তিক খাবার ও পানীয়",
+    "en": "Plant-based foods and beverages",
+    "ms": "Makanan dan minuman berasaskan tumbuhan",
+    "da": "Plantebaserede fødevarer og drikkevarer",
+    "lt": "Augalinės kilmės maisto produktai ir gėrimai",
+    "ar": "الأطعمة والمشروبات النباتية",
+    "id": "Makanan dan minuman nabati",
+    "fi": "Kasvipohjaiset ruoat ja juomat",
+    "et": "Taimsed toidud ja joogid",
+    "hu": "Növényi alapú élelmiszerek és italok",
+    "cs": "Rostlinné potraviny a nápoje",
+    "th": "อาหารและเครื่องดื่มจากพืช",
+    "hr": "Biljne hrane i pića",
+    "zh": "植物性食物与饮品"
+   },
+   "parents": []
+  },
+  "en:plant-based-pickles": {
+   "name": {
+    "he": "חמוצים מן הצומח",
+    "es": "Vegetales encurtidos",
+    "pl": "Marynowane produkty roślinne",
+    "ca": "Conserves vegetals",
+    "hr": "Kiseli krastavci na biljnoj bazi",
+    "hu": "Növényi savanyúságok",
+    "fi": "kasvipohjaiset säilykkeet",
+    "ru": "Маринованные растительные продукты",
+    "sv": "Inlagda växter",
+    "fr": "Pickles d'origine végétale",
+    "de": "Pflanzliches eingelegtes Pflanze",
+    "pt": "Pickles à base de plantas",
+    "nl": "Plantaardige zoetzuren",
+    "ro": "Legume murate",
+    "en": "Plant-based pickles",
+    "it": "Sottaceti a base di vegetali"
+   },
+   "parents": [
+    "en:pickles",
+    "en:plant-based-foods"
+   ]
+  },
+  "en:poultry-meals": {
+   "name": {
+    "en": "Poultry meals",
+    "it": "Pollame",
+    "de": "Geflügelgerichte",
+    "lt": "Paukštienos patiekalai",
+    "nl": "Gevogelte maaltijden",
+    "ru": "Мясо птицы",
+    "fi": "Siipikarja-ateriat",
+    "fr": "Plats à la volaille",
+    "es": "Comidas de aves",
+    "th": "ผลิตภัณฑ์จากสัตว์ปีก",
+    "ca": "Menjars d'aus de corral",
+    "hr": "Jela od peradi",
+    "hu": "Baromfihúsok"
+   },
+   "parents": [
+    "en:meals-with-meat"
+   ]
+  },
+  "en:prepared-salads": {
+   "name": {
+    "es": "Ensaladas preparadas",
+    "he": "סלטים מוכנים",
+    "pl": "Gotowe sałatki",
+    "hr": "Pripremljene salate",
+    "ca": "Amanides preparades",
+    "bg": "Готови салати",
+    "hu": "Előkészített saláták",
+    "fi": "valmiit salaatit",
+    "ru": "Готовые салаты",
+    "fr": "Salades composées",
+    "de": "Fertigsalate",
+    "lt": "Paruoštos salotos",
+    "nl": "Opgemaakte salades",
+    "en": "Prepared salads",
+    "it": "Insalate pronte"
+   },
+   "parents": [
+    "en:meals"
+   ]
+  },
+  "en:prepared-vegetables": {
+   "name": {
+    "hu": "Előkészített zöldségek",
+    "he": "ירקות מבושלים",
+    "es": "Preparados vegetales",
+    "hr": "Pripremljeno povrće",
+    "ca": "Verdures preparades",
+    "ru": "Приготовленные овощи",
+    "fi": "kypsennetyt kasvikset",
+    "fr": "Légumes préparés",
+    "pt": "Legumes preparados",
+    "nl": "Kant-en-klaar groenten",
+    "de": "Vorbereitetes Gemüse",
+    "lt": "Paruoštos daržovės",
+    "en": "Prepared vegetables",
+    "it": "Verdure pronte"
+   },
+   "parents": [
+    "en:plant-based-foods"
+   ]
+  },
+  "en:salty-snacks": {
+   "name": {
+    "it": "Snacks salati",
+    "en": "Salty snacks",
+    "ro": "Gustări sărate",
+    "nl": "Zoute snacks",
+    "da": "Salte snacks",
+    "pt": "Petiscos salgados",
+    "lt": "Sūrūs užkandžiai",
+    "tr": "Tuzlu atıştırmalıklar",
+    "de": "salzige Snacks",
+    "sv": "Salta snacks",
+    "fr": "Snacks salés",
+    "ru": "Солёные закуски",
+    "fi": "suolaiset naposteltavat",
+    "hu": "Sós ételek",
+    "bg": "Солени закуски",
+    "hr": "Slane grickalice",
+    "ca": "Aperitius salats",
+    "pl": "Słone przekąski",
+    "es": "Snacks salados",
+    "zh": "咸味零食",
+    "he": "חטיפים מלוחים"
+   },
+   "parents": [
+    "en:snacks"
+   ]
+  },
+  "en:sauces": {
+   "name": {
+    "nl": "Sauzen",
+    "no": "Sauser",
+    "ro": "sosuri",
+    "pt": "Molhos",
+    "de": "Saucen",
+    "tr": "Sos",
+    "fr": "Sauces",
+    "sv": "Såser",
+    "ru": "Соусы",
+    "ja": "ソース",
+    "bg": "Сосове",
+    "ca": "Salses",
+    "pl": "Sosy",
+    "es": "Salsas",
+    "he": "רטבים",
+    "it": "Salse",
+    "en": "Sauces",
+    "da": "Sovse",
+    "lt": "Padažai",
+    "fi": "kastikkeet",
+    "et": "Kasten",
+    "hu": "Szószok",
+    "hr": "umaci",
+    "th": "กลุ่มผลิตภัณฑ์ไส้กรอก",
+    "zh": "酱汁"
+   },
+   "parents": [
+    "en:condiments"
+   ]
+  },
+  "en:snacks": {
+   "name": {
+    "hu": "Snackek",
+    "cs": "Svačiny",
+    "hr": "Grickalice",
+    "th": "ขนม-ของว่าง",
+    "zh": "零食",
+    "fi": "Naposteltavat",
+    "da": "Snacks",
+    "lt": "Užkandžiai",
+    "it": "Snack",
+    "en": "Snacks",
+    "bg": "Закуски",
+    "ca": "Snacks",
+    "pl": "Przekąski",
+    "es": "Botanas",
+    "he": "חטיפים",
+    "fr": "Snacks",
+    "sv": "Snacks",
+    "ru": "Закуски",
+    "nl": "Snacks",
+    "ro": "Gustări",
+    "no": "Snacks",
+    "pt": "Lanches comida",
+    "de": "Imbiss",
+    "tr": "Atıştırmalıklar"
+   },
+   "parents": []
+  },
+  "en:spice-mix": {
+   "name": {
+    "es": "Mezcla de especias",
+    "pl": "Mieszanki przypraw",
+    "hr": "Mješavina začina",
+    "ja": "ミックススパイス",
+    "ru": "Смесь специй",
+    "fi": "maustesekoitus",
+    "fr": "Mélanges d'épices",
+    "de": "Gewürzmischung",
+    "lt": "Prieskonių mišinys",
+    "nl": "Specerijenmengelingen",
+    "en": "Spice Mix",
+    "it": "Mix di spezie"
+   },
+   "parents": [
+    "en:spices"
+   ]
+  },
+  "en:spices": {
+   "name": {
+    "sv": "Kryddor",
+    "fr": "Epices",
+    "ru": "Специи",
+    "ja": "香辛料",
+    "bg": "Подправки",
+    "pl": "przyprawy z niezielonych części roślin",
+    "ca": "Espècies",
+    "he": "תבלינים",
+    "es": "Especias",
+    "pt": "Temperos",
+    "ro": "Condimente",
+    "nl": "Specerijen",
+    "tr": "Baharat",
+    "de": "Gewürze",
+    "fi": "ei-vihreät kasvinosat mausteet",
+    "hu": "Nem zöld növényi rész fűszerek",
+    "cs": "Koření",
+    "hr": "Začinima",
+    "it": "Spezie",
+    "en": "Spices",
+    "da": "Ikke-grønne plantedele krydderier",
+    "lt": "Prieskoniai"
+   },
+   "parents": [
+    "en:herbs-and-spices",
+    "en:plant-based-foods"
+   ]
+  },
+  "en:spreads": {
+   "name": {
+    "en": "Spreads",
+    "it": "Spalmabili",
+    "lt": "Užtepėlės ir jų produktai",
+    "da": "Smørbare produkter",
+    "fi": "levitteet",
+    "zh": "塗抺食品",
+    "hr": "namazi",
+    "hu": "Kenhető élelmiszerek",
+    "de": "Brotaufstriche",
+    "tr": "Ekmeğe sürülen ürünler",
+    "nl": "Smeerbare producten",
+    "no": "Pålegg",
+    "pt": "Produtos para barrar",
+    "ja": "スプレッド",
+    "ru": "Намазки",
+    "fr": "Produits à tartiner",
+    "sv": "Bredbara pålägg",
+    "es": "Untables",
+    "he": "ממרחים",
+    "ca": "Productes per untar",
+    "pl": "Smarowidła",
+    "sl": "namazi",
+    "bg": "Крем за мазане"
+   },
+   "parents": []
+  },
+  "en:sweet-snacks": {
+   "name": {
+    "en": "Sweet snacks",
+    "it": "Snack dolci",
+    "de": "Süßer Snack",
+    "lt": "Saldūs užkandžiai",
+    "pt": "Lanches doces",
+    "ro": "Gustări dulci",
+    "nl": "Zoete snacks",
+    "da": "Søde snacks",
+    "fi": "Makeat naposteltavat",
+    "ru": "Сладкие закуски",
+    "sv": "Söta snacks",
+    "fr": "Snacks sucrés",
+    "zh": "含糖零食",
+    "es": "Snacks dulces",
+    "he": "חטיפים מתוקים",
+    "pl": "Słodkie przekąski",
+    "hr": "Slatki zalogaji",
+    "ca": "Aperitius dolços",
+    "bg": "Сладки закуски",
+    "cs": "Sladké svačiny",
+    "hu": "Cukros ételek"
+   },
+   "parents": [
+    "en:snacks"
+   ]
+  },
+  "en:sweet-spreads": {
+   "name": {
+    "hu": "Édes kenhető élelmiszer",
+    "ca": "Productes dolços per untar",
+    "hr": "Slatki namazi",
+    "pl": "Słodkie smarowidła",
+    "he": "ממרחים מתוקים",
+    "es": "Untables dulces",
+    "sv": "Söta pålägg",
+    "fr": "Produits à tartiner sucrés",
+    "fi": "makeat levitteet",
+    "ru": "Сладкие намазки",
+    "nl": "Zoete smeerpastas",
+    "pt": "Doces para barrar",
+    "lt": "Saldžios užtepėlės",
+    "de": "Süße Brotaufstriche",
+    "tr": "Ekmeğe sürülen tatlı ürünler",
+    "it": "Spalmabili dolci",
+    "en": "Sweet spreads"
+   },
+   "parents": [
+    "en:breakfasts",
+    "en:spreads"
+   ]
+  },
+  "en:tea-bags": {
+   "name": {
+    "it": "Bustine di tè",
+    "en": "Tea bags",
+    "lt": "Arbatos maišeliai",
+    "de": "Teebeutel",
+    "tr": "Poşet çay",
+    "nl": "Theezakjes",
+    "pt": "Saquinhos de chá",
+    "ja": "ティーバッグ",
+    "fr": "Thés en sachets",
+    "fi": "teepussit",
+    "ru": "Чайные пакетики",
+    "hr": "Vrećice čaja",
+    "zh": "袋茶",
+    "es": "Bolsitas de té",
+    "hu": "Teafilterek"
+   },
+   "parents": [
+    "en:tea-leaves"
+   ]
+  },
+  "en:tea-leaves": {
+   "name": {
+    "fr": "Feuilles de thé",
+    "en": "Tea leaves",
+    "it": "Foglie di tè",
+    "nl": "Theeblaadjes",
+    "hu": "Tealevél",
+    "es": "Hojas de té",
+    "de": "Teeblätter",
+    "hr": "Listići čaja"
+   },
+   "parents": [
+    "en:beverage-preparations"
+   ]
+  },
+  "en:teas": {
+   "name": {
+    "lt": "Arbatos",
+    "da": "Te",
+    "it": "Tè",
+    "en": "Teas",
+    "la": "Camellia sinensis",
+    "hr": "čajevi",
+    "th": "ชา",
+    "zh": "茶",
+    "hu": "Teák",
+    "cs": "Čaje",
+    "fi": "teet",
+    "tr": "Çay",
+    "de": "Tees",
+    "nl": "Theeën",
+    "pt": "Chás",
+    "ca": "Tè",
+    "pl": "Herbata",
+    "he": "סוגי תה",
+    "es": "Tés",
+    "bg": "Чай",
+    "ja": "茶",
+    "sv": "Teer",
+    "fr": "Thés",
+    "ru": "Чай"
+   },
+   "parents": [
+    "en:hot-beverages",
+    "en:plant-based-beverages"
+   ]
+  },
+  "en:vegetable-salads": {
+   "name": {
+    "hr": "Salate od povrća",
+    "pl": "Sałatki z warzywami",
+    "lt": "Salotos su daržovėmis",
+    "de": "Gemüsesalat",
+    "nl": "Groentesalade",
+    "it": "Insalate di verdure",
+    "en": "Vegetable salads",
+    "fr": "Salades de légumes",
+    "fi": "Kasvissalaatit"
+   },
+   "parents": [
+    "en:prepared-salads"
+   ]
+  },
+  "fr:pates-a-tartiner": {
+   "name": {
+    "fr": "Pâtes à tartiner"
+   },
+   "parents": [
+    "en:sweet-spreads"
+   ]
+  }
+ },
+ "products": [
+  {
+   "case": "groceries_with_lineage",
+   "code": "0000800000002",
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:plant-based-foods",
+    "en:condiments",
+    "en:spices",
+    "en:spice-mix",
+    "en:groceries"
+   ]
+  },
+  {
+   "case": "salted_snacks_only",
+   "code": "0000309444901",
+   "categories_tags": [
+    "en:salted-snacks"
+   ]
+  },
+  {
+   "case": "salted_snacks_with_lineage",
+   "code": "0009300003544",
+   "categories_tags": [
+    "en:condiments",
+    "en:sauces",
+    "en:hot-sauces",
+    "en:groceries",
+    "en:salted-snacks"
+   ]
+  },
+  {
+   "case": "easter_food",
+   "code": "00108867",
+   "categories_tags": [
+    "en:snacks",
+    "en:sweet-snacks",
+    "en:cocoa-and-its-products",
+    "en:confectioneries",
+    "en:festive-foods",
+    "en:chocolate-candies",
+    "en:chocolates",
+    "en:easter-food"
+   ]
+  },
+  {
+   "case": "aoc_cheeses",
+   "code": "2225653026636",
+   "categories_tags": [
+    "en:dairies",
+    "en:fermented-foods",
+    "en:fermented-milk-products",
+    "en:cheeses",
+    "en:aoc-cheeses",
+    "en:labeled-cheeses"
+   ]
+  },
+  {
+   "case": "out_of_language",
+   "code": "0000101209159",
+   "categories_tags": [
+    "en:breakfasts",
+    "en:spreads",
+    "en:sweet-spreads",
+    "fr:pates-a-tartiner",
+    "en:hazelnut-spreads",
+    "en:chocolate-spreads",
+    "en:cocoa-and-hazelnuts-spreads"
+   ]
+  },
+  {
+   "case": "all_unknown",
+   "code": "0011110507112",
+   "categories_tags": [
+    "en:empty",
+    "en:proposed-for-deletion"
+   ]
+  },
+  {
+   "case": "clean_control",
+   "code": "0000105000042",
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:beverages",
+    "en:hot-beverages",
+    "en:plant-based-beverages",
+    "en:teas",
+    "en:tea-bags"
+   ]
+  },
+  {
+   "case": "baking_decorations",
+   "code": "0011110326409",
+   "categories_tags": [
+    "en:baking-decorations"
+   ]
+  },
+  {
+   "case": "long_tail_unknown",
+   "code": "0002000012557",
+   "categories_tags": [
+    "en:meats-and-their-products",
+    "en:meals",
+    "en:prepared-salads",
+    "en:meals-with-meat",
+    "en:poultry-meals",
+    "en:meals-with-chicken",
+    "en:vegetable-salads",
+    "en:salads"
+   ]
+  }
+ ]
+}

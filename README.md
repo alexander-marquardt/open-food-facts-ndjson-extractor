@@ -21,7 +21,7 @@ This tool transforms raw, complex Open Food Facts data into a flattened, search-
 | `price` | float | Synthetic, deterministic price for e-commerce simulation. |
 | `currency` | string | Currency code (default: USD). |
 | `image_url` | string | Computed primary product image URL. |
-| `categories` | list | Cleaned, flat list of the product's own category tags, de-duplicated and rendered with the taxonomy's display name for `--lang` — the **same** label the matching `category_path` segment carries, so the two fields can be joined on string. |
+| `categories` | list | Cleaned, flat list of the product's own category tags, de-duplicated, **validated against the taxonomy** (see [Tags that are not taxonomy categories](#tags-that-are-not-taxonomy-categories)) and rendered with the taxonomy's display name for `--lang` — the **same** label the matching `category_path` segment carries, so the two fields can be joined on string. |
 | `category_path` | list | **Hierarchical** category path — a single root→leaf chain as cumulative `/`-joined strings (e.g. `["Snacks", "Snacks/Salty snacks", "Snacks/Salty snacks/Crisps"]`), reconstructed from the Open Food Facts category taxonomy graph. Powers breadcrumb-style, drill-down category facets. |
 | `attrs` | object | **Flattened Dictionary** of key-value attributes (e.g., Nutri-Score, Energy). |
 | `attr_keys` | list | List of all keys available in `attrs` for faceting. |
@@ -283,6 +283,62 @@ never tagged, and those ancestors are legitimately absent from `categories`.
 every chain node the product *did* tag appears verbatim in `categories` — by
 exact string, on real Open Food Facts records.
 
+### Tags that are not taxonomy categories
+
+A product's `categories_tags` are **not** guaranteed to be taxonomy nodes. Legacy
+tags, contributor-entered tags and tags upstream has since renamed all ride along
+in the export. Measured over the first 300,000 records of the January 2026 dump
+against the pinned 14,457-node snapshot, after the `en:undefined`/`en:null`
+sentinels `--category-exclude` already removes:
+
+| | |
+| :--- | ---: |
+| products with a real category tag | 218,239 |
+| tag instances | 1,171,851 |
+| instances with no taxonomy node | 49,962 (4.26%) |
+| distinct such tags | 7,712 |
+| products carrying at least one | 42,727 (19.6%) |
+| products where *every* tag is one | 5,456 (2.50%) |
+
+Those tags used to be rendered into the searchable `categories` field as if they
+were canonical. `Groceries` alone was searchable on 6,299 documents of the built
+English catalog — a value with no node in the hierarchy, so it can never be a
+`category_path` segment and can never be authored as a merchandising rule value.
+It is also a value the labeller has no `name` to render, only a slug.
+
+Each tag now goes through, in order:
+
+1. **A curated alias map** — `TAG_ALIASES` in
+   `src/off_demo_extract/category_tags.py`, an id upstream retired mapped to the
+   node that *is* that category today (`en:easter-food` →
+   `en:easter-foods-and-drinks`). Most entries are derived from upstream's own
+   synonym lines, which is where a rename leaves its trace; the two that are not
+   are marked inline. Aliases are canonicalizations, never generalizations: a tag
+   is never filed under a *broader* node, because that would put a product in a
+   category it never claimed.
+2. **A curated drop list** — `TAG_DROPS`, each entry carrying the reason it is
+   refused. `en:groceries` is 36.6% of all unresolvable instances on its own and
+   is contentless in a grocery catalog; `en:aoc-cheeses` and `en:labeled-cheeses`
+   are label *attributes* rather than places in a product hierarchy.
+3. **Membership in the run's category vocabulary** — the same node set the
+   hierarchical path is allowed to walk, so the two fields cannot draw on
+   different vocabularies. A tag that is a real node but in a language this
+   catalog does not place in a path (`fr:charcuteries-cuites` in an English
+   catalog) is refused here too: `category_path` already refuses it, so leaving
+   it in the flat field produces a value that is searchable but never facetable.
+
+**A refused value never refuses its record.** Dropping the record on an
+unresolvable tag would cost 19.6% of tagged products; dropping only the offending
+value costs 2.50%, because in 87% of cases the product has a complete valid
+lineage and one junk tag riding along. The 2.50% that end up with nothing are
+exactly the products `--require-category-path` already drops.
+
+Every run reports what it refused, in a `category_tag_curation` block: totals by
+reason, the distinct unresolvable-tag count, the rate, and the worst offenders by
+name. The rate is meant to be read per run — this defect was originally found by
+reverse-mapping a built index against the taxonomy, which nobody should have to
+do twice.
+
 The taxonomy file is fetched once from
 [`https://static.openfoodfacts.org/data/taxonomies/categories.json`](https://static.openfoodfacts.org/data/taxonomies/categories.json)
 and cached at `data/taxonomy/categories.json`. Override its location with
@@ -300,8 +356,11 @@ exactly what each does:
   an empty `category_path` (`[]`). The flat `categories` field is still written,
   but with no taxonomy there are no display names to read, so its labels fall
   back to a prettified slug of the tag id — English, and without the taxonomy's
-  hyphenation or parentheticals. Use this to skip the download when you don't
-  need the hierarchy and are not relying on category labels.
+  hyphenation or parentheticals. With no taxonomy there is also no vocabulary to
+  validate tags against, so only the curated drop list applies and the rest are
+  emitted unchecked; refusing everything would blank the field for the whole run.
+  Use this to skip the download when you don't need the hierarchy and are not
+  relying on category labels.
 - **`--require-category-path`** *(default: on)* — **drops products whose
   `category_path` can't be reconstructed**, so the catalog is uniformly
   drill-down-faceted. This is a small tail — roughly 2–6% of otherwise-clean
@@ -367,6 +426,7 @@ ecommerce-open-food-facts/
 │   └── off_demo_extract/  # Python Package
 │       ├── extract.py     # Main extraction pipeline
 │       ├── taxonomy.py    # OFF taxonomy graph → hierarchical category_path
+│       ├── category_tags.py  # Curated aliases/drops + validation of product tags
 │       └── pricing.py     # Synthetic price model
 ├── tests/
 │   ├── conftest.py        # Puts src/ on sys.path so tests import normally
