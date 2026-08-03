@@ -962,11 +962,12 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
             categories = [label for _tag, label in flat_entries]
             primary_category_label = categories[0] if categories else None
 
-            # Hierarchical, musgrave-style category path derived from the OFF
-            # taxonomy graph (a single clean root→leaf chain as cumulative path
-            # strings). The flat ``categories`` list above is still used for
-            # pricing-bucket matching and attrs; ``category_path`` is the field
-            # PRISM's hierarchical category facet renders.
+            # Hierarchical category path derived from the OFF taxonomy graph, in
+            # the shape retail catalogs typically expose (a single clean root→leaf
+            # chain as cumulative path strings). The flat ``categories`` list
+            # above is still used for pricing-bucket matching and attrs;
+            # ``category_path`` is the field PRISM's hierarchical category facet
+            # renders.
             path_entries = (
                 category_path_entries(
                     tags_curated,

@@ -10,10 +10,11 @@ is a directed acyclic graph (a category can have several parents). Naively
 joining them with ``/`` produces a nonsense path that mixes parallel roots and
 sibling branches.
 
-To get a clean, musgrave-style hierarchy (an array of cumulative path strings
-like ``["Beverages", "Beverages/Hot beverages", "Beverages/Hot beverages/Teas"]``)
-we need the taxonomy *graph* — the parent→child edges — and then walk a single
-canonical chain from the product's most specific category up to a root.
+To get a clean hierarchy in the shape retail catalogs typically expose (an array
+of cumulative path strings like ``["Beverages", "Beverages/Hot beverages",
+"Beverages/Hot beverages/Teas"]``) we need the taxonomy *graph* — the
+parent→child edges — and then walk a single canonical chain from the product's
+most specific category up to a root.
 
 The taxonomy is the public OFF file:
     https://static.openfoodfacts.org/data/taxonomies/categories.json
@@ -542,7 +543,7 @@ def build_category_path(
     lang: str = "en",
     canonical_parents: Optional[Dict[str, Optional[str]]] = None,
 ) -> List[str]:
-    """Cumulative root→leaf path strings, musgrave-style.
+    """Cumulative root→leaf path strings, the shape retail catalogs typically expose.
 
     Example: ``["Beverages", "Beverages/Hot beverages",
     "Beverages/Hot beverages/Teas", "Beverages/Hot beverages/Teas/Tea bags"]``.
