@@ -276,6 +276,9 @@ ecommerce-open-food-facts/
 ├── tests/
 │   ├── test_taxonomy.py            # Regression tests for the hierarchy builder
 │   └── test_category_path_gate.py  # End-to-end tests for the category_path gate
+│   ├── conftest.py        # Puts src/ on sys.path so tests import normally
+│   ├── test_business_signal_values.py  # margin / popularity derivation
+│   └── test_taxonomy.py   # Regression tests for the hierarchy builder
 ├── pyproject.toml         # Dependencies
 └── README.md
 ```
