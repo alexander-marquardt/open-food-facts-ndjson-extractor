@@ -1,18 +1,21 @@
 """Business-signal derivation: popularity is observed, margin is modelled.
 
-Both fields were a uniform random draw seeded on the GTIN until
-elastic/prism#5027. These tests pin that ``popularity`` is a monotone function
-of the dump's real ``unique_scans_n`` and nothing else, and that ``margin``
-depends on the product's category and label tags rather than on its barcode.
+Both fields were a uniform random draw seeded on the GTIN until the draw was
+diagnosed and replaced. These tests pin that ``popularity`` is a monotone
+function of the dump's real ``unique_scans_n`` and nothing else, and that
+``margin`` depends on the product's category and label tags rather than on its
+barcode.
 
 The last section runs the removed draw side by side with its replacement, so
 the claim that the old values carried no information is demonstrated by
 executing both, not asserted in prose.
 
-They also pin the exact numbers the PRISM customization repo's migration script
-(``scripts/business_signal_values.py`` in elastic/prism-open-food-facts)
-produces, because a catalogue re-extracted here has to agree with a catalogue
-migrated there.
+They also pin the exact numbers these derivations produce, digit for digit.
+That matters because an already-indexed catalog is migrated in place by a
+separate script rather than re-extracted from the dump: the two paths have to
+land on identical values, or the same product carries one margin in a
+freshly built index and a different one in a migrated index of the same data.
+Changing a constant here without changing it there is the failure this pins.
 """
 
 from __future__ import annotations
@@ -100,7 +103,7 @@ _BARCODES = [f"{n:013d}" for n in range(2000)]
 
 
 def test_the_draw_had_the_uniform_signature_the_catalogues_were_measured_to_have():
-    """elastic/prism#5027 identified the fill from its mean landing on the midpoint.
+    """The fill was identified from its mean landing on the midpoint of the range.
 
     Reproduced here so the diagnosis is checkable and not taken on trust: over a
     barcode sample the draw's means sit on the midpoints of 0..200 and 0..10000,
