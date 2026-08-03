@@ -18,6 +18,7 @@ from off_demo_extract.taxonomy import (
     build_canonical_parent_map,
     category_path_entries,
     default_keep_prefixes,
+    display_label,
     AddressAudit,
 )
 
@@ -258,28 +259,38 @@ def pick_primary_category_tag(tags: list[str], exclude: Set[str]) -> Optional[st
     return None
 
 
-def prettify_category(tag: str) -> str:
-    t = tag
-    if ":" in t:
-        t = t.split(":", 1)[1]
-    t = t.replace("-", " ").replace("_", " ").strip()
-    if not t:
-        return tag
-    return t[0].upper() + t[1:]
+def build_category_label_entries(
+    primary_tag: Optional[str],
+    tags_filtered: list[str],
+    taxonomy: Optional[Dict[str, Any]],
+    lang: str = "en",
+    max_n: int = MAX_NUM_CATEGORIES,
+) -> list[tuple[str, str]]:
+    """``(tag_id, label)`` for the flat ``categories`` field, primary tag first.
 
+    The label comes from :func:`off_demo_extract.taxonomy.display_label` — the
+    same function that names a ``category_path`` segment. This field used to
+    de-slug the tag id itself, which rendered the identical node under a
+    different string in the two fields (``Plant based foods`` here versus
+    ``Plant-based foods`` there) and made them unjoinable by string; deriving
+    both from one function is what stops a change to labelling from reaching one
+    field and not the other.
 
-def build_categories_list(primary_tag: Optional[str], tags_filtered: list[str], max_n: int = MAX_NUM_CATEGORIES) -> list[str]:
+    Ids ride along so a run can audit the two fields against each other. Callers
+    that only want the strings want :func:`build_categories_list`.
+    """
+    tax = taxonomy if taxonomy is not None else {}
     seen: Set[str] = set()
-    out: list[str] = []
+    out: list[tuple[str, str]] = []
 
     def add(tag: str) -> None:
-        label = prettify_category(tag)
+        label = display_label(tax, tag, lang)
         # Suppress "Undefined"/"Unknown"/etc from appearing as categories.
         if _is_undefined_like(label):
             return
         if label not in seen:
             seen.add(label)
-            out.append(label)
+            out.append((tag, label))
 
     if primary_tag:
         add(primary_tag)
@@ -290,6 +301,21 @@ def build_categories_list(primary_tag: Optional[str], tags_filtered: list[str], 
         add(t)
 
     return out
+
+
+def build_categories_list(
+    primary_tag: Optional[str],
+    tags_filtered: list[str],
+    taxonomy: Optional[Dict[str, Any]] = None,
+    lang: str = "en",
+    max_n: int = MAX_NUM_CATEGORIES,
+) -> list[str]:
+    return [
+        label
+        for _tag, label in build_category_label_entries(
+            primary_tag, tags_filtered, taxonomy, lang, max_n
+        )
+    ]
 
 
 # ----------------------------
@@ -473,7 +499,6 @@ def format_nutrient(nutriments: Dict[str, Any], key_100g: str, unit_key: Optiona
 
 def build_attrs(
     product: Dict[str, Any],
-    primary_category_tag: Optional[str],
     primary_category_label: Optional[str],
 ) -> Dict[str, str]:
     attrs: Dict[str, str] = {}
@@ -515,12 +540,16 @@ def build_attrs(
         attrs["Countries"] = countries
 
     # Category: suppress undefined-like values.
+    #
+    # There is deliberately no second, tag-derived fallback here. One existed and
+    # was unreachable: ``primary_category_label`` is the first entry of the flat
+    # ``categories`` list, which already dropped undefined-like labels, so it is
+    # absent only when *every* tag was undefined-like — exactly the case a
+    # fallback would have to suppress too. Reviving it would also mean a second
+    # rule for naming a category, which is the defect this field's labelling was
+    # just single-sourced to remove.
     if primary_category_label and not _is_undefined_like(primary_category_label):
         attrs["Category"] = primary_category_label
-    elif primary_category_tag:
-        cat = prettify_category(primary_category_tag)
-        if not _is_undefined_like(cat):
-            attrs["Category"] = cat
 
     nutriments = product.get("nutriments")
     if isinstance(nutriments, dict):
@@ -620,6 +649,8 @@ class Counters:
     with_category_path: int = 0
     missing_category_path: int = 0
     categories_at_multiple_addresses: int = 0
+    categories_under_multiple_labels: int = 0
+    labels_shared_by_multiple_categories: int = 0
 
 
 def _fmt_int(n: int) -> str:
@@ -846,7 +877,10 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
                 c.missing_category += 1
                 continue
 
-            categories = build_categories_list(primary_tag, tags_filtered, max_n=MAX_NUM_CATEGORIES)
+            flat_entries = build_category_label_entries(
+                primary_tag, tags_filtered, taxonomy, lang, max_n=MAX_NUM_CATEGORIES
+            )
+            categories = [label for _tag, label in flat_entries]
             primary_category_label = categories[0] if categories else None
 
             # Hierarchical, musgrave-style category path derived from the OFF
@@ -873,7 +907,7 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
                 c.missing_category_path += 1
                 continue
 
-            attrs = build_attrs(product, primary_category_tag=primary_tag, primary_category_label=primary_category_label)
+            attrs = build_attrs(product, primary_category_label=primary_category_label)
 
             dietary_restrictions = dietary_restrictions_from_off(product)
             if dietary_restrictions:
@@ -935,8 +969,11 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
 
             if category_path:
                 c.with_category_path += 1
-                # Property 2 check, on the records actually written.
-                address_audit.record(path_entries)
+            # Property 2 (one address per category) and the label invariants
+            # (one label per category, one category per label), on the records
+            # actually written. The flat entries go in even when no path
+            # resolved, so a tag that never reaches a chain is still audited.
+            address_audit.record(path_entries, flat_entries)
 
             out.write(json.dumps(doc, ensure_ascii=False) + "\n")
             c.written += 1
@@ -962,14 +999,35 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
     log(_progress_line(c, elapsed))
 
     c.categories_at_multiple_addresses = address_audit.conflict_count
+    c.categories_under_multiple_labels = address_audit.label_conflict_count
+    c.labels_shared_by_multiple_categories = address_audit.shared_label_count
+    audit_summary = address_audit.summary()
     if address_audit.conflict_count:
         log(
             f"WARNING: {address_audit.conflict_count:,} categories resolved to more "
             "than one path address in this run — category_path is no longer a strict "
             "tree. See category_path_addresses in the report."
         )
-        for example in address_audit.summary()["examples"]:
+        for example in audit_summary["examples"]:
             log(f"  {example['category']}: {' | '.join(example['addresses'])}")
+    if address_audit.label_conflict_count:
+        log(
+            f"WARNING: {address_audit.label_conflict_count:,} categories rendered "
+            "under more than one label in this run — category_path and categories "
+            "can no longer be joined on string. See category_path_addresses in the "
+            "report."
+        )
+        for example in audit_summary["label_examples"]:
+            log(f"  {example['category']}: {' | '.join(example['labels'])}")
+    if address_audit.shared_label_count:
+        log(
+            f"WARNING: {address_audit.shared_label_count:,} labels are shared by "
+            "more than one category in this run — joining categories to a "
+            "category_path segment on string is ambiguous for those. See "
+            "category_path_addresses in the report."
+        )
+        for example in audit_summary["shared_label_examples"]:
+            log(f"  {example['label']}: {' | '.join(example['categories'])}")
     log("Done.")
 
     report = {
@@ -979,9 +1037,10 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
         "elapsed_seconds": elapsed,
         "counters": c.__dict__,
         # Property 2: every category must occupy exactly one position in the
-        # tree. Reported per run so a regression shows up here rather than in a
+        # tree, and render under exactly one label (and that label must name only
+        # it). Reported per run so a regression shows up here rather than in a
         # hand audit of the built index.
-        "category_path_addresses": address_audit.summary(),
+        "category_path_addresses": audit_summary,
         "filters": {
             "lang": lang,
             "title": f"product_name_{lang} OR (lang=={lang} AND product_name)",
