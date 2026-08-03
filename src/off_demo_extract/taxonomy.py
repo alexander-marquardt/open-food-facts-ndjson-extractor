@@ -62,6 +62,26 @@ identical path, on every product.
 root→leaf chain, so a product's ``category_path`` is one cumulative path and
 never a union of branches.
 
+What the language filter still cuts short
+-----------------------------------------
+Anchoring runs to a root of the map built for *this* run, and that map only
+contains the languages the catalog may place in a path. 90 of the 161 roots an
+English run sees are not taxonomy roots at all: they are nodes whose only parent
+is foreign, so pruning promoted them. ``en:pate`` sits under
+``fr:charcuteries-diverses`` under ``en:prepared-meats``, and an English catalog
+therefore files it as a top-level ``Pâté``.
+
+That residue is small. Over the first 300,000 records of the January 2026 dump,
+455 products resolve an unanchored chain for English and 2 do for French; 6 of
+those English ones also clear the extractor's title/description/image filters and
+so reach the output, out of 16,847 records written. But it is the whole of what
+"truncated" still means, and it is invisible from the path alone, which is why
+:func:`global_roots` and :func:`unanchored_head` exist and why
+``--require-category-path`` consults them rather than only testing the path for
+emptiness. Removing the *cause* (teaching the walk to pass through a foreign
+ancestor) is a separate change; refusing to emit an address that no other
+catalog agrees with is this one.
+
 The tie-break
 -------------
 2,545 of the 14,457 taxonomy nodes have more than one parent, and 1,070 of those
@@ -85,9 +105,9 @@ from __future__ import annotations
 import json
 import sys
 import urllib.request
-from collections import deque
+from collections import Counter, deque
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Set, TextIO, Tuple
+from typing import Any, Dict, Iterable, List, Optional, Sequence, Set, TextIO, Tuple
 
 TAXONOMY_URL = "https://static.openfoodfacts.org/data/taxonomies/categories.json"
 
@@ -195,6 +215,59 @@ def eligible_nodes(
     return {n for n in taxonomy if n not in skip and lang_ok(n)}
 
 
+def parents_of(
+    taxonomy: Dict[str, Any], node: str, within: Optional[Set[str]] = None
+) -> List[str]:
+    """A node's declared parents, restricted to ids that actually exist.
+
+    ``within`` narrows the restriction further to a chosen subset — the eligible
+    nodes of one run. Omitting it asks the question of the *whole* taxonomy,
+    which is what tells a real root apart from one manufactured by pruning.
+    """
+    raw = taxonomy.get(node)
+    raw = raw.get("parents") if isinstance(raw, dict) else None
+    if not isinstance(raw, list):
+        return []
+    allowed: Any = taxonomy if within is None else within
+    return [p for p in raw if isinstance(p, str) and p in allowed]
+
+
+def global_roots(taxonomy: Dict[str, Any]) -> Set[str]:
+    """The taxonomy's **true** roots: ids with no parent anywhere in the file.
+
+    Deliberately blind to both the language filter and ``--category-exclude``,
+    which is the whole point. :func:`build_canonical_parent_map` works over one
+    run's *eligible* nodes, so a node whose only parent was pruned out of that
+    set becomes a root **of the pruned map** while remaining a child in the
+    taxonomy. Measured on the pinned 14,457-node snapshot: the taxonomy has 92
+    roots, but the English-eligible map has 161, of which 90 are manufactured
+    this way (``en:pate`` is one — it really sits under ``fr:charcuteries-
+    diverses`` under ``en:prepared-meats``).
+
+    A chain headed by such a node is *truncated*: its real ancestors exist and
+    were simply not available to this catalog. Comparing a chain's head against
+    this set is what separates that case from a product legitimately filed at a
+    root, which the ``--require-category-path`` gate could not do while it only
+    tested the path for emptiness.
+    """
+    return {n for n in taxonomy if not parents_of(taxonomy, n)}
+
+
+def unanchored_head(
+    chain: Sequence[str], taxonomy_roots: Set[str]
+) -> Optional[str]:
+    """The head of ``chain`` when the chain stops short of a global root.
+
+    Returns ``None`` for a chain that is properly anchored — and for an empty
+    chain, which is a different defect with its own counter (there is no
+    resolved hierarchy at all to be truncated).
+    """
+    if not chain:
+        return None
+    head = chain[0]
+    return None if head in taxonomy_roots else head
+
+
 def build_canonical_parent_map(
     taxonomy: Dict[str, Any],
     keep_prefixes: Optional[Set[str]] = None,
@@ -221,19 +294,21 @@ def build_canonical_parent_map(
     ``None`` marks a root. The mapping is acyclic by construction, because a
     node's canonical parent always has a strictly smaller depth than the node.
 
+    ``None`` marks a root **of this map**, which is not the same thing as a root
+    of the taxonomy: a node all of whose parents were pruned away by
+    ``keep_prefixes`` or ``exclude`` also lands here parentless. Use
+    :func:`global_roots` when the question is whether a chain reached the real
+    top of the taxonomy.
+
     Build this **once per run** and thread it into :func:`category_chain` —
     rebuilding it per product would be both slow and pointless, since its whole
     purpose is to be product-independent.
     """
     nodes = eligible_nodes(taxonomy, keep_prefixes=keep_prefixes, exclude=exclude)
 
-    def parents_of(node: str) -> List[str]:
-        raw = taxonomy.get(node, {}).get("parents")
-        if not isinstance(raw, list):
-            return []
-        return [p for p in raw if isinstance(p, str) and p in nodes]
-
-    parents: Dict[str, List[str]] = {n: parents_of(n) for n in nodes}
+    parents: Dict[str, List[str]] = {
+        n: parents_of(taxonomy, n, within=nodes) for n in nodes
+    }
     children: Dict[str, List[str]] = {}
     for node, ps in parents.items():
         for p in ps:
@@ -519,6 +594,66 @@ class AddressAudit:
                 {"label": label, "categories": sorted(owners)} for label, owners in shared
             ],
         }
+
+
+class RootAnchorAudit:
+    """Per-run totals for chains that stopped short of a global taxonomy root.
+
+    ``--require-category-path`` refuses these records, and a refusal that is not
+    counted is indistinguishable from an input that never contained one — the
+    same argument that put the refused *tags* in the report. So the count and
+    the offending heads are named per run whether or not the gate is on: with
+    the gate off nothing is dropped and this block is the only place the number
+    appears at all.
+
+    The heads are worth naming rather than just totalling because the population
+    is tiny and lopsided. Over the first 300,000 records of the January 2026
+    dump, an English run resolves an unanchored chain for 455 products, and just
+    six distinct heads account for all of them — two (``en:pate``,
+    ``en:poultry-hams``) are 91% of the total. A list that short is a work item;
+    a bare percentage is not.
+    """
+
+    def __init__(self, top_n: int = 20) -> None:
+        self.top_n = top_n
+        self.products = 0
+        self.heads: Counter = Counter()
+
+    def record(self, head: str) -> None:
+        self.products += 1
+        self.heads[head] += 1
+
+    @property
+    def distinct_heads(self) -> int:
+        return len(self.heads)
+
+    def summary(self) -> Dict[str, Any]:
+        return {
+            "products_with_unanchored_path": self.products,
+            "distinct_unanchored_heads": self.distinct_heads,
+            "top_unanchored_heads": [
+                {"category": head, "products": n}
+                for head, n in self.heads.most_common(self.top_n)
+            ],
+        }
+
+    def log_lines(self, dropped: bool) -> List[str]:
+        """One-screen summary for stderr; empty when nothing was unanchored."""
+        if not self.products:
+            return []
+        verb = "dropped" if dropped else "kept (gate off)"
+        lines = [
+            f"Category path: {self.products:,} products {verb} on a chain that "
+            f"stops short of a taxonomy root, under {self.distinct_heads:,} "
+            "distinct heads. Their real ancestors are in the taxonomy but not in "
+            "this catalog's languages.",
+        ]
+        top = ", ".join(
+            f"{head} x{n:,}" for head, n in self.heads.most_common(5)
+        )
+        if top:
+            lines.append(f"  top unanchored heads: {top}")
+        return lines
 
 
 def _log_stderr(msg: str) -> None:
