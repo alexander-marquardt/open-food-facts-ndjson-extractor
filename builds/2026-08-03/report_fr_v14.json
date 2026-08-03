@@ -1,0 +1,289 @@
+{
+  "input": "/Users/alexandermarquardt/Documents/ecommerce-open-food-facts/data/json_source/openfoodfacts-products.jsonl.gz",
+  "output": "/Users/alexandermarquardt/Documents/off-catalogs-2026-08-03/off_fr_v14.ndjson",
+  "pricing_config": "/private/tmp/wt-ext12-s26-a7f3/config/pricing_buckets.json",
+  "elapsed_seconds": 506.0304057598114,
+  "counters": {
+    "read": 4241020,
+    "written": 223036,
+    "bad_json": 0,
+    "missing_code": 2,
+    "missing_title": 2929198,
+    "missing_desc": 944596,
+    "missing_image": 110040,
+    "missing_category": 34148,
+    "with_category_path": 223036,
+    "missing_category_path": 0,
+    "unanchored_category_path": 0,
+    "categories_at_multiple_addresses": 0,
+    "categories_under_multiple_labels": 0,
+    "labels_shared_by_multiple_categories": 0,
+    "products_with_refused_category_tags": 40850,
+    "refused_category_tags": 49712
+  },
+  "category_path_addresses": {
+    "categories_seen": 5582,
+    "categories_at_multiple_addresses": 0,
+    "examples": [],
+    "labels_seen": 6502,
+    "categories_under_multiple_labels": 0,
+    "label_examples": [],
+    "labels_shared_by_multiple_categories": 0,
+    "shared_label_examples": []
+  },
+  "category_tag_curation": {
+    "products_with_tags": 227650,
+    "products_with_rejected_tags": 40850,
+    "products_with_no_accepted_tag": 4614,
+    "tag_instances": 1504955,
+    "accepted_instances": 1455243,
+    "aliased_instances": 6646,
+    "rejected_instances": 49712,
+    "rejected_rate": 0.033032,
+    "unknown_tag_instances": 34317,
+    "unknown_tag_rate": 0.022803,
+    "distinct_unknown_tags": 14854,
+    "rejected_by_reason": {
+      "curated_drop": 14330,
+      "not_in_taxonomy": 34317,
+      "out_of_language": 1065
+    },
+    "top_unknown_tags": [
+      {
+        "tag": "en:snacks-sucres",
+        "instances": 224
+      },
+      {
+        "tag": "fr:gaufres-liegeoises",
+        "instances": 141
+      },
+      {
+        "tag": "en:aliments-et-boissons-a-base-de-vegetaux",
+        "instances": 131
+      },
+      {
+        "tag": "fr:aliments-a-base-de-plantes-seches",
+        "instances": 128
+      },
+      {
+        "tag": "en:biscuits-et-gateaux",
+        "instances": 125
+      },
+      {
+        "tag": "fr:epicerie",
+        "instances": 121
+      },
+      {
+        "tag": "fr:legumes-en-conserve-et-bocal",
+        "instances": 120
+      },
+      {
+        "tag": "en:open-pies",
+        "instances": 119
+      },
+      {
+        "tag": "fr:epices-et-aromates",
+        "instances": 112
+      },
+      {
+        "tag": "en:chocolate-covered-fruits",
+        "instances": 108
+      },
+      {
+        "tag": "en:aliments-d-origine-vegetale",
+        "instances": 102
+      },
+      {
+        "tag": "en:two-crust-pies",
+        "instances": 100
+      },
+      {
+        "tag": "en:couscous",
+        "instances": 99
+      },
+      {
+        "tag": "en:margherita-pizza",
+        "instances": 96
+      },
+      {
+        "tag": "en:almond-meal",
+        "instances": 84
+      },
+      {
+        "tag": "en:pet-food",
+        "instances": 82
+      },
+      {
+        "tag": "en:epicerie",
+        "instances": 81
+      },
+      {
+        "tag": "en:vegetable-jams",
+        "instances": 80
+      },
+      {
+        "tag": "en:chicken-basque-style",
+        "instances": 80
+      },
+      {
+        "tag": "fr:tartinades",
+        "instances": 79
+      }
+    ],
+    "top_out_of_language_tags": [
+      {
+        "tag": "ca:cervesa-ipa",
+        "instances": 259
+      },
+      {
+        "tag": "xx:tofu",
+        "instances": 202
+      },
+      {
+        "tag": "es:rulo-de-cabra",
+        "instances": 81
+      },
+      {
+        "tag": "es:fusilli-de-trigo-duro",
+        "instances": 53
+      },
+      {
+        "tag": "es:farfalle-de-trigo-duro",
+        "instances": 41
+      },
+      {
+        "tag": "it:calzone",
+        "instances": 25
+      },
+      {
+        "tag": "de:schwarzwälder-schinken",
+        "instances": 20
+      },
+      {
+        "tag": "de:kaffeesahne",
+        "instances": 20
+      },
+      {
+        "tag": "es:fideos-de-trigo-duro",
+        "instances": 18
+      },
+      {
+        "tag": "it:bresaola-della-valtellina",
+        "instances": 15
+      },
+      {
+        "tag": "de:fleischsalat",
+        "instances": 13
+      },
+      {
+        "tag": "it:mortadella-bologna",
+        "instances": 11
+      },
+      {
+        "tag": "es:chocolates-negro-con-pistachos",
+        "instances": 11
+      },
+      {
+        "tag": "es:picos-de-pan",
+        "instances": 11
+      },
+      {
+        "tag": "it:cantucci-toscani",
+        "instances": 11
+      },
+      {
+        "tag": "nl:noord-hollandse-gouda",
+        "instances": 10
+      },
+      {
+        "tag": "de:pfannkuchenmischung",
+        "instances": 8
+      },
+      {
+        "tag": "it:speck-alto-adige",
+        "instances": 8
+      },
+      {
+        "tag": "it:fettuccine",
+        "instances": 8
+      },
+      {
+        "tag": "it:pappardelle",
+        "instances": 7
+      }
+    ],
+    "curated_drops": [
+      {
+        "tag": "en:groceries",
+        "instances": 10166,
+        "reason": "contentless catch-all — every product in a grocery catalog is groceries. 36.6% of all unresolvable tag instances, and only 58 of its 18,291 carriers have no other tag, so refusing it costs essentially nothing."
+      },
+      {
+        "tag": "en:salads",
+        "instances": 1191,
+        "reason": "unresolvable — 901 instances, no node in the pinned snapshot or upstream and no rename kept it as a synonym. The nearest node, en:prepared-salads, is a narrower sibling rather than a successor, and 'salads' is ambiguous between a leaf salad and a prepared one; 24 of its 901 carriers keep no other usable tag."
+      },
+      {
+        "tag": "en:raw-cured-ham",
+        "instances": 603,
+        "reason": "unresolvable — 340 instances. en:cured-hams exists and keeps 'cured ham' as a synonym, but not this id: aliasing there would silently discard 'raw', which is the distinction the tag exists to make. Every carrier keeps a valid lineage, so refusing the value costs no records."
+      },
+      {
+        "tag": "en:labeled-cheeses",
+        "instances": 576,
+        "reason": "quality-label attribute, not a category — 'this cheese carries some label' is not a place in a product hierarchy."
+      },
+      {
+        "tag": "en:aoc-cheeses",
+        "instances": 557,
+        "reason": "protected-designation label, not a category. The designation is already carried on the product as a label; its carriers all keep their cheese lineage, so nothing is lost by keeping it out of the category vocabulary."
+      },
+      {
+        "tag": "en:preparations-made-from-fish-meat",
+        "instances": 535,
+        "reason": "unresolvable — 241 instances. en:fish-preparations carries the synonym 'Preparations made from fish', without the 'meat' this id has, so the match is a near miss rather than upstream evidence of a rename. Every carrier keeps a valid lineage, so refusing the value costs no records."
+      },
+      {
+        "tag": "fr:autres-produits",
+        "instances": 367,
+        "reason": "contentless catch-all ('other products') — names the absence of a category rather than a category."
+      },
+      {
+        "tag": "fr:produits-labellises",
+        "instances": 209,
+        "reason": "quality-label attribute, not a category (see en:labeled-cheeses)."
+      },
+      {
+        "tag": "fr:produits-aoc",
+        "instances": 124,
+        "reason": "protected-designation label, not a category (see en:aoc-cheeses)."
+      },
+      {
+        "tag": "en:mexican-dinner-mixes",
+        "instances": 2,
+        "reason": "unresolvable — 383 instances and the costliest entry here: 352 of its 383 carriers keep no other usable tag, so they are dropped by the --require-category-path gate. Upstream has no successor and no near node at all (only en:mexican-cheeses and en:mexican-salads share a stem), so there is nothing to alias it to that would not be an invention."
+      }
+    ]
+  },
+  "category_path_anchoring": {
+    "taxonomy_roots": 92,
+    "traversal_roots": 92,
+    "phantom_roots": 0,
+    "top_phantom_roots": [],
+    "products_with_unanchored_path": 0,
+    "distinct_unanchored_heads": 0,
+    "top_unanchored_heads": []
+  },
+  "filters": {
+    "lang": "fr",
+    "title": "product_name_fr OR (lang==fr AND product_name)",
+    "description": "generic_name_fr OR ingredients_text_fr OR (lang==fr AND generic_name/ingredients_text)",
+    "image": "computed from images/front_fr + rev/imgid",
+    "category": "required",
+    "category_tags": "aliased through the curated rename map, then refused unless the id is a taxonomy node this catalog may file a product under; refused values are dropped, never their records",
+    "category_path": "hierarchical root->leaf path from OFF taxonomy (written for 223,036/223,036 records; 0 unresolved products dropped, 0 more dropped for a path that stops short of a taxonomy root)",
+    "price": "category baseline unit model + deterministic noise + label premiums + retail rounding",
+    "dietary_restrictions": "keyword list derived from labels_tags and ingredients_analysis_tags (positive-only)",
+    "progress": "every 500000 records and/or 5.0s"
+  }
+}
