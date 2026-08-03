@@ -31,7 +31,8 @@ taxonomy — never per product:
    the reversed ``parents`` edges. That gives every node its exact *fewest-hops*
    distance to a root, and picks each node's single canonical parent. The result
    is a spanning forest of the DAG: every non-root keeps exactly one parent, no
-   node is orphaned, only redundant parent edges are dropped.
+   node is orphaned, only redundant parent edges are dropped. It is built over
+   the **whole** taxonomy, in every language, for every catalog.
 2. :func:`category_chain` then takes the product's own tags only to choose the
    **leaf**, and walks the canonical parent map from that leaf all the way to a
    **global** root — materialising ancestors the product never tagged.
@@ -62,25 +63,45 @@ identical path, on every product.
 root→leaf chain, so a product's ``category_path`` is one cumulative path and
 never a union of branches.
 
-What the language filter still cuts short
------------------------------------------
-Anchoring runs to a root of the map built for *this* run, and that map only
-contains the languages the catalog may place in a path. 90 of the 161 roots an
-English run sees are not taxonomy roots at all: they are nodes whose only parent
-is foreign, so pruning promoted them. ``en:pate`` sits under
+Where the language filter applies — naming, not traversal
+----------------------------------------------------------
+A catalog is localized, so it must not offer ``fr:pates-a-tartiner`` as an
+English category. But pruning the *graph* to enforce that also deleted every
+edge through a pruned node, so a node whose only parent was foreign became a
+root of the pruned graph and its chain stopped there. Measured on the pinned
+snapshot, that promoted 90 nodes to roots for an English run (161 roots against
+the taxonomy's 92), 90 for Spanish and 53 for French — three catalogs each
+projecting against a differently shaped forest. ``en:pate`` sits under
 ``fr:charcuteries-diverses`` under ``en:prepared-meats``, and an English catalog
-therefore files it as a top-level ``Pâté``.
+filed it as a top-level ``Pâté``.
 
-That residue is small. Over the first 300,000 records of the January 2026 dump,
-455 products resolve an unanchored chain for English and 2 do for French; 6 of
-those English ones also clear the extractor's title/description/image filters and
-so reach the output, out of 16,847 records written. But it is the whole of what
-"truncated" still means, and it is invisible from the path alone, which is why
-:func:`global_roots` and :func:`unanchored_head` exist and why
-``--require-category-path`` consults them rather than only testing the path for
-emptiness. Removing the *cause* (teaching the walk to pass through a foreign
-ancestor) is a separate change; refusing to emit an address that no other
-catalog agrees with is this one.
+So the language filter is applied where the localization argument actually
+holds, and nowhere else:
+
+* **Traversal is language-blind.** :func:`build_canonical_parent_map` covers all
+  14,457 nodes for every catalog, so its roots *are* the taxonomy's 92 and a
+  chain can pass through a foreign ancestor instead of being severed at it. One
+  map serves en, es and fr, so a node's ancestry is the same list of ids in all
+  three (92 nodes disagreed before).
+* **Leaf choice is language-filtered.** ``keep_prefixes`` still decides which of
+  the product's *own* tags may be the leaf, which is what keeps a French-only
+  category from being the thing an English product is filed under, and it is the
+  same set :func:`eligible_nodes` hands the flat ``categories`` field.
+* **Labels are localized, by fallback.** A traversed foreign node renders
+  through :func:`display_label` like any other — ``lang`` → English → ``xx`` →
+  slug — so the ``fr:`` hop in ``en:pate``'s lineage reads ``Charcuteries
+  diverses`` in the English path. Measured: of the 8,939 nodes an English
+  catalog may file under, 141 have a foreign node in their global ancestry and
+  81 have one with no English or ``xx`` name, so 0.9% of English filings carry
+  one French-language segment. That is the price of the trade, and it buys back
+  the true lineage of every one of them.
+
+What that leaves for the ``--require-category-path`` gate is ``--category-
+exclude``: an operator who excludes a mid-taxonomy node still severs the chains
+beneath it, and those chains are still truncated addresses that no other catalog
+agrees with. :func:`global_roots` and :func:`unanchored_head` therefore stay, and
+the gate still consults them rather than only testing the path for emptiness —
+the number it reports is simply expected to be zero now.
 
 The tie-break
 -------------
@@ -169,9 +190,14 @@ def display_label(taxonomy: Dict[str, Any], canonical_id: str, lang: str = "en")
     mechanical de-slug destroys — and, unlike the slug, it is **localised**, so a
     Spanish or French catalog renders Spanish or French rather than English.
     Every one of the taxonomy's 8,939 ``en:``-prefixed nodes has an ``en`` name,
-    so on the English backbone the slug fallback never fires; it remains for
-    localised-only nodes and for runs with no taxonomy at all (``--no-taxonomy``,
-    which passes an empty mapping here).
+    so on the English backbone the slug fallback never fires. It fires for the
+    foreign ancestors a language-blind chain now walks through: of the 8,965
+    nodes an English path may contain, 26 are foreign and 20 of those have
+    neither an English nor an ``xx`` name, so they render de-slugged from their
+    own language — ``fr:charcuteries-diverses`` reads ``Charcuteries diverses``.
+    That is the deliberate trade for keeping their descendants' real lineage; see
+    the module docstring. It also remains the fallback for runs with no taxonomy
+    at all (``--no-taxonomy``, which passes an empty mapping here).
     """
     node = taxonomy.get(canonical_id) or {}
     names = node.get("name") if isinstance(node.get("name"), dict) else {}
@@ -190,9 +216,17 @@ def display_label(taxonomy: Dict[str, Any], canonical_id: str, lang: str = "en")
 def _lang_filter(keep_prefixes: Optional[Set[str]]):
     """Predicate keeping only canonical ids whose language prefix is wanted.
 
-    ``keep_prefixes`` (e.g. ``{"en"}``) keeps an English catalog from surfacing a
-    French-only node like ``fr:pates-a-tartiner`` mid-path. English is the
-    taxonomy's backbone language, so callers typically include ``"en"``.
+    ``keep_prefixes`` (e.g. ``{"en"}``) keeps an English catalog from *naming* a
+    French-only node like ``fr:pates-a-tartiner``: it decides which ids may be a
+    product's leaf and which may be a value of the flat ``categories`` field.
+    English is the taxonomy's backbone language, so callers typically include
+    ``"en"``.
+
+    It deliberately does **not** decide which nodes a chain may walk *through*.
+    Filtering the graph deleted the edges through every filtered node too, which
+    orphaned their children into roots of a locale-shaped forest; see the module
+    docstring. ``None`` — no filtering at all — is what the traversal graph asks
+    for.
     """
     if not keep_prefixes:
         return lambda canonical_id: True
@@ -209,7 +243,16 @@ def eligible_nodes(
     keep_prefixes: Optional[Set[str]] = None,
     exclude: Optional[Set[str]] = None,
 ) -> Set[str]:
-    """Taxonomy ids this run is allowed to place in a path."""
+    """Taxonomy ids this catalog is allowed to **name**.
+
+    That is: the ids a product may be filed *under* (the leaf of its chain) and
+    the ids the flat ``categories`` field may carry. Both fields draw on this one
+    set so they can never disagree about what exists.
+
+    This is **not** the set a chain may walk through — see
+    :func:`build_canonical_parent_map`, which is language-blind on purpose. Pass
+    ``keep_prefixes=None`` to ask for the whole taxonomy minus ``exclude``.
+    """
     lang_ok = _lang_filter(keep_prefixes)
     skip = exclude or set()
     return {n for n in taxonomy if n not in skip and lang_ok(n)}
@@ -236,19 +279,19 @@ def global_roots(taxonomy: Dict[str, Any]) -> Set[str]:
     """The taxonomy's **true** roots: ids with no parent anywhere in the file.
 
     Deliberately blind to both the language filter and ``--category-exclude``,
-    which is the whole point. :func:`build_canonical_parent_map` works over one
-    run's *eligible* nodes, so a node whose only parent was pruned out of that
-    set becomes a root **of the pruned map** while remaining a child in the
-    taxonomy. Measured on the pinned 14,457-node snapshot: the taxonomy has 92
-    roots, but the English-eligible map has 161, of which 90 are manufactured
-    this way (``en:pate`` is one — it really sits under ``fr:charcuteries-
-    diverses`` under ``en:prepared-meats``).
+    which is the whole point. The language filter no longer touches the graph, so
+    the 92 roots here are exactly the roots of the map
+    :func:`build_canonical_parent_map` builds for a default run — that agreement
+    is the invariant, not a coincidence, and the gate is what proves it held.
 
-    A chain headed by such a node is *truncated*: its real ancestors exist and
-    were simply not available to this catalog. Comparing a chain's head against
-    this set is what separates that case from a product legitimately filed at a
-    root, which the ``--require-category-path`` gate could not do while it only
-    tested the path for emptiness.
+    ``--category-exclude`` can still break it: excluding a mid-taxonomy node
+    strands every node beneath it, which becomes a root **of the map** while
+    remaining a child in the taxonomy. A chain headed by such a node is
+    *truncated* — its real ancestors exist and were simply not available to this
+    run. Comparing a chain's head against this set is what separates that case
+    from a product legitimately filed at a root, which the
+    ``--require-category-path`` gate could not do while it only tested the path
+    for emptiness.
     """
     return {n for n in taxonomy if not parents_of(taxonomy, n)}
 
@@ -270,7 +313,6 @@ def unanchored_head(
 
 def build_canonical_parent_map(
     taxonomy: Dict[str, Any],
-    keep_prefixes: Optional[Set[str]] = None,
     exclude: Optional[Set[str]] = None,
 ) -> Dict[str, Optional[str]]:
     """Pick one canonical parent for every taxonomy node, once, for the whole run.
@@ -279,6 +321,14 @@ def build_canonical_parent_map(
     one parent. This collapses it to a spanning **forest** — every non-root keeps
     exactly one parent, the roots stay roots, and no node is orphaned; only
     redundant parent edges are dropped.
+
+    **Language-blind, and takes no ``keep_prefixes``.** The graph is the same for
+    every catalog: all 14,457 nodes, so the map's roots are the taxonomy's 92 and
+    a chain crosses a foreign ancestor rather than stopping at it. The parameter
+    used to exist and is gone rather than defaulted, because a pruned graph is
+    not a weaker version of this one — it is a differently shaped forest with
+    90 extra roots for an English run, and no caller should be able to ask for it
+    by accident. Where language *does* apply is :func:`eligible_nodes`.
 
     Selection rule, in order:
 
@@ -294,17 +344,16 @@ def build_canonical_parent_map(
     ``None`` marks a root. The mapping is acyclic by construction, because a
     node's canonical parent always has a strictly smaller depth than the node.
 
-    ``None`` marks a root **of this map**, which is not the same thing as a root
-    of the taxonomy: a node all of whose parents were pruned away by
-    ``keep_prefixes`` or ``exclude`` also lands here parentless. Use
-    :func:`global_roots` when the question is whether a chain reached the real
-    top of the taxonomy.
+    ``None`` marks a root **of this map**. With no ``exclude`` those are exactly
+    :func:`global_roots`; ``exclude`` can still strand a node whose only parents
+    were excluded, so that function stays the authority on whether a chain
+    reached the real top of the taxonomy.
 
     Build this **once per run** and thread it into :func:`category_chain` —
     rebuilding it per product would be both slow and pointless, since its whole
     purpose is to be product-independent.
     """
-    nodes = eligible_nodes(taxonomy, keep_prefixes=keep_prefixes, exclude=exclude)
+    nodes = eligible_nodes(taxonomy, keep_prefixes=None, exclude=exclude)
 
     parents: Dict[str, List[str]] = {
         n: parents_of(taxonomy, n, within=nodes) for n in nodes
@@ -393,6 +442,12 @@ def category_chain(
 
     Leaf selection:
 
+    0. Keep only tags whose language prefix is in ``keep_prefixes``. This is the
+       **one** place the catalog's language narrows the hierarchy: an English
+       product is not filed under a French-only category. It is applied to the
+       product's tags, not to the graph, so a chain chosen here still walks
+       through whatever ancestors the taxonomy gives it. ``None`` accepts any
+       language.
     1. Drop any tag that is a canonical ancestor of another of this product's
        tags — an ancestor is already on the more specific tag's chain.
     2. Of what remains, the **longest** canonical chain wins (the most specific
@@ -402,16 +457,18 @@ def category_chain(
     ``canonical_parents`` should be the map built once per run by
     :func:`build_canonical_parent_map`. It is optional only so ad-hoc callers and
     tests can pass tags alone; omitting it rebuilds the map on every call, which
-    is far too slow for an extraction run. When it *is* supplied, the language
-    filter is already baked into it and ``keep_prefixes`` is not consulted again.
+    is far too slow for an extraction run. Supplying it does not change the
+    outcome: the map is language-blind either way, and ``keep_prefixes`` is
+    consulted here regardless of which branch produced it.
     """
     if canonical_parents is None:
-        canonical_parents = build_canonical_parent_map(
-            taxonomy, keep_prefixes=keep_prefixes, exclude=exclude
-        )
+        canonical_parents = build_canonical_parent_map(taxonomy, exclude=exclude)
 
+    leaf_ok = _lang_filter(keep_prefixes)
     present: Set[str] = {
-        t for t in product_tags if t not in exclude and t in canonical_parents
+        t
+        for t in product_tags
+        if t not in exclude and t in canonical_parents and leaf_ok(t)
     }
     if not present:
         return []
@@ -464,10 +521,16 @@ def category_path_entries(
 
 
 def default_keep_prefixes(lang: str) -> Set[str]:
-    """Taxonomy languages a catalog in ``lang`` may put in a path.
+    """Taxonomy languages a catalog in ``lang`` may **name** a category in.
 
     English is the taxonomy backbone; the persona language rides alongside it so
-    localized-only nodes still resolve while foreign-language noise stays out.
+    localized-only nodes are still filable while foreign-language noise stays out
+    of the leaf and out of the flat ``categories`` field.
+
+    It does not bound what a chain may *pass through*: a path's intermediate
+    nodes come from the language-blind graph and are localized by
+    :func:`display_label` instead. Applying this to the graph is what created 90
+    phantom roots for an English run.
     """
     return {"en", lang} if lang else {"en"}
 
@@ -511,9 +574,10 @@ class AddressAudit:
     * **one node per label** — the inverse. Two distinct nodes rendering the same
       string make the two fields ambiguous to join even with the labels unified,
       so it is a defect of the same join even though nothing is misspelled. It is
-      zero among the nodes a path may contain — the taxonomy's 8,939
-      English-backbone labels are all distinct, and so are the English/Spanish
-      and English/French eligible sets — but *not* zero over the flat
+      zero among the nodes a path may contain — re-measured once traversal went
+      language-blind, over the 8,965 / 9,354 / 11,753 nodes reachable in an
+      English, Spanish and French path, all of whose labels are distinct — but
+      *not* zero over the flat
       ``categories`` field, which carries the product's tags whatever their
       language prefix: upstream holds duplicate nodes such as
       ``en:capsicum-frutescens`` and ``fr:capsicum-frutescens`` that render to one
@@ -606,18 +670,34 @@ class RootAnchorAudit:
     the gate off nothing is dropped and this block is the only place the number
     appears at all.
 
-    The heads are worth naming rather than just totalling because the population
-    is tiny and lopsided. Over the first 300,000 records of the January 2026
-    dump, an English run resolves an unanchored chain for 455 products, and just
-    six distinct heads account for all of them — two (``en:pate``,
-    ``en:poultry-hams``) are 91% of the total. A list that short is a work item;
-    a bare percentage is not.
+    **On a default run the expected value is zero**, and that is the reason to
+    keep reporting it rather than to stop. The language filter used to sever
+    chains wholesale — over the first 300,000 records of the January 2026 dump an
+    English run left 455 products unanchored under six heads, ``en:pate`` and
+    ``en:poultry-hams`` alone being 91% of them — and now does not, because
+    traversal is language-blind. What can still sever a chain is
+    ``--category-exclude`` naming a mid-taxonomy node, which is an operator
+    decision whose cost belongs in the report. A zero here is the standing
+    evidence that the forest still has exactly the taxonomy's roots; a non-zero
+    one names the excluded node's orphans.
     """
 
-    def __init__(self, top_n: int = 20) -> None:
+    def __init__(
+        self,
+        taxonomy_roots: Optional[Set[str]] = None,
+        traversal_roots: Optional[Set[str]] = None,
+        top_n: int = 20,
+    ) -> None:
         self.top_n = top_n
         self.products = 0
         self.heads: Counter = Counter()
+        # The two forests, so the report answers "did pruning invent roots?"
+        # without anyone re-deriving it. That question is the *cause* of every
+        # product this audit can count, and it is answerable before a single
+        # record is read — a run whose input happens to carry nothing under a
+        # phantom root would otherwise report a clean zero over a broken forest.
+        self.taxonomy_roots: Set[str] = set(taxonomy_roots or ())
+        self.traversal_roots: Set[str] = set(traversal_roots or ())
 
     def record(self, head: str) -> None:
         self.products += 1
@@ -627,8 +707,18 @@ class RootAnchorAudit:
     def distinct_heads(self) -> int:
         return len(self.heads)
 
+    @property
+    def phantom_roots(self) -> List[str]:
+        """Roots of the walked graph that the taxonomy does not call roots."""
+        return sorted(self.traversal_roots - self.taxonomy_roots)
+
     def summary(self) -> Dict[str, Any]:
+        phantom = self.phantom_roots
         return {
+            "taxonomy_roots": len(self.taxonomy_roots),
+            "traversal_roots": len(self.traversal_roots),
+            "phantom_roots": len(phantom),
+            "top_phantom_roots": phantom[: self.top_n],
             "products_with_unanchored_path": self.products,
             "distinct_unanchored_heads": self.distinct_heads,
             "top_unanchored_heads": [
@@ -638,15 +728,28 @@ class RootAnchorAudit:
         }
 
     def log_lines(self, dropped: bool) -> List[str]:
-        """One-screen summary for stderr; empty when nothing was unanchored."""
+        """One-screen summary for stderr; empty when the forest and run are clean."""
+        lines: List[str] = []
+        phantom = self.phantom_roots
+        if phantom:
+            # Louder than the per-product count, and printed even when no product
+            # happened to sit under one: a graph with roots the taxonomy does not
+            # have is a defect of the whole run's addressing, not of those rows.
+            lines.append(
+                f"WARNING: the category graph this run walked has {len(phantom):,} "
+                f"roots the taxonomy does not ({len(self.traversal_roots):,} against "
+                f"{len(self.taxonomy_roots):,}). Every chain under one of them is "
+                "filed at an address no other catalog agrees with."
+            )
+            lines.append(f"  phantom roots: {', '.join(phantom[:5])}")
         if not self.products:
-            return []
+            return lines
         verb = "dropped" if dropped else "kept (gate off)"
-        lines = [
+        lines += [
             f"Category path: {self.products:,} products {verb} on a chain that "
             f"stops short of a taxonomy root, under {self.distinct_heads:,} "
-            "distinct heads. Their real ancestors are in the taxonomy but not in "
-            "this catalog's languages.",
+            "distinct heads. Their real ancestors are in the taxonomy but were "
+            "excluded from this run, so the chain has nowhere to anchor.",
         ]
         top = ", ".join(
             f"{head} x{n:,}" for head, n in self.heads.most_common(5)

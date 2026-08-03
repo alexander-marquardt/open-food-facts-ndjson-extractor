@@ -848,38 +848,50 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
     # One canonical parent per category, decided once for the whole run rather
     # than per product. This is what pins a category to a single address across
     # the catalog; see off_demo_extract.taxonomy for the selection rule.
+    # Language-blind on purpose: the graph a chain walks is the whole taxonomy,
+    # the same one for every catalog. Filtering it by language deleted the edges
+    # through every filtered node too, which promoted 90 nodes to roots of an
+    # English run's forest and truncated the chains beneath them.
     canonical_parents: Optional[Dict[str, Optional[str]]] = None
     if taxonomy is not None:
-        canonical_parents = build_canonical_parent_map(
-            taxonomy,
-            keep_prefixes=default_keep_prefixes(lang),
-            exclude=cat_exclude,
-        )
+        canonical_parents = build_canonical_parent_map(taxonomy, exclude=cat_exclude)
         roots = sum(1 for parent in canonical_parents.values() if parent is None)
         log(
             f"Canonical category parents: {len(canonical_parents):,} nodes, "
             f"{roots:,} roots (fewest hops to a root; ties by canonical id)"
         )
-    # The taxonomy's real roots, before this run's language filter pruned
-    # anything. The two counts are logged together because their gap *is* the
-    # truncation the category_path gate refuses: every root of the pruned map
-    # that is missing from here heads a chain whose true ancestors were dropped.
+    # The taxonomy's real roots. These two counts should now agree — the graph is
+    # unfiltered, so its roots *are* the taxonomy's — and any gap is what
+    # --category-exclude stranded, which is exactly what the category_path gate
+    # refuses.
     taxonomy_roots: Set[str] = global_roots(taxonomy) if taxonomy is not None else set()
     if taxonomy is not None:
         log(
             f"Taxonomy roots: {len(taxonomy_roots):,} global "
             "(a chain must reach one of these to count as resolved)"
         )
-    # The flat ``categories`` field draws on exactly the ids the hierarchical
-    # path may walk — the canonical parent map is that set, so it is reused
-    # rather than re-derived. ``None`` when no taxonomy was loaded.
+    # The ids this catalog may *name*: the leaf a product is filed under and the
+    # values of the flat ``categories`` field, which is where the language filter
+    # belongs. Narrower than the graph above, which a path may walk through in
+    # any language. ``None`` when no taxonomy was loaded.
     vocabulary: Optional[CategoryVocabulary] = None
-    if taxonomy is not None and canonical_parents is not None:
-        vocabulary = CategoryVocabulary.from_canonical_parents(canonical_parents, taxonomy)
+    if taxonomy is not None:
+        vocabulary = CategoryVocabulary.for_catalog(
+            taxonomy, default_keep_prefixes(lang), cat_exclude
+        )
+        log(
+            f"Category vocabulary: {len(vocabulary.eligible):,} ids this catalog "
+            f"may file a product under (languages {sorted(default_keep_prefixes(lang))})"
+        )
 
     address_audit = AddressAudit()
     tag_audit = TagCurationAudit()
-    root_audit = RootAnchorAudit()
+    root_audit = RootAnchorAudit(
+        taxonomy_roots=taxonomy_roots,
+        traversal_roots={
+            node for node, parent in (canonical_parents or {}).items() if parent is None
+        },
+    )
 
     log(f"Input:          {args.input}")
     log(f"Output:         {args.output}")
@@ -969,12 +981,11 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
             category_path = [path for _node, path in path_entries]
 
             # A chain is walked to a root of *this run's* parent map, which is a
-            # global taxonomy root only when the language filter left the head's
-            # ancestry intact. When it did not, the chain is truncated: en:pate
-            # really hangs under fr:charcuteries-diverses under en:prepared-meats
-            # and shows up in an English catalog as a top-level "Pâté". Recorded
-            # for every record, gate or no gate, so the number exists in the
-            # report of a run that keeps them.
+            # global taxonomy root unless --category-exclude stranded the head's
+            # ancestry. When it did, the chain is truncated: it starts mid-
+            # taxonomy at an address no other catalog agrees with. Expected to be
+            # zero on a default run, and recorded for every record either way so
+            # the zero is evidence rather than an absence of measurement.
             truncated_at = unanchored_head(
                 [node for node, _path in path_entries], taxonomy_roots
             )
@@ -1150,7 +1161,7 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
             "category": "required" if args.require_category else "optional",
             "category_tags": (
                 "aliased through the curated rename map, then refused unless the "
-                "id is a taxonomy node this catalog may place in a path; refused "
+                "id is a taxonomy node this catalog may file a product under; refused "
                 "values are dropped, never their records"
                 if taxonomy is not None
                 else "no taxonomy loaded: tags aliased and curated-dropped only, not validated"

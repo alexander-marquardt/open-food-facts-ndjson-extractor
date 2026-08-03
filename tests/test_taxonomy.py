@@ -94,7 +94,14 @@ def test_no_naive_flatten() -> None:
 
 
 def test_foreign_language_node_excluded() -> None:
-    """An English path must not surface a French-only taxonomy node."""
+    """An English product must not be *filed under* a French-only node.
+
+    ``fr:tisanes`` is a leaf here, so the language filter is what keeps it out.
+    It is not a claim that no French node can ever appear in an English path — an
+    *ancestor* can, and must (``tests/test_language_blind_traversal.py``); cutting
+    those was what severed chains. The rule is about what a product is filed
+    under, not about which segments the taxonomy makes it pass through.
+    """
     tags = ["en:beverages", "en:hot-beverages", "en:teas", "fr:tisanes"]
     path = build_category_path(tags, TAXONOMY, EXCLUDE, lang="en")
     assert all("Tisanes" not in entry for entry in path), path
