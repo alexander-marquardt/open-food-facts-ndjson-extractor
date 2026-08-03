@@ -169,12 +169,14 @@ To produce a real tree — the same cumulative-path shape merchandising tools us
 for drill-down facets — the extractor loads the public OFF category taxonomy and
 walks a single canonical chain:
 
-1. Keep the product's tags that exist in the taxonomy (drops noise and
+1. **Once per run**, collapse the whole taxonomy DAG to a spanning forest by
+   giving every category one canonical parent (see [Canonical parents and the
+   tie-break](#canonical-parents-and-the-tie-break)).
+2. Keep the product's tags that exist in the taxonomy (drops noise and
    foreign-language-only nodes for the target language).
-2. Induce the subgraph of just that product's tags, so the result is faithful to
-   how the product is actually filed rather than to the global graph.
-3. Pick the most specific leaf and walk parents upward, choosing the chain that
-   reaches furthest toward a root.
+3. Pick the most specific of those tags as the leaf, and walk the canonical
+   parent map from it to a **global** taxonomy root — materialising ancestors the
+   product never tagged.
 4. Emit cumulative `/`-joined path strings using the taxonomy's localized display
    names.
 
@@ -187,6 +189,42 @@ category_path:
     "Beverages/Hot beverages",
     "Beverages/Hot beverages/Teas" ]                              (one clean chain)
 ```
+
+### Canonical parents and the tie-break
+
+Step 1 is what makes the hierarchy usable for faceting, and it is the reason the
+walk is anchored globally rather than to the product's own tags. Two properties
+have to hold, and both are covered by tests in `tests/test_taxonomy.py`:
+
+- **One address per category.** A category occupies exactly one position in the
+  tree, so every product carrying it files it at the same path. Anchoring only to
+  the product's own tags broke this whenever a product omitted an intermediate
+  tag: the walk stopped at whatever the product happened to hold and invented a
+  shorter path, so the same category showed up at two addresses and its facet
+  count split in two.
+- **One path per product.** Each product carries exactly one root→leaf chain,
+  never a union of branches.
+
+The canonical parent of each node is chosen by **fewest hops to a taxonomy root**,
+and **on a tie the lexicographically smallest canonical id wins**. The tie-break
+is not a corner case: 2,545 of the 14,457 categories have several parents and
+1,070 of those tie on depth, so it decides nearly half the multi-parent cases.
+
+It has to be *stable across taxonomy refreshes* — if a category's address moved
+between rebuilds, previously authored merchandising rules would silently stop
+matching. Lexicographic order depends only on the set of tied ids, so upstream
+re-ordering a `parents` list cannot move an address. On the current taxonomy all
+2,545 multi-parent nodes already list their parents in lexicographic order, so
+this rule agrees with the upstream authored order on every tie today, while not
+being hostage to it.
+
+Collapsing the DAG this way cuts 2,769 of the taxonomy's 17,134 parent edges and
+orphans **zero** categories: every non-root keeps exactly one parent and all 92
+roots stay roots. Only redundant parent relationships are dropped.
+
+Each run's report carries a `category_path_addresses` block counting the
+categories that resolved to more than one address. It should always read zero;
+if it does not, the extraction log says so.
 
 The flat `categories` list is still emitted (it drives pricing-bucket matching
 and the `attrs.Category` field); `category_path` is the additional hierarchical
@@ -274,7 +312,10 @@ ecommerce-open-food-facts/
 │       ├── taxonomy.py    # OFF taxonomy graph → hierarchical category_path
 │       └── pricing.py     # Synthetic price model
 ├── tests/
-│   └── test_taxonomy.py   # Regression tests for the hierarchy builder
+│   ├── test_taxonomy.py   # Regression tests for the hierarchy builder
+│   ├── test_canonical_parents.py    # Canonical parent map and its tie-break
+│   ├── test_category_addressing.py  # One address per category, one path per product
+│   └── fixtures/          # Real OFF products + pruned taxonomy, checked in
 ├── pyproject.toml         # Dependencies
 └── README.md
 ```

@@ -14,7 +14,10 @@ from off_demo_extract.pricing import load_pricing_config, estimate_price, _seede
 from off_demo_extract.taxonomy import (
     ensure_taxonomy,
     load_taxonomy,
-    build_category_path,
+    build_canonical_parent_map,
+    category_path_entries,
+    default_keep_prefixes,
+    AddressAudit,
 )
 
 
@@ -530,6 +533,7 @@ class Counters:
     missing_category: int = 0
     with_category_path: int = 0
     missing_category_path: int = 0
+    categories_at_multiple_addresses: int = 0
 
 
 def _fmt_int(n: int) -> str:
@@ -691,6 +695,23 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
     lang = args.lang.strip()
     cat_exclude = {x.strip() for x in args.category_exclude.split(",") if x.strip()}
 
+    # One canonical parent per category, decided once for the whole run rather
+    # than per product. This is what pins a category to a single address across
+    # the catalog; see off_demo_extract.taxonomy for the selection rule.
+    canonical_parents: Optional[Dict[str, Optional[str]]] = None
+    if taxonomy is not None:
+        canonical_parents = build_canonical_parent_map(
+            taxonomy,
+            keep_prefixes=default_keep_prefixes(lang),
+            exclude=cat_exclude,
+        )
+        roots = sum(1 for parent in canonical_parents.values() if parent is None)
+        log(
+            f"Canonical category parents: {len(canonical_parents):,} nodes, "
+            f"{roots:,} roots (fewest hops to a root; ties by canonical id)"
+        )
+    address_audit = AddressAudit()
+
     log(f"Input:          {args.input}")
     log(f"Output:         {args.output}")
     log(f"Report:         {args.report}")
@@ -747,11 +768,18 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
             # strings). The flat ``categories`` list above is still used for
             # pricing-bucket matching and attrs; ``category_path`` is the field
             # PRISM's hierarchical category facet renders.
-            category_path = (
-                build_category_path(tags_raw, taxonomy, cat_exclude, lang)
+            path_entries = (
+                category_path_entries(
+                    tags_raw,
+                    taxonomy,
+                    cat_exclude,
+                    lang,
+                    canonical_parents=canonical_parents,
+                )
                 if taxonomy is not None
                 else []
             )
+            category_path = [path for _node, path in path_entries]
 
             # Optional clean-data gate: skip products whose hierarchy doesn't
             # resolve. Done before the pricing model so dropped records are cheap.
@@ -811,6 +839,8 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
 
             if category_path:
                 c.with_category_path += 1
+                # Property 2 check, on the records actually written.
+                address_audit.record(path_entries)
 
             out.write(json.dumps(doc, ensure_ascii=False) + "\n")
             c.written += 1
@@ -834,6 +864,16 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
 
     elapsed = time.time() - t0
     log(_progress_line(c, elapsed))
+
+    c.categories_at_multiple_addresses = address_audit.conflict_count
+    if address_audit.conflict_count:
+        log(
+            f"WARNING: {address_audit.conflict_count:,} categories resolved to more "
+            "than one path address in this run — category_path is no longer a strict "
+            "tree. See category_path_addresses in the report."
+        )
+        for example in address_audit.summary()["examples"]:
+            log(f"  {example['category']}: {' | '.join(example['addresses'])}")
     log("Done.")
 
     report = {
@@ -842,6 +882,10 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
         "pricing_config": str(args.pricing_config),
         "elapsed_seconds": elapsed,
         "counters": c.__dict__,
+        # Property 2: every category must occupy exactly one position in the
+        # tree. Reported per run so a regression shows up here rather than in a
+        # hand audit of the built index.
+        "category_path_addresses": address_audit.summary(),
         "filters": {
             "lang": lang,
             "title": f"product_name_{lang} OR (lang=={lang} AND product_name)",
