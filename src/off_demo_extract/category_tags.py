@@ -36,9 +36,10 @@ with no category at all are exactly the products the existing
 The three rejection reasons
 ---------------------------
 ``curated_drop``
-    A tag on :data:`TAG_DROPS`: it is contentless, or it is an *attribute*
-    rather than a category. Recorded with its reason so the decision is legible
-    instead of buried in the long tail.
+    A tag on :data:`TAG_DROPS`: it is contentless, it is an *attribute* rather
+    than a category, or it is a genuine category name with real volume that has
+    no successor anywhere and so cannot be resolved. Recorded with its reason so
+    the decision is legible instead of buried in the long tail.
 ``not_in_taxonomy``
     No node with this id, in the pinned snapshot or upstream. The long tail.
 ``out_of_language``
@@ -65,7 +66,8 @@ under a new id. It deliberately does **not** map a tag to a broader node: filing
 ``en:raw-cured-ham`` under ``en:cured-hams`` would put a product in a category it
 never claimed, which is a worse failure than dropping the value — and the
 measurement says nothing is at stake, since those carriers keep a valid lineage
-anyway.
+anyway. That tag is now on :data:`TAG_DROPS` for exactly this reason; the
+generalisation was offered, examined and declined, rather than left open.
 
 Each entry was verified, not guessed. Two evidence classes:
 
@@ -147,6 +149,20 @@ TAG_ALIASES: Dict[str, str] = {
 # listed anyway so the decision is recorded and reported separately, instead of
 # vanishing into a 7,712-entry tail where nobody can see that one tag is a third
 # of the problem.
+#
+# Two kinds live here, and the reason string says which:
+#
+# * *not a category* — contentless catch-alls and attributes. These would be
+#   refused on principle even if they did have a node.
+# * *unresolvable* — a genuine category name with real volume whose successor
+#   does not exist. Every one of these was re-checked against upstream's own
+#   synonym lines (the class-A evidence described above) before being listed: no
+#   name in any language line of ``taxonomies/food/categories.txt`` slugifies to
+#   these ids, so no rename kept them as a synonym and there is nothing to alias
+#   them to. Each has a near neighbour that is *broader*, which is precisely the
+#   generalisation :data:`TAG_ALIASES` refuses. Listing them changes what the run
+#   *reports*, not what it emits — they were already refused as
+#   ``not_in_taxonomy``, indistinguishable from a contributor's typo.
 TAG_DROPS: Dict[str, str] = {
     "en:groceries": (
         "contentless catch-all — every product in a grocery catalog is groceries. "
@@ -170,6 +186,35 @@ TAG_DROPS: Dict[str, str] = {
     "fr:produits-labellises": "quality-label attribute, not a category (see en:labeled-cheeses).",
     "en:proposed-for-deletion": "upstream taxonomy maintenance marker, not a product category.",
     "en:empty": "placeholder for a missing value.",
+    # -- Unresolvable: real volume, no successor anywhere. Counts are instances /
+    # carriers / carriers left with no accepted tag, over the first 300,000
+    # records of the January 2026 dump.
+    "en:salads": (
+        "unresolvable — 901 instances, no node in the pinned snapshot or upstream "
+        "and no rename kept it as a synonym. The nearest node, en:prepared-salads, "
+        "is a narrower sibling rather than a successor, and 'salads' is ambiguous "
+        "between a leaf salad and a prepared one; 24 of its 901 carriers keep no "
+        "other usable tag."
+    ),
+    "en:mexican-dinner-mixes": (
+        "unresolvable — 383 instances and the costliest entry here: 352 of its 383 "
+        "carriers keep no other usable tag, so they are dropped by the "
+        "--require-category-path gate. Upstream has no successor and no near node "
+        "at all (only en:mexican-cheeses and en:mexican-salads share a stem), so "
+        "there is nothing to alias it to that would not be an invention."
+    ),
+    "en:raw-cured-ham": (
+        "unresolvable — 340 instances. en:cured-hams exists and keeps 'cured ham' "
+        "as a synonym, but not this id: aliasing there would silently discard "
+        "'raw', which is the distinction the tag exists to make. Every carrier "
+        "keeps a valid lineage, so refusing the value costs no records."
+    ),
+    "en:preparations-made-from-fish-meat": (
+        "unresolvable — 241 instances. en:fish-preparations carries the synonym "
+        "'Preparations made from fish', without the 'meat' this id has, so the "
+        "match is a near miss rather than upstream evidence of a rename. Every "
+        "carrier keeps a valid lineage, so refusing the value costs no records."
+    ),
 }
 
 

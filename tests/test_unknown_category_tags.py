@@ -2,14 +2,14 @@
 
 These run the real ``extract.main()`` CLI path over **real** Open Food Facts tag
 data. ``fixtures/off_unknown_category_tags.json`` holds the ``categories_tags``
-of ten real products taken verbatim from the public JSONL export — including the
+of eleven real products taken verbatim from the public JSONL export — including the
 non-taxonomy tags that are the whole point — together with the ancestor closure
 of those tags from the public category taxonomy. Only the surrounding product
 envelope (title, description, image) is synthesised, so that every fixture record
 clears the extractor's earlier filters and the *only* thing that can separate
 them is category handling.
 
-The ten cases, and what each is for:
+The eleven cases, and what each is for:
 
 ===========================  =======================================================
 ``groceries_with_lineage``   the 87% case — a complete valid lineage plus one junk
@@ -30,8 +30,11 @@ The ten cases, and what each is for:
 ``clean_control``            no refusals; proves the curation is not eating
                              ordinary products.
 ``baking_decorations``       a retired id that strands 991 of its 1,098 carriers.
-``long_tail_unknown``        an unresolvable tag with no curated verdict — the
-                             tail the report's top-N has to surface.
+``long_tail_unknown``        ``en:salads``: a real category name with real volume
+                             and no successor anywhere, now a recorded drop (#19).
+``long_tail_typo``           ``en:potato-crips``: a contributor's misspelling. This
+                             is the tail the report's top-N has to surface — a tag
+                             nobody curated, as opposed to one we chose to refuse.
 ===========================  =======================================================
 
 Run with ``pytest tests/`` or directly: ``python tests/test_unknown_category_tags.py``.
@@ -70,7 +73,8 @@ MUST_BE_REFUSED = {
     "en:labeled-cheeses": "label attribute, not a category",
     "en:empty": "placeholder",
     "en:proposed-for-deletion": "upstream maintenance marker",
-    "en:salads": "no taxonomy node, no curated successor",
+    "en:salads": "real category name, no successor anywhere — a recorded drop",
+    "en:potato-crips": "contributor typo — the anonymous tail nobody curated",
     "fr:pates-a-tartiner": "real node, wrong language for an English catalog",
 }
 MUST_BE_ALIASED = {
@@ -265,18 +269,23 @@ def test_the_report_surfaces_the_unknown_tag_rate() -> None:
     assert curation["aliased_instances"] == 4, curation
     assert curation["products_with_no_accepted_tag"] == 1, curation
     assert curation["rejected_by_reason"] == {
-        "curated_drop": 6,
+        "curated_drop": 7,
         "not_in_taxonomy": 1,
         "out_of_language": 1,
     }, curation
+    # ``en:salads`` is a *recorded* drop, so the tail this asserts on has to be a
+    # tag nobody chose — ``en:potato-crips``, a contributor's typo, verbatim from
+    # the export. Asserting the rate on a curated tag would make this test agree
+    # with itself: every drop we ever record would leave it green while the
+    # not_in_taxonomy path went unexercised.
     assert curation["distinct_unknown_tags"] == 1
-    assert curation["top_unknown_tags"] == [{"tag": "en:salads", "instances": 1}]
+    assert curation["top_unknown_tags"] == [{"tag": "en:potato-crips", "instances": 1}]
     assert curation["top_out_of_language_tags"] == [
         {"tag": "fr:pates-a-tartiner", "instances": 1}
     ]
     assert 0 < curation["unknown_tag_rate"] < 1
-    assert report["counters"]["refused_category_tags"] == 8, report["counters"]
-    assert report["counters"]["products_with_refused_category_tags"] == 6, report["counters"]
+    assert report["counters"]["refused_category_tags"] == 9, report["counters"]
+    assert report["counters"]["products_with_refused_category_tags"] == 7, report["counters"]
 
 
 def test_curated_drops_are_reported_with_their_recorded_reason() -> None:
@@ -307,7 +316,7 @@ def test_without_a_taxonomy_the_flat_field_is_not_emptied() -> None:
     rec = records[_id("groceries_with_lineage")]
     assert display_label({}, "en:spices", "en") in rec["categories"], rec["categories"]
     assert display_label({}, "en:groceries", "en") not in rec["categories"], rec["categories"]
-    assert report["category_tag_curation"]["rejected_by_reason"] == {"curated_drop": 6}
+    assert report["category_tag_curation"]["rejected_by_reason"] == {"curated_drop": 7}
 
 
 def _run() -> int:

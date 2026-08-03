@@ -1435,6 +1435,14 @@
     "en:vegetable-salads",
     "en:salads"
    ]
+  },
+  {
+   "case": "long_tail_typo",
+   "code": "0038000845208",
+   "categories_tags": [
+    "en:snacks",
+    "en:potato-crips"
+   ]
   }
  ]
 }
