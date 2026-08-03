@@ -73,7 +73,7 @@ def test_untagged_ancestors_are_materialised() -> None:
 
 def test_canonical_parent_map_is_a_spanning_forest() -> None:
     """Every node keeps exactly one parent; roots stay roots; nothing is orphaned."""
-    canonical = build_canonical_parent_map(TAXONOMY, keep_prefixes={"en", "fr"})
+    canonical = build_canonical_parent_map(TAXONOMY)
     assert set(canonical) == set(TAXONOMY), "every node must be covered"
     for node, parent in canonical.items():
         if parent is None:
@@ -87,7 +87,7 @@ def test_canonical_parent_map_is_a_spanning_forest() -> None:
 
 
 def test_canonical_parent_map_is_acyclic_and_reaches_a_root() -> None:
-    canonical = build_canonical_parent_map(TAXONOMY, keep_prefixes={"en", "fr"})
+    canonical = build_canonical_parent_map(TAXONOMY)
     for node in TAXONOMY:
         chain = canonical_ancestry(canonical, node)
         assert chain[-1] == node
@@ -167,9 +167,7 @@ def test_a_cycle_does_not_swallow_its_component() -> None:
 def test_prebuilt_map_matches_the_on_demand_one() -> None:
     """Threading the run-wide map must not change any answer."""
     tags = ["en:tea-bags", "en:plant-based-beverages"]
-    canonical = build_canonical_parent_map(
-        TAXONOMY, keep_prefixes={"en"}, exclude=EXCLUDE
-    )
+    canonical = build_canonical_parent_map(TAXONOMY, exclude=EXCLUDE)
     assert category_chain(
         tags, TAXONOMY, EXCLUDE, keep_prefixes={"en"}, canonical_parents=canonical
     ) == category_chain(tags, TAXONOMY, EXCLUDE, keep_prefixes={"en"})
