@@ -1,0 +1,780 @@
+{
+ "_source": "Open Food Facts (openfoodfacts.org), ODbL. Real product category tags from the public JSONL export, and the ancestor closure of those tags from the public category taxonomy, with English/Spanish/French names retained.",
+ "products": [
+  {
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:plant-based-foods",
+    "en:fruits-and-vegetables-based-foods",
+    "en:condiments",
+    "en:spreads",
+    "en:vegetables-based-foods",
+    "en:culinary-plants",
+    "en:plant-based-spreads",
+    "en:salted-spreads",
+    "en:onions-and-their-products",
+    "en:chutneys",
+    "en:onion-chutneys"
+   ],
+   "code": "0000260440264"
+  },
+  {
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:plant-based-foods",
+    "en:fruits-and-vegetables-based-foods",
+    "en:vegetable-based-foods-and-beverages",
+    "en:vegetables-based-foods",
+    "en:fresh-foods",
+    "en:vegetables",
+    "en:fresh-plant-based-foods",
+    "en:leaf-vegetables",
+    "en:fresh-vegetables",
+    "en:lettuces",
+    "en:romaine-lettuce"
+   ],
+   "code": "0000651003214"
+  },
+  {
+   "categories_tags": [
+    "en:beverages",
+    "en:carbonated-drinks",
+    "en:sodas"
+   ],
+   "code": "0000764001787"
+  },
+  {
+   "categories_tags": [
+    "en:desserts",
+    "en:frozen-foods",
+    "en:frozen-desserts",
+    "en:ice-creams-and-sorbets",
+    "en:ice-creams",
+    "en:ice-cream-tubs",
+    "en:sundae-ice-cream"
+   ],
+   "code": "00012444"
+  },
+  {
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:beverages",
+    "en:plant-based-beverages",
+    "en:tea-based-beverages",
+    "en:iced-teas",
+    "en:peach-flavored-iced-teas"
+   ],
+   "code": "0002000003012"
+  },
+  {
+   "categories_tags": [
+    "en:dairies",
+    "en:milks"
+   ],
+   "code": "00062114"
+  },
+  {
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:plant-based-foods",
+    "en:fats",
+    "en:vegetable-fats",
+    "en:olive-tree-products",
+    "en:vegetable-oils",
+    "en:olive-oils",
+    "en:extra-virgin-olive-oils",
+    "en:virgin-olive-oils"
+   ],
+   "code": "0008127000019"
+  },
+  {
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:beverages",
+    "en:plant-based-beverages",
+    "en:carbonated-drinks",
+    "en:fruit-based-beverages",
+    "en:sodas",
+    "en:fruit-sodas",
+    "en:sodas-with-exotic-fruits",
+    "en:sweetened-beverages"
+   ],
+   "code": "0008274000078"
+  },
+  {
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:plant-based-foods",
+    "en:fruits-and-vegetables-based-foods",
+    "en:canned-foods",
+    "en:vegetables-based-foods",
+    "en:canned-plant-based-foods",
+    "en:pickles",
+    "en:canned-vegetables",
+    "en:plant-based-pickles",
+    "en:pickled-vegetables",
+    "en:pickled-peppers"
+   ],
+   "code": "0009300000116"
+  },
+  {
+   "categories_tags": [
+    "en:snacks",
+    "en:breakfasts",
+    "en:salty-snacks",
+    "en:spreads",
+    "en:appetizers",
+    "en:biscuits-and-crackers",
+    "en:sweet-spreads",
+    "en:crackers-appetizers",
+    "fr:pates-a-tartiner",
+    "en:hazelnut-spreads",
+    "en:pretzel"
+   ],
+   "code": "0009800800094"
+  }
+ ],
+ "taxonomy": {
+  "en:appetizers": {
+   "name": {
+    "en": "Appetizers",
+    "es": "Aperitivos",
+    "fr": "Amuse-gueules"
+   },
+   "parents": [
+    "en:salty-snacks"
+   ]
+  },
+  "en:beverages": {
+   "name": {
+    "en": "Beverages",
+    "es": "Bebidas",
+    "fr": "Boissons"
+   },
+   "parents": [
+    "en:beverages-and-beverages-preparations"
+   ]
+  },
+  "en:beverages-and-beverages-preparations": {
+   "name": {
+    "en": "Beverages and beverages preparations",
+    "es": "Bebidas y preparaciones de bebidas",
+    "fr": "Boissons et préparations de boissons"
+   }
+  },
+  "en:biscuits-and-crackers": {
+   "name": {
+    "en": "Biscuits and crackers",
+    "fr": "Biscuits sucrés & biscuits apéritifs"
+   }
+  },
+  "en:breakfasts": {
+   "name": {
+    "en": "Breakfasts",
+    "es": "Desayunos",
+    "fr": "Petit-déjeuners"
+   }
+  },
+  "en:canned-foods": {
+   "name": {
+    "en": "Canned foods",
+    "es": "Conservas",
+    "fr": "Conserves"
+   }
+  },
+  "en:canned-plant-based-foods": {
+   "name": {
+    "en": "Canned plant-based foods",
+    "es": "Alimentos de origen vegetal en conserva",
+    "fr": "Aliments à base de plantes en conserve"
+   },
+   "parents": [
+    "en:canned-foods",
+    "en:plant-based-foods"
+   ]
+  },
+  "en:canned-vegetables": {
+   "name": {
+    "en": "Canned vegetables",
+    "es": "Verduras y hortalizas en conserva",
+    "fr": "Légumes en conserve"
+   },
+   "parents": [
+    "en:canned-plant-based-foods",
+    "en:vegetables-based-foods"
+   ]
+  },
+  "en:carbonated-drinks": {
+   "name": {
+    "en": "Carbonated drinks",
+    "es": "Bebidas carbonatadas",
+    "fr": "Boissons gazeuses"
+   },
+   "parents": [
+    "en:beverages"
+   ]
+  },
+  "en:chutneys": {
+   "name": {
+    "en": "Chutneys",
+    "xx": "Chutneys"
+   },
+   "parents": [
+    "en:plant-based-spreads"
+   ]
+  },
+  "en:condiments": {
+   "name": {
+    "en": "Condiments",
+    "es": "Condimentos",
+    "fr": "Condiments"
+   }
+  },
+  "en:crackers-appetizers": {
+   "name": {
+    "en": "Crackers (Appetizers)",
+    "es": "Crackers",
+    "fr": "Biscuits apéritifs"
+   },
+   "parents": [
+    "en:appetizers",
+    "en:biscuits-and-crackers"
+   ]
+  },
+  "en:culinary-plants": {
+   "name": {
+    "en": "Culinary plants",
+    "es": "Plantas culinarias",
+    "fr": "Plantes condimentaires"
+   },
+   "parents": [
+    "en:condiments",
+    "en:plant-based-foods"
+   ]
+  },
+  "en:dairies": {
+   "name": {
+    "en": "Dairies",
+    "es": "Lácteos",
+    "fr": "Produits laitiers"
+   }
+  },
+  "en:desserts": {
+   "name": {
+    "en": "Desserts",
+    "es": "Postres",
+    "fr": "Desserts"
+   }
+  },
+  "en:extra-virgin-olive-oils": {
+   "name": {
+    "en": "Extra-virgin olive oils",
+    "es": "Aceites de oliva virgen extra",
+    "fr": "Huiles d'olive vierges extra"
+   },
+   "parents": [
+    "en:virgin-olive-oils"
+   ]
+  },
+  "en:fats": {
+   "name": {
+    "en": "Fats",
+    "es": "Aceites y grasas",
+    "fr": "Matières grasses"
+   }
+  },
+  "en:fresh-foods": {
+   "name": {
+    "en": "Fresh foods",
+    "es": "Alimentos frescos",
+    "fr": "Frais"
+   }
+  },
+  "en:fresh-plant-based-foods": {
+   "name": {
+    "en": "Fresh plant-based foods",
+    "es": "Alimentos de origen vegetal frescos",
+    "fr": "Aliments à base de plantes frais"
+   },
+   "parents": [
+    "en:fresh-foods",
+    "en:plant-based-foods"
+   ]
+  },
+  "en:fresh-vegetables": {
+   "name": {
+    "en": "Fresh vegetables",
+    "es": "Verduras y hortalizas frescas",
+    "fr": "Légumes frais"
+   },
+   "parents": [
+    "en:fresh-plant-based-foods",
+    "en:vegetables-based-foods"
+   ]
+  },
+  "en:frozen-desserts": {
+   "name": {
+    "en": "Frozen desserts",
+    "es": "Postres helados",
+    "fr": "Desserts glacés"
+   },
+   "parents": [
+    "en:desserts",
+    "en:frozen-foods"
+   ]
+  },
+  "en:frozen-foods": {
+   "name": {
+    "en": "Frozen foods",
+    "es": "Congelados",
+    "fr": "Surgelés"
+   }
+  },
+  "en:fruit-based-beverages": {
+   "name": {
+    "en": "Fruit-based beverages",
+    "es": "Bebidas a base de frutas",
+    "fr": "Boissons aux fruits"
+   },
+   "parents": [
+    "en:plant-based-beverages"
+   ]
+  },
+  "en:fruit-sodas": {
+   "name": {
+    "en": "Fruit sodas",
+    "es": "Sodas a base de frutas",
+    "fr": "Sodas aux fruits"
+   },
+   "parents": [
+    "en:fruit-based-beverages",
+    "en:sodas"
+   ]
+  },
+  "en:fruits-and-vegetables-based-foods": {
+   "name": {
+    "en": "Fruits and vegetables based foods",
+    "es": "Frutas y verduras y sus productos",
+    "fr": "Aliments à base de fruits et de légumes"
+   },
+   "parents": [
+    "en:plant-based-foods"
+   ]
+  },
+  "en:hazelnut-spreads": {
+   "name": {
+    "en": "Hazelnut spreads",
+    "es": "Cremas a base de avellanas",
+    "fr": "Pâtes à tartiner aux noisettes"
+   },
+   "parents": [
+    "en:sweet-spreads",
+    "fr:pates-a-tartiner"
+   ]
+  },
+  "en:ice-cream-tubs": {
+   "name": {
+    "en": "Ice cream tubs",
+    "es": "Tarrinas y bloques de helado",
+    "fr": "Crèmes glacées en pot"
+   },
+   "parents": [
+    "en:ice-creams"
+   ]
+  },
+  "en:ice-creams": {
+   "name": {
+    "en": "ice creams",
+    "es": "helado",
+    "fr": "glaces"
+   },
+   "parents": [
+    "en:ice-creams-and-sorbets"
+   ]
+  },
+  "en:ice-creams-and-sorbets": {
+   "name": {
+    "en": "Ice creams and sorbets",
+    "es": "Helados y sorbetes",
+    "fr": "Glaces et sorbets"
+   },
+   "parents": [
+    "en:frozen-desserts"
+   ]
+  },
+  "en:iced-teas": {
+   "name": {
+    "en": "Iced teas",
+    "es": "Tés helados",
+    "fr": "Thés glacés"
+   },
+   "parents": [
+    "en:tea-based-beverages"
+   ]
+  },
+  "en:leaf-vegetables": {
+   "name": {
+    "en": "Leaf vegetables",
+    "es": "Verduras de hoja",
+    "fr": "Légumes-feuilles"
+   },
+   "parents": [
+    "en:vegetables"
+   ]
+  },
+  "en:lettuces": {
+   "name": {
+    "en": "Lettuces",
+    "es": "Lechuga",
+    "fr": "Laitues"
+   },
+   "parents": [
+    "en:leaf-vegetables"
+   ]
+  },
+  "en:milks": {
+   "name": {
+    "en": "Milks",
+    "es": "Leches",
+    "fr": "Laits"
+   },
+   "parents": [
+    "en:milks-liquid-and-powder"
+   ]
+  },
+  "en:milks-liquid-and-powder": {
+   "name": {
+    "en": "Milks (liquid and powder)",
+    "fr": "Laits (fluide et poudre)"
+   },
+   "parents": [
+    "en:dairies"
+   ]
+  },
+  "en:olive-oils": {
+   "name": {
+    "en": "Olive oils",
+    "es": "Aceites de oliva",
+    "fr": "Huiles d'olive"
+   },
+   "parents": [
+    "en:olive-tree-products",
+    "en:vegetable-oils"
+   ]
+  },
+  "en:olive-tree-products": {
+   "name": {
+    "en": "Olive tree products",
+    "es": "Productos del olivo",
+    "fr": "Produits de l'olivier"
+   },
+   "parents": [
+    "en:plant-based-foods"
+   ]
+  },
+  "en:onion-chutneys": {
+   "name": {
+    "en": "Onion chutneys",
+    "es": "Cebolla caramelizada",
+    "fr": "Confits d'oignons"
+   },
+   "parents": [
+    "en:chutneys",
+    "en:onions-and-their-products",
+    "en:plant-based-spreads"
+   ]
+  },
+  "en:onions-and-their-products": {
+   "name": {
+    "en": "Onions and their products",
+    "es": "Cebollas y derivados",
+    "fr": "Oignons et dérivés"
+   },
+   "parents": [
+    "en:vegetables-based-foods"
+   ]
+  },
+  "en:peach-flavored-iced-teas": {
+   "name": {
+    "en": "Peach flavored iced teas",
+    "fr": "Thés glacés saveur pêche"
+   },
+   "parents": [
+    "en:iced-teas"
+   ]
+  },
+  "en:pickled-peppers": {
+   "name": {
+    "en": "Pickled peppers",
+    "es": "Pimientos encurtidos",
+    "fr": "Poivrons au vinaigre"
+   },
+   "parents": [
+    "en:pickled-vegetables"
+   ]
+  },
+  "en:pickled-vegetables": {
+   "name": {
+    "en": "Pickled vegetables",
+    "es": "Verduras y hortalizas encurtidas",
+    "fr": "Pickles de légumes"
+   },
+   "parents": [
+    "en:plant-based-pickles",
+    "en:prepared-vegetables"
+   ]
+  },
+  "en:pickles": {
+   "name": {
+    "en": "Pickles",
+    "es": "Encurtidos",
+    "fr": "Pickles"
+   },
+   "parents": [
+    "en:plant-based-foods"
+   ]
+  },
+  "en:plant-based-beverages": {
+   "name": {
+    "en": "Plant-based beverages",
+    "es": "Bebidas de origen vegetal",
+    "fr": "Boissons à base de végétaux"
+   },
+   "parents": [
+    "en:beverages",
+    "en:plant-based-foods-and-beverages"
+   ]
+  },
+  "en:plant-based-foods": {
+   "name": {
+    "en": "Plant-based foods",
+    "es": "Alimentos de origen vegetal",
+    "fr": "Aliments d'origine végétale"
+   },
+   "parents": [
+    "en:plant-based-foods-and-beverages"
+   ]
+  },
+  "en:plant-based-foods-and-beverages": {
+   "name": {
+    "en": "Plant-based foods and beverages",
+    "es": "Alimentos y bebidas de origen vegetal",
+    "fr": "Aliments et boissons à base de végétaux"
+   }
+  },
+  "en:plant-based-pickles": {
+   "name": {
+    "en": "Plant-based pickles",
+    "es": "Vegetales encurtidos",
+    "fr": "Pickles d'origine végétale"
+   },
+   "parents": [
+    "en:pickles",
+    "en:plant-based-foods"
+   ]
+  },
+  "en:plant-based-spreads": {
+   "name": {
+    "en": "Plant-based spreads",
+    "es": "Untables vegetales",
+    "fr": "Pâtes à tartiner végétales"
+   },
+   "parents": [
+    "en:plant-based-foods",
+    "en:spreads"
+   ]
+  },
+  "en:prepared-vegetables": {
+   "name": {
+    "en": "Prepared vegetables",
+    "es": "Preparados vegetales",
+    "fr": "Légumes préparés"
+   },
+   "parents": [
+    "en:plant-based-foods"
+   ]
+  },
+  "en:pretzel": {
+   "name": {
+    "en": "Pretzel",
+    "es": "Bretzel",
+    "fr": "Bretzels"
+   },
+   "parents": [
+    "en:crackers-appetizers"
+   ]
+  },
+  "en:romaine-lettuce": {
+   "name": {
+    "en": "Romaine lettuce",
+    "fr": "Laitue romaine"
+   },
+   "parents": [
+    "en:lettuces"
+   ]
+  },
+  "en:salted-spreads": {
+   "name": {
+    "en": "Salted spreads",
+    "es": "Untables salados",
+    "fr": "Produits à tartiner salés"
+   },
+   "parents": [
+    "en:spreads"
+   ]
+  },
+  "en:salty-snacks": {
+   "name": {
+    "en": "Salty snacks",
+    "es": "Snacks salados",
+    "fr": "Snacks salés"
+   },
+   "parents": [
+    "en:snacks"
+   ]
+  },
+  "en:snacks": {
+   "name": {
+    "en": "Snacks",
+    "es": "Botanas",
+    "fr": "Snacks"
+   }
+  },
+  "en:sodas": {
+   "name": {
+    "en": "Sodas",
+    "es": "Sodas",
+    "fr": "Sodas"
+   },
+   "parents": [
+    "en:carbonated-drinks"
+   ]
+  },
+  "en:sodas-with-exotic-fruits": {
+   "name": {
+    "en": "Sodas with exotic fruits",
+    "fr": "Sodas aux fruits exotiques"
+   },
+   "parents": [
+    "en:fruit-sodas"
+   ]
+  },
+  "en:spreads": {
+   "name": {
+    "en": "Spreads",
+    "es": "Untables",
+    "fr": "Produits à tartiner"
+   }
+  },
+  "en:sundae-ice-cream": {
+   "name": {
+    "en": "Sundae ice cream",
+    "fr": "Sundae"
+   },
+   "parents": [
+    "en:frozen-desserts"
+   ]
+  },
+  "en:sweet-spreads": {
+   "name": {
+    "en": "Sweet spreads",
+    "es": "Untables dulces",
+    "fr": "Produits à tartiner sucrés"
+   },
+   "parents": [
+    "en:breakfasts",
+    "en:spreads"
+   ]
+  },
+  "en:sweetened-beverages": {
+   "name": {
+    "en": "Sweetened beverages",
+    "es": "Bebidas azucaradas",
+    "fr": "Boissons avec sucre ajouté"
+   },
+   "parents": [
+    "en:beverages"
+   ]
+  },
+  "en:tea-based-beverages": {
+   "name": {
+    "en": "Tea-based beverages",
+    "es": "Bebidas de té",
+    "fr": "Boissons au thé"
+   },
+   "parents": [
+    "en:beverages"
+   ]
+  },
+  "en:vegetable-based-foods-and-beverages": {
+   "name": {
+    "en": "Vegetable-based foods and beverages",
+    "es": "Comida y bebida vegetal",
+    "fr": "Aliments et boissons à base de légumes"
+   },
+   "parents": [
+    "en:plant-based-foods-and-beverages"
+   ]
+  },
+  "en:vegetable-fats": {
+   "name": {
+    "en": "Vegetable fats",
+    "es": "Grasas vegetales",
+    "fr": "Matières grasses végétales"
+   },
+   "parents": [
+    "en:fats",
+    "en:plant-based-foods"
+   ]
+  },
+  "en:vegetable-oils": {
+   "name": {
+    "en": "Vegetable oils",
+    "es": "Aceites vegetales",
+    "fr": "Huiles"
+   },
+   "parents": [
+    "en:vegetable-fats"
+   ]
+  },
+  "en:vegetables": {
+   "name": {
+    "en": "Vegetables",
+    "es": "Hortalizas",
+    "fr": "Légumes"
+   },
+   "parents": [
+    "en:vegetables-based-foods"
+   ]
+  },
+  "en:vegetables-based-foods": {
+   "name": {
+    "en": "Vegetables based foods",
+    "es": "Verduras y hortalizas y sus productos",
+    "fr": "Légumes et dérivés"
+   },
+   "parents": [
+    "en:fruits-and-vegetables-based-foods",
+    "en:vegetable-based-foods-and-beverages"
+   ]
+  },
+  "en:virgin-olive-oils": {
+   "name": {
+    "en": "Virgin olive oils",
+    "es": "Aceites de oliva virgen",
+    "fr": "Huiles d'olive vierges"
+   },
+   "parents": [
+    "en:olive-oils"
+   ]
+  },
+  "fr:pates-a-tartiner": {
+   "name": {
+    "fr": "Pâtes à tartiner"
+   },
+   "parents": [
+    "en:sweet-spreads"
+   ]
+  }
+ }
+}

@@ -21,7 +21,7 @@ This tool transforms raw, complex Open Food Facts data into a flattened, search-
 | `price` | float | Synthetic, deterministic price for e-commerce simulation. |
 | `currency` | string | Currency code (default: USD). |
 | `image_url` | string | Computed primary product image URL. |
-| `categories` | list | Cleaned, flat list of category tags (de-duplicated, prettified). |
+| `categories` | list | Cleaned, flat list of the product's own category tags, de-duplicated and rendered with the taxonomy's display name for `--lang` — the **same** label the matching `category_path` segment carries, so the two fields can be joined on string. |
 | `category_path` | list | **Hierarchical** category path — a single root→leaf chain as cumulative `/`-joined strings (e.g. `["Snacks", "Snacks/Salty snacks", "Snacks/Salty snacks/Crisps"]`), reconstructed from the Open Food Facts category taxonomy graph. Powers breadcrumb-style, drill-down category facets. |
 | `attrs` | object | **Flattened Dictionary** of key-value attributes (e.g., Nutri-Score, Energy). |
 | `attr_keys` | list | List of all keys available in `attrs` for faceting. |
@@ -95,21 +95,30 @@ The output is a clean, flat JSON object, ready to be indexed into a search engin
   "id": "0008127000019",
   "title": "Extra virgin olive oil",
   "brand": "Athena Imports",
-  "description": "Extra virgin olive oil. Extra virgin olive oil Key specifications: Category: Plant based foods and beverages; Serving size: 15 ml; Nutri-Score: B; NOVA group: 2; Eco-Score: E; Dietary restrictions: vegan, vegetarian; Ingredients analysis: palm-oil-free, vegan, vegetarian; Energy (kcal/100g): 800 kcal; Fat (g/100g): 93.3 g; Saturated fat (g/100g): 13.3 g; Sugars (g/100g): 0 g; Salt (g/100g): 0 g; Protein (g/100g): 0 g; Countries: United States",
+  "description": "Extra virgin olive oil. Extra virgin olive oil Key specifications: Category: Plant-based foods and beverages; Serving size: 15 ml; Nutri-Score: B; NOVA group: 2; Eco-Score: E; Dietary restrictions: vegan, vegetarian; Ingredients analysis: palm-oil-free, vegan, vegetarian; Energy (kcal/100g): 800 kcal; Fat (g/100g): 93.3 g; Saturated fat (g/100g): 13.3 g; Sugars (g/100g): 0 g; Salt (g/100g): 0 g; Protein (g/100g): 0 g; Countries: United States",
   "image_url": "https://images.openfoodfacts.org/images/products/000/812/700/0019/front_en.5.400.jpg",
   "price": 14.29,
+  "margin": 22,
+  "popularity": 0,
   "currency": "USD",
   "categories": [
-    "Plant based foods and beverages",
-    "Plant based foods",
-    "Fats"
+    "Plant-based foods and beverages",
+    "Plant-based foods",
+    "Fats",
+    "Vegetable fats",
+    "Olive tree products",
+    "Vegetable oils",
+    "Olive oils",
+    "Extra-virgin olive oils",
+    "Virgin olive oils"
   ],
   "category_path": [
     "Plant-based foods and beverages",
-    "Plant-based foods and beverages/Fats",
-    "Plant-based foods and beverages/Fats/Vegetable fats",
-    "Plant-based foods and beverages/Fats/Vegetable fats/Olive oils",
-    "Plant-based foods and beverages/Fats/Vegetable fats/Olive oils/Extra-virgin olive oils"
+    "Plant-based foods and beverages/Plant-based foods",
+    "Plant-based foods and beverages/Plant-based foods/Olive tree products",
+    "Plant-based foods and beverages/Plant-based foods/Olive tree products/Olive oils",
+    "Plant-based foods and beverages/Plant-based foods/Olive tree products/Olive oils/Virgin olive oils",
+    "Plant-based foods and beverages/Plant-based foods/Olive tree products/Olive oils/Virgin olive oils/Extra-virgin olive oils"
   ],
   "attrs": {
     "Serving size": "15 ml",
@@ -118,7 +127,7 @@ The output is a clean, flat JSON object, ready to be indexed into a search engin
     "Eco-Score": "E",
     "Ingredients analysis": "palm-oil-free, vegan, vegetarian",
     "Countries": "United States",
-    "Category": "Plant based foods and beverages",
+    "Category": "Plant-based foods and beverages",
     "Energy (kcal/100g)": "800 kcal",
     "Fat (g/100g)": "93.3 g",
     "Saturated fat (g/100g)": "13.3 g",
@@ -127,8 +136,12 @@ The output is a clean, flat JSON object, ready to be indexed into a search engin
     "Protein (g/100g)": "0 g",
     "Dietary restrictions": "vegan, vegetarian",
     "Price source": "estimated_unit_model",
-    "Pricing bucket": "oils_fats",
-    "Estimated unit price": "11.59 USD/l (15ml, bucket=oils_fats, scale=1.21, ratio=0.15)"
+    "Pricing bucket": "olive_oil",
+    "Estimated unit price": "28.68 USD/l (default 500ml (no package qty), source=none, bucket=olive_oil)",
+    "Margin source": "modelled_category_margin",
+    "Modelled margin": "22% (bucket=olive_oil base=22%)",
+    "Popularity source": "open_food_facts_unique_scans",
+    "Unique scans (Open Food Facts)": "0"
   },
   "attr_keys": [
     "Category",
@@ -139,15 +152,19 @@ The output is a clean, flat JSON object, ready to be indexed into a search engin
     "Estimated unit price",
     "Fat (g/100g)",
     "Ingredients analysis",
+    "Margin source",
+    "Modelled margin",
     "NOVA group",
     "Nutri-Score",
+    "Popularity source",
     "Price source",
     "Pricing bucket",
     "Protein (g/100g)",
     "Salt (g/100g)",
     "Saturated fat (g/100g)",
     "Serving size",
-    "Sugars (g/100g)"
+    "Sugars (g/100g)",
+    "Unique scans (Open Food Facts)"
   ],
   "dietary_restrictions": [
     "vegan",
@@ -223,18 +240,55 @@ orphans **zero** categories: every non-root keeps exactly one parent and all 92
 roots stay roots. Only redundant parent relationships are dropped.
 
 Each run's report carries a `category_path_addresses` block counting the
-categories that resolved to more than one address. It should always read zero;
-if it does not, the extraction log says so.
+categories that resolved to more than one address, the categories that rendered
+under more than one label, and the labels claimed by more than one category. All
+three should always read zero; if any does not, the extraction log says so.
 
-The flat `categories` list is still emitted (it drives pricing-bucket matching
-and the `attrs.Category` field); `category_path` is the additional hierarchical
-field.
+### One label per category
+
+The flat `categories` list is still emitted alongside the hierarchical
+`category_path` (it also drives pricing-bucket matching and the `attrs.Category`
+field). Both are derived from the product's `categories_tags`, and **both take a
+category's label from one function** — `display_label` in
+`src/off_demo_extract/taxonomy.py` — so a change to how categories are named
+cannot reach one field and not the other.
+
+That label is the taxonomy's `name` for `--lang`, falling back to English, then
+`xx`, then a prettified slug. It is preferred over de-slugging the tag id because
+it is the upstream-authored human label: it carries correct hyphenation
+(`Plant-based foods`), disambiguating parentheticals (`Crackers (Appetizers)`)
+and casing that a mechanical de-slug destroys — and, unlike a slug, it is
+localized. All 8,939 English-backbone nodes have an English name, so the slug
+fallback never fires on that backbone.
+
+`categories` used to de-slug the tag id itself. That gave the same node two
+spellings across the two fields (`Plant based foods` next to `Plant-based
+foods`), so nothing could relate a flat value to a path segment by string: over
+the first 200,000 lines of the public export, only 75.1% of products had every
+self-tagged chain node's label present verbatim in `categories`; it is now 100%.
+Because the de-slug worked off the `en:`-prefixed tag id, it also emitted English
+labels in **every** locale — a Spanish catalog rendered `Plant based foods` in
+`categories` and `Alimentos de origen vegetal` in `category_path`, in the same
+document. Both fields are now localized together.
+
+Where the taxonomy has no translation the label falls back to English in both
+fields, which is a gap in the upstream taxonomy rather than a disagreement
+between the fields: of the 8,939 English-backbone nodes, 86.0% have a French name
+and 34.6% a Spanish one.
+
+Note that the two fields are *relatable*, not identical: `category_path` is
+anchored to a global taxonomy root, so it materialises ancestors the product
+never tagged, and those ancestors are legitimately absent from `categories`.
+`tests/test_category_label_agreement.py` pins the direction that must hold —
+every chain node the product *did* tag appears verbatim in `categories` — by
+exact string, on real Open Food Facts records.
 
 The taxonomy file is fetched once from
 [`https://static.openfoodfacts.org/data/taxonomies/categories.json`](https://static.openfoodfacts.org/data/taxonomies/categories.json)
 and cached at `data/taxonomy/categories.json`. Override its location with
 `--taxonomy <path>`. Display names follow `--lang`, so the French and Spanish
-personas get localized category labels.
+personas get localized category labels — in `categories` as well as in
+`category_path`.
 
 ### Category-hierarchy flags
 
@@ -243,8 +297,11 @@ exactly what each does:
 
 - **`--no-taxonomy`** — turns the hierarchy feature *off entirely*. The extractor
   does **not** load (or download) the taxonomy, and every product is written with
-  an empty `category_path` (`[]`). The flat `categories` field is unaffected. Use
-  this to skip the download when you don't need the hierarchy.
+  an empty `category_path` (`[]`). The flat `categories` field is still written,
+  but with no taxonomy there are no display names to read, so its labels fall
+  back to a prettified slug of the tag id — English, and without the taxonomy's
+  hyphenation or parentheticals. Use this to skip the download when you don't
+  need the hierarchy and are not relying on category labels.
 - **`--require-category-path`** *(default: on)* — **drops products whose
   `category_path` can't be reconstructed**, so the catalog is uniformly
   drill-down-faceted. This is a small tail — roughly 2–6% of otherwise-clean
