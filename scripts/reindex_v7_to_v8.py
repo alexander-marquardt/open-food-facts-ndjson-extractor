@@ -84,7 +84,7 @@ def build_dest_body(source: str) -> dict:
     }
 
     # Add the hierarchical category field. Keyword for exact faceting / drill-down;
-    # a `.text` sub-field mirrors how customer catalogs (e.g. a retailer) expose the
+    # a `.text` sub-field mirrors how retail catalogs typically expose the
     # category for optional full-text boosting later.
     props = dict(mapping.get("properties", {}))
     if "category_path" not in props:
