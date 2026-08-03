@@ -1,0 +1,228 @@
+{
+ "_source": "Open Food Facts (openfoodfacts.org), ODbL. Real product category tags from the public JSONL export, and the ancestor closure of those tags from the public category taxonomy.",
+ "products": [
+  {
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:beverages",
+    "en:plant-based-beverages"
+   ],
+   "code": "0000764001770"
+  },
+  {
+   "categories_tags": [
+    "en:beverages",
+    "en:carbonated-drinks",
+    "en:sodas"
+   ],
+   "code": "0000764001787"
+  },
+  {
+   "categories_tags": [
+    "en:beverages"
+   ],
+   "code": "0000764003040"
+  },
+  {
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:beverages",
+    "en:plant-based-beverages"
+   ],
+   "code": "0000764114944"
+  },
+  {
+   "categories_tags": [
+    "en:beverages",
+    "en:carbonated-drinks",
+    "en:sodas"
+   ],
+   "code": "0008274000061"
+  },
+  {
+   "categories_tags": [
+    "en:beverages"
+   ],
+   "code": "0008274000498"
+  },
+  {
+   "categories_tags": [
+    "en:beverages-and-beverages-preparations",
+    "en:beverages"
+   ],
+   "code": "0008361860110"
+  },
+  {
+   "categories_tags": [
+    "en:beverages-and-beverages-preparations",
+    "en:plant-based-foods-and-beverages",
+    "en:beverages",
+    "en:plant-based-beverages"
+   ],
+   "code": "0011110821126"
+  },
+  {
+   "categories_tags": [
+    "en:beverages-and-beverages-preparations",
+    "en:beverages"
+   ],
+   "code": "0011152296081"
+  },
+  {
+   "categories_tags": [
+    "en:beverages-and-beverages-preparations",
+    "en:plant-based-foods-and-beverages",
+    "en:beverages",
+    "en:plant-based-beverages"
+   ],
+   "code": "0016229903534"
+  },
+  {
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:beverages",
+    "en:plant-based-beverages",
+    "en:juices-and-nectars"
+   ],
+   "code": "0031200330055"
+  },
+  {
+   "categories_tags": [
+    "en:beverages-and-beverages-preparations",
+    "en:beverages",
+    "en:carbonated-drinks",
+    "en:sodas"
+   ],
+   "code": "0035826087461"
+  },
+  {
+   "categories_tags": [
+    "en:beverages",
+    "en:carbonated-drinks"
+   ],
+   "code": "0041268192175"
+  },
+  {
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:beverages",
+    "en:plant-based-beverages",
+    "en:juices-and-nectars"
+   ],
+   "code": "0041331028103"
+  },
+  {
+   "categories_tags": [
+    "en:beverages-and-beverages-preparations",
+    "en:beverages",
+    "en:carbonated-drinks",
+    "en:sodas"
+   ],
+   "code": "0054900000608"
+  },
+  {
+   "categories_tags": [
+    "en:beverages-and-beverages-preparations",
+    "en:beverages",
+    "en:carbonated-drinks"
+   ],
+   "code": "00557030"
+  },
+  {
+   "categories_tags": [
+    "en:beverages",
+    "en:carbonated-drinks"
+   ],
+   "code": "00752008"
+  },
+  {
+   "categories_tags": [
+    "en:beverages-and-beverages-preparations",
+    "en:plant-based-foods-and-beverages",
+    "en:beverages",
+    "en:plant-based-beverages",
+    "en:juices-and-nectars"
+   ],
+   "code": "0079800100135"
+  },
+  {
+   "categories_tags": [
+    "en:beverages-and-beverages-preparations",
+    "en:plant-based-foods-and-beverages",
+    "en:beverages",
+    "en:plant-based-beverages",
+    "en:juices-and-nectars"
+   ],
+   "code": "0082592727152"
+  }
+ ],
+ "taxonomy": {
+  "en:beverages": {
+   "name": {
+    "en": "Beverages",
+    "es": "Bebidas",
+    "fr": "Boissons"
+   },
+   "parents": [
+    "en:beverages-and-beverages-preparations"
+   ]
+  },
+  "en:beverages-and-beverages-preparations": {
+   "name": {
+    "en": "Beverages and beverages preparations",
+    "es": "Bebidas y preparaciones de bebidas",
+    "fr": "Boissons et préparations de boissons"
+   },
+   "parents": []
+  },
+  "en:carbonated-drinks": {
+   "name": {
+    "en": "Carbonated drinks",
+    "es": "Bebidas carbonatadas",
+    "fr": "Boissons gazeuses"
+   },
+   "parents": [
+    "en:beverages"
+   ]
+  },
+  "en:juices-and-nectars": {
+   "name": {
+    "en": "Juices and nectars",
+    "es": "Zumos y néctares",
+    "fr": "Jus et nectars"
+   },
+   "parents": [
+    "en:plant-based-beverages"
+   ]
+  },
+  "en:plant-based-beverages": {
+   "name": {
+    "en": "Plant-based beverages",
+    "es": "Bebidas de origen vegetal",
+    "fr": "Boissons à base de végétaux"
+   },
+   "parents": [
+    "en:beverages",
+    "en:plant-based-foods-and-beverages"
+   ]
+  },
+  "en:plant-based-foods-and-beverages": {
+   "name": {
+    "en": "Plant-based foods and beverages",
+    "es": "Alimentos y bebidas de origen vegetal",
+    "fr": "Aliments et boissons à base de végétaux"
+   },
+   "parents": []
+  },
+  "en:sodas": {
+   "name": {
+    "en": "Sodas",
+    "es": "Sodas",
+    "fr": "Sodas"
+   },
+   "parents": [
+    "en:carbonated-drinks"
+   ]
+  }
+ }
+}
