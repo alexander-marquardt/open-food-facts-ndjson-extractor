@@ -467,6 +467,40 @@ outside `_search`, `_count`, `_mapping` and `_settings` — so it is safe to poi
 at a cluster other people are using. Results for the current indices are in
 [`builds/2026-08-03/INDEX_VERIFICATION.md`](builds/2026-08-03/INDEX_VERIFICATION.md).
 
+### Adding `category_path` to an index that is already loaded
+
+`scripts/inject_category_path.py` sends partial `_update` operations keyed by
+`_id`, which merge the one field without running the ingest pipeline — so the
+embedding vectors already in `_source` are left alone.
+
+A partial update **cannot create a document**. Elasticsearch answers an update
+against an id the index does not hold with a per-item `404`, and the bulk request
+itself still succeeds — so the interesting output of this tool is not what it
+printed, it is what it exited with:
+
+```bash
+python scripts/inject_category_path.py \
+    --index catalog_en_v14 \
+    --ndjson data/products/off_en_v14.ndjson
+```
+
+| Exit | Meaning |
+| :--- | :--- |
+| 0 | every document sent was applied, or the misses stayed inside a tolerance that was named on the command line |
+| 1 | the run completed and its outcomes fail the gate |
+| 2 | the run could not complete — the bulk request itself failed |
+
+Every per-item outcome is counted apart from the others (`updated`, `noop`,
+`not_found`, `conflict`, `failed`, and `unaccounted` for documents the response
+said nothing about), the applied rate is printed, and the first few ids the index
+does not hold are named — enough to tell "wrong index" from "stale id set"
+without a second query. The default is zero tolerance for a miss: the extract
+that built an index has no legitimate reason to address a document that index
+does not hold. `--allow-missing N` or `--allow-missing-fraction F` makes an
+exception explicit, and the tolerance in force is printed in the report. What no
+tolerance can authorise is a run that applied **nothing** — that is what pointing
+at the wrong index looks like, and it always fails.
+
 ## Clean data definition
 
 - Title in target language: `product_name_{lang}` OR (`lang == {lang}` AND `product_name`) — controlled by `--lang`
@@ -517,7 +551,8 @@ ecommerce-open-food-facts/
 │   ├── verify_catalog.py  # Re-derives the catalog's properties from the NDJSON
 │   ├── build_manifest.py  # Pins dump / taxonomy / commit by checksum
 │   ├── verify_index.py    # Checks a live index against that manifest (read-only)
-│   └── inject_category_path.py  # Adds category_path to an already-loaded index
+│   └── inject_category_path.py  # Adds category_path to an already-loaded index,
+│                                #   and fails when the updates miss their documents
 ├── builds/                # Per-build manifests, reports and verification notes
 ├── tests/
 │   ├── conftest.py        # Puts src/ on sys.path so tests import normally
