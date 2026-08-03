@@ -1,0 +1,238 @@
+{
+  "schema": "off-index-verification/1",
+  "generated_utc": "2026-08-03T11:24:41Z",
+  "index": "catalog_fr_v13",
+  "lang": "fr",
+  "manifest": {
+    "path": "builds/2026-08-03/build_manifest.json",
+    "schema": "off-catalog-build-manifest/1",
+    "generated_utc": "2026-08-03T10:34:52Z"
+  },
+  "checks": [
+    {
+      "check": "manifest_identity",
+      "status": "unverifiable",
+      "reason": "the index records nothing about the build that produced it: its mapping has no _meta.off_catalog_build block. The manifest named on the command line is therefore an assertion by the operator, not something the index confirms.",
+      "remedy": "have the loader write _meta.off_catalog_build (manifest_sha256, generated_utc, lang, extractor_commit, dump_sha256, taxonomy_sha256, catalog_sha256, expected_distinct_ids). _meta is free-form, survives dynamic:strict, and can be added to a live index with PUT /<index>/_mapping without a reindex.",
+      "manifest": "builds/2026-08-03/build_manifest.json",
+      "manifest_sha256": "ca93f17d9d40be7b6f1a5a70411b93f3086d3252e25f0d0f5151c9c2fabbdcf4",
+      "asserted": {
+        "extractor_commit": "9e8a4c6f38e7f03d7f42dc4fbc97601210285d83",
+        "dump_sha256": "f06f34f7ecd19405bf3e91a31d638d96ba91cd364bee69f9530a6c6380dd2f5f",
+        "taxonomy_sha256": "74717ecc001cf8661f6ec0bb3fc8c7a0cf317a6355a245004e892348fe575ec5"
+      },
+      "pinned_taxonomy_sha256": "74717ecc001cf8661f6ec0bb3fc8c7a0cf317a6355a245004e892348fe575ec5",
+      "taxonomy_file": "/Users/alexandermarquardt/Documents/ecommerce-open-food-facts/data/taxonomy/categories.json",
+      "taxonomy_file_sha256": "74717ecc001cf8661f6ec0bb3fc8c7a0cf317a6355a245004e892348fe575ec5"
+    },
+    {
+      "check": "document_count",
+      "status": "fail",
+      "indexed_documents": 195209,
+      "manifest_distinct_ids": 222955,
+      "delta": -27746,
+      "manifest_records": 223036,
+      "note": "compared against distinct_ids, not records: an index keyed by id holds one document per distinct id, and this locale's catalog has 81 duplicate id instances"
+    },
+    {
+      "check": "category_path_coverage",
+      "status": "pass",
+      "indexed_documents": 195209,
+      "with_category_path": 195209,
+      "without_category_path": 0,
+      "note": "documents present but without the field are the signature of a partial _update pass over an index that already held other documents; documents absent entirely are the signature of an incomplete load"
+    },
+    {
+      "check": "category_vocabulary",
+      "status": "fail",
+      "snapshot_labels": 14452,
+      "snapshot_root_labels": 92,
+      "distinct_categories_in_index": 16743,
+      "distinct_category_path_addresses": 6499,
+      "distinct_category_path_segments": 5913,
+      "values_outside_snapshot": 15795,
+      "value_instances_outside_snapshot": 1178189,
+      "top_values_outside_snapshot": [
+        {
+          "value": "Plant based foods and beverages",
+          "doc_count": 66983
+        },
+        {
+          "value": "Plant based foods",
+          "doc_count": 56987
+        },
+        {
+          "value": "Sweet snacks",
+          "doc_count": 33598
+        },
+        {
+          "value": "Beverages",
+          "doc_count": 26067
+        },
+        {
+          "value": "Meats and their products",
+          "doc_count": 21868
+        },
+        {
+          "value": "Cereals and potatoes",
+          "doc_count": 19077
+        },
+        {
+          "value": "Fruits and vegetables based foods",
+          "doc_count": 18230
+        },
+        {
+          "value": "Meals",
+          "doc_count": 18227
+        },
+        {
+          "value": "Meats",
+          "doc_count": 16058
+        },
+        {
+          "value": "Biscuits and cakes",
+          "doc_count": 15235
+        }
+      ],
+      "path_segments_outside_snapshot": 0,
+      "top_path_segments_outside_snapshot": [],
+      "path_heads_outside_taxonomy_roots": 27,
+      "top_path_heads_outside_taxonomy_roots": [
+        "Biscuits sandwich",
+        "Boissons",
+        "Boissons instantanées",
+        "Charcuteries",
+        "Confitures de fraise et de rhubarbe",
+        "Dosettes",
+        "Feuilles de brick",
+        "Flavoured almonds",
+        "Gnocchi",
+        "Goulash"
+      ],
+      "orphan_addresses": 0,
+      "top_orphan_addresses": [],
+      "snapshot_labels_unused_by_index": 13504,
+      "sample_snapshot_labels_unused_by_index": [
+        "% de matières grasses",
+        "3 riberas",
+        "Aachener weihnachts leberwurst",
+        "Abadia retuerta",
+        "Abats",
+        "Abats cuits",
+        "Abats d'agneau",
+        "Abats d'agneau surgelés",
+        "Abats d'oie",
+        "Abats d'oie surgelés"
+      ]
+    },
+    {
+      "check": "document_identity",
+      "status": "fail",
+      "catalog": "/Users/alexandermarquardt/Documents/off-catalogs-2026-08-03/off_fr_v14.ndjson",
+      "catalog_distinct_ids": 222955,
+      "indexed_ids": 195209,
+      "catalog_ids_absent_from_index": 27746,
+      "index_ids_absent_from_catalog": 0,
+      "sample_index_ids_absent_from_catalog": [],
+      "missing_contiguous_runs": 48,
+      "missing_runs_of_100_or_more": 13,
+      "ids_in_runs_of_100_or_more": 27707,
+      "largest_missing_runs": [
+        {
+          "catalog_position": 61861,
+          "length": 5936
+        },
+        {
+          "catalog_position": 33116,
+          "length": 4954
+        },
+        {
+          "catalog_position": 218913,
+          "length": 4042
+        },
+        {
+          "catalog_position": 38748,
+          "length": 2776
+        },
+        {
+          "catalog_position": 68292,
+          "length": 2461
+        },
+        {
+          "catalog_position": 11795,
+          "length": 1977
+        },
+        {
+          "catalog_position": 160317,
+          "length": 1955
+        },
+        {
+          "catalog_position": 106378,
+          "length": 981
+        },
+        {
+          "catalog_position": 164217,
+          "length": 966
+        },
+        {
+          "catalog_position": 49471,
+          "length": 497
+        }
+      ],
+      "note": "many short runs is a per-record difference between two extracts; a few long runs is a load that dropped batches"
+    }
+  ],
+  "aggregation_truncation": {
+    "categories": {
+      "requested_size": 30000,
+      "buckets_returned": 16743,
+      "size_saturated": false,
+      "sum_other_doc_count": 0,
+      "doc_count_error_upper_bound": 0,
+      "complete": true,
+      "escalated_to_composite": false
+    },
+    "category_path": {
+      "requested_size": 30000,
+      "buckets_returned": 6499,
+      "size_saturated": false,
+      "sum_other_doc_count": 0,
+      "doc_count_error_upper_bound": 0,
+      "complete": true,
+      "escalated_to_composite": false
+    }
+  },
+  "failed": [
+    "document_count",
+    "category_vocabulary",
+    "document_identity"
+  ],
+  "unverifiable": [
+    "manifest_identity"
+  ],
+  "requests": [
+    "/catalog_fr_v13/_mapping",
+    "/catalog_fr_v13/_search",
+    "/catalog_fr_v13/_search",
+    "/catalog_fr_v13/_search",
+    "/catalog_fr_v13/_search",
+    "/catalog_fr_v13/_search",
+    "/catalog_fr_v13/_search",
+    "/catalog_fr_v13/_search",
+    "/catalog_fr_v13/_search",
+    "/catalog_fr_v13/_search",
+    "/catalog_fr_v13/_search",
+    "/catalog_fr_v13/_search",
+    "/catalog_fr_v13/_search",
+    "/catalog_fr_v13/_search",
+    "/catalog_fr_v13/_search",
+    "/catalog_fr_v13/_search",
+    "/catalog_fr_v13/_search",
+    "/catalog_fr_v13/_search",
+    "/catalog_fr_v13/_search",
+    "/catalog_fr_v13/_search",
+    "/catalog_fr_v13/_search",
+    "/catalog_fr_v13/_search",
+    "/catalog_fr_v13/_search"
+  ]
+}

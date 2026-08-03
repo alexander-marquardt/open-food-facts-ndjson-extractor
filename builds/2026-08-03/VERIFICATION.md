@@ -213,6 +213,13 @@ and the id-level diff were not read from a cluster. Distinguishing "the load
 stopped early" from "the index predates the extract" needs one `_count` and one
 id sample, and that is the natural first step of the indexing pass.
 
+> **Since measured.** `scripts/verify_index.py` read the cluster and answered it:
+> the fr load did not complete. The 27,746 ids the index lacks arrive in 48
+> contiguous runs, 13 of which hold 99.86% of them and the largest of which is
+> 5,936 consecutive records — the shape of dropped bulk batches, not of an index
+> built from a different extract. See
+> [`INDEX_VERIFICATION.md`](INDEX_VERIFICATION.md).
+
 Two things make the class of error non-recurring rather than merely explained:
 
 1. `--require-category-path` is on by default, so `written == with_category_path`
@@ -277,4 +284,5 @@ the one it records.
   against the pinned snapshot — is half done: every value in these files is
   checked against the snapshot here (0 outside it, all three locales), but the
   comparison against what is actually in an index needs a cluster and belongs
-  with the indexing pass.
+  with the indexing pass. *(Done since, read-only, in
+  [`INDEX_VERIFICATION.md`](INDEX_VERIFICATION.md).)*

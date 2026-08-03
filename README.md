@@ -421,6 +421,52 @@ silently emitting an empty dataset.
 | `--no-taxonomy` | always `[]` | No (gate auto-disabled) |
 | taxonomy fails to load | always `[]` | No (gate auto-disabled, with a warning) |
 
+## Verifying a build
+
+A catalog passes through three artifacts, and each one is checked against the
+one before it. The chain matters: a claim about an index that rests only on the
+code that wrote it is not a check.
+
+| Stage | Script | Reads | Answers |
+| :--- | :--- | :--- | :--- |
+| Artifact | `scripts/verify_catalog.py` | the NDJSON + the taxonomy snapshot | is the file tree-shaped, anchored, and inside the snapshot's vocabulary? |
+| Identity | `scripts/build_manifest.py` | the dump, the taxonomy, the run reports | what was this built *from*, by checksum? |
+| Index | `scripts/verify_index.py` | a live index + the manifest | does what got loaded match what was built? |
+
+The third stage is the one that used to be missing, and its absence cost
+something concrete: `catalog_fr_v13` held 195,209 documents where its extract has
+222,955 distinct ids, and the 12.5% shortfall survived months and three index
+generations because no check ever put the two numbers side by side.
+
+```bash
+export PRISM_ELASTICSEARCH_URL=...  PRISM_ELASTICSEARCH_API_KEY=...
+
+python scripts/verify_index.py \
+    --index catalog_fr_v13 \
+    --manifest builds/2026-08-03/build_manifest.json \
+    --taxonomy data/taxonomy/categories.json
+```
+
+It compares the index's document count against the manifest's **distinct ids**
+(not its record count — an index keyed by id holds one document per id, and the
+two differ by 1/3/81 for en/es/fr), reports every `categories` value and
+`category_path` segment the pinned snapshot does not explain *and* every snapshot
+label the index never uses, and says whether the index records which build
+produced it. Today no index does, so that last check reports `unverifiable`
+rather than pretending the manifest on the command line was confirmed by
+anything; it prints the `_meta` block a loader would have to write to make the
+answer real.
+
+Adding `--catalog <ndjson>` diffs the two id sets exactly and profiles the
+missing ids by run length in catalog order, which is what separates a load that
+dropped batches from two extracts that merely disagree record by record. It is
+opt-in because it costs a pass over the NDJSON; the default run is two requests.
+
+The whole thing is read-only by construction — one helper refuses any endpoint
+outside `_search`, `_count`, `_mapping` and `_settings` — so it is safe to point
+at a cluster other people are using. Results for the current indices are in
+[`builds/2026-08-03/INDEX_VERIFICATION.md`](builds/2026-08-03/INDEX_VERIFICATION.md).
+
 ## Clean data definition
 
 - Title in target language: `product_name_{lang}` OR (`lang == {lang}` AND `product_name`) — controlled by `--lang`
@@ -467,12 +513,19 @@ ecommerce-open-food-facts/
 │       ├── taxonomy.py    # OFF taxonomy graph → hierarchical category_path
 │       ├── category_tags.py  # Curated aliases/drops + validation of product tags
 │       └── pricing.py     # Synthetic price model
+├── scripts/
+│   ├── verify_catalog.py  # Re-derives the catalog's properties from the NDJSON
+│   ├── build_manifest.py  # Pins dump / taxonomy / commit by checksum
+│   ├── verify_index.py    # Checks a live index against that manifest (read-only)
+│   └── inject_category_path.py  # Adds category_path to an already-loaded index
+├── builds/                # Per-build manifests, reports and verification notes
 ├── tests/
 │   ├── conftest.py        # Puts src/ on sys.path so tests import normally
 │   ├── test_business_signal_values.py  # margin / popularity derivation
 │   ├── test_canonical_parents.py       # Canonical parent map and its tie-break
 │   ├── test_category_addressing.py     # One address per category, one path per product
 │   ├── test_category_path_gate.py      # End-to-end tests for the category_path gate
+│   ├── test_index_verification.py      # Index-vs-manifest checks, on captured ES envelopes
 │   ├── test_taxonomy.py   # Regression tests for the hierarchy builder
 │   └── fixtures/          # Real OFF products + pruned taxonomy, checked in
 ├── pyproject.toml         # Dependencies
