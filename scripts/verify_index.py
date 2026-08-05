@@ -41,7 +41,7 @@ What it checks
     which cannot create a document and count the rest as ``missing``).
 
 ``category_vocabulary`` (needs ``--taxonomy``)
-    Every distinct ``categories`` value and every ``category_path`` segment in
+    Every distinct ``taxonomy_tags`` value and every ``category_path`` segment in
     the index, checked against the display labels of the pinned snapshot — the
     index-side mirror of the rule ``verify_catalog.py`` applies to the NDJSON, so
     a catalog and its index are judged by one rule rather than two. Reported in
@@ -87,7 +87,7 @@ script exists to catch. So all three truncation signals are read and reported:
 
 * ``len(buckets) == size`` — the reliable tell, and the escalation trigger.
 * ``sum_other_doc_count`` — reported, but **not** trusted alone: on a
-  multi-valued field (``categories`` and ``category_path`` both are) a document
+  multi-valued field (``taxonomy_tags`` and ``category_path`` both are) a document
   is counted in every bucket it lands in, so the sum of bucket doc counts can
   exceed the document total and drive this to zero while terms are still
   missing.
@@ -183,7 +183,7 @@ CHUNK = 1 << 22
 READ_ONLY_ENDPOINTS = frozenset({"_search", "_count", "_mapping", "_settings"})
 
 # Enough for every catalog built here (the largest uses 16,743 distinct
-# ``categories`` values) with room to spare, and saturation escalates rather than
+# ``taxonomy_tags`` values) with room to spare, and saturation escalates rather than
 # truncates, so this is a performance knob and not a correctness one.
 DEFAULT_TERMS_SIZE = 30000
 COMPOSITE_PAGE = 10000
@@ -540,12 +540,12 @@ def check_category_path_coverage(indexed: int, with_path: int) -> Dict[str, Any]
 
 
 def check_category_vocabulary(
-    categories: Dict[str, int],
+    taxonomy_tags: Dict[str, int],
     addresses: Dict[str, int],
     labels: Set[str],
     root_labels: Set[str],
 ) -> Dict[str, Any]:
-    outside = {value: count for value, count in categories.items() if value not in labels}
+    outside = {value: count for value, count in taxonomy_tags.items() if value not in labels}
 
     segments: Set[str] = set()
     for address in addresses:
@@ -565,14 +565,14 @@ def check_category_vocabulary(
         and address.rsplit(PATH_SEPARATOR, 1)[0] not in addresses
     )
 
-    unused = sorted(labels - set(categories))
+    unused = sorted(labels - set(taxonomy_tags))
     failed = bool(outside or segments_outside or heads_outside or orphans)
     return _check(
         "category_vocabulary",
         "fail" if failed else "pass",
         snapshot_labels=len(labels),
         snapshot_root_labels=len(root_labels),
-        distinct_categories_in_index=len(categories),
+        distinct_categories_in_index=len(taxonomy_tags),
         distinct_category_path_addresses=len(addresses),
         distinct_category_path_segments=len(segments),
         values_outside_snapshot=len(outside),
@@ -664,7 +664,7 @@ def verify(
             "track_total_hits": True,
             "aggs": {
                 "with_category_path": {"filter": {"exists": {"field": "category_path"}}},
-                "categories": {"terms": {"field": "categories", "size": terms_size}},
+                "taxonomy_tags": {"terms": {"field": "taxonomy_tags", "size": terms_size}},
                 "category_path": {"terms": {"field": "category_path", "size": terms_size}},
             },
         },
@@ -683,8 +683,8 @@ def verify(
 
     truncation: Dict[str, Any] = {}
     if taxonomy_path is not None:
-        categories, truncation["categories"] = resolve_vocabulary(
-            request, index, "categories", aggregations["categories"], terms_size
+        taxonomy_tags, truncation["taxonomy_tags"] = resolve_vocabulary(
+            request, index, "taxonomy_tags", aggregations["taxonomy_tags"], terms_size
         )
         addresses, truncation["category_path"] = resolve_vocabulary(
             request, index, "category_path", aggregations["category_path"], terms_size
@@ -694,7 +694,7 @@ def verify(
         root_labels = {
             display_label(taxonomy, node, resolved_lang) for node in global_roots(taxonomy)
         }
-        checks.append(check_category_vocabulary(categories, addresses, labels, root_labels))
+        checks.append(check_category_vocabulary(taxonomy_tags, addresses, labels, root_labels))
     else:
         checks.append(
             _check(
