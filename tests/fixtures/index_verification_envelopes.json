@@ -1,8 +1,8 @@
 {
-  "captured_utc": "2026-08-03T11:19:42Z",
-  "index": "catalog_es_v13",
+  "captured_utc": "2026-08-05T19:23:17Z",
+  "index": "catalog_es_v14",
   "mapping_response": {
-    "catalog_es_v13": {
+    "catalog_es_v14": {
       "mappings": {
         "dynamic": "strict",
         "_source": {
@@ -36,12 +36,12 @@
               }
             }
           },
-          "categories": {
+          "taxonomy_tags": {
             "type": "keyword",
             "fields": {
               "normalized": {
                 "type": "keyword",
-                "normalizer": "keyword_normalizer"
+                "normalizer": "prism_facet_normalizer"
               },
               "text": {
                 "type": "text",
@@ -57,7 +57,7 @@
             "fields": {
               "normalized": {
                 "type": "keyword",
-                "normalizer": "keyword_normalizer"
+                "normalizer": "prism_facet_normalizer"
               },
               "text": {
                 "type": "text",
@@ -70,7 +70,7 @@
     }
   },
   "search_response": {
-    "took": 19,
+    "took": 22,
     "timed_out": false,
     "_shards": {
       "total": 1,
@@ -90,62 +90,62 @@
       "with_category_path": {
         "doc_count": 31910
       },
-      "categories": {
+      "taxonomy_tags": {
         "doc_count_error_upper_bound": 0,
-        "sum_other_doc_count": 167983,
+        "sum_other_doc_count": 161959,
         "buckets": [
           {
-            "key": "Plant based foods and beverages",
+            "key": "Alimentos y bebidas de origen vegetal",
             "doc_count": 14053
           },
           {
-            "key": "Plant based foods",
+            "key": "Alimentos de origen vegetal",
             "doc_count": 12444
           },
           {
-            "key": "Snacks",
+            "key": "Botanas",
             "doc_count": 6690
           },
           {
-            "key": "Sweet snacks",
+            "key": "Snacks dulces",
             "doc_count": 5312
           },
           {
-            "key": "Cereals and potatoes",
+            "key": "Cereales y patatas",
             "doc_count": 4422
           }
         ]
       },
       "category_path": {
         "doc_count_error_upper_bound": 0,
-        "sum_other_doc_count": 105746,
+        "sum_other_doc_count": 102525,
         "buckets": [
           {
             "key": "Alimentos y bebidas de origen vegetal",
-            "doc_count": 12105
+            "doc_count": 9719
           },
           {
             "key": "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal",
-            "doc_count": 10591
+            "doc_count": 7410
           },
           {
             "key": "Botanas",
-            "doc_count": 6210
+            "doc_count": 3967
           },
           {
             "key": "Botanas/Snacks dulces",
-            "doc_count": 4980
+            "doc_count": 2901
           },
           {
             "key": "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Cereales y patatas",
-            "doc_count": 3068
+            "doc_count": 2619
           }
         ]
       }
     }
   },
   "composite_page_response": {
-    "took": 7,
+    "took": 6,
     "timed_out": false,
     "_shards": {
       "total": 1,
@@ -164,20 +164,20 @@
     "aggregations": {
       "values": {
         "after_key": {
-          "v": "Aceites y grasas/Grasas animales/Butter fat/Clarified butter/ghee"
+          "v": "Aceites y grasas/Grasas animales/Mantequillas"
         },
         "buckets": [
           {
             "key": {
               "v": "Aceites y grasas"
             },
-            "doc_count": 22
+            "doc_count": 255
           },
           {
             "key": {
               "v": "Aceites y grasas/Grasas animales"
             },
-            "doc_count": 5
+            "doc_count": 135
           },
           {
             "key": {
@@ -193,16 +193,16 @@
           },
           {
             "key": {
-              "v": "Aceites y grasas/Grasas animales/Butter fat/Clarified butter/ghee"
+              "v": "Aceites y grasas/Grasas animales/Mantequillas"
             },
-            "doc_count": 3
+            "doc_count": 128
           }
         ]
       }
     }
   },
   "composite_terminal_response": {
-    "took": 5,
+    "took": 8,
     "timed_out": false,
     "_shards": {
       "total": 1,

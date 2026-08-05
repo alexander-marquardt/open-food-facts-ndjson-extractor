@@ -570,7 +570,7 @@ python scripts/verify_index.py \
 
 It compares the index's document count against the manifest's **distinct ids**
 (not its record count — an index keyed by id holds one document per id, and the
-two differ by 1/3/81 for en/es/fr), reports every `categories` value and
+two differ by 1/3/81 for en/es/fr), reports every `taxonomy_tags` value and
 `category_path` segment the pinned snapshot does not explain *and* every snapshot
 label the index never uses, and says whether the index records which build
 produced it. Today no index does, so that last check reports `unverifiable`

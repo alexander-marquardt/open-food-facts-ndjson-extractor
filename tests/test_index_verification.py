@@ -4,7 +4,7 @@ Two things make these tests worth trusting rather than merely green.
 
 **The response envelopes are live captures.** Every Elasticsearch response these
 tests replay comes from ``tests/fixtures/index_verification_envelopes.json``,
-which was recorded against a real ``catalog_*_v13`` index with the exact requests
+which was recorded against a real ``catalog_es_v14`` index with the exact requests
 ``verify_index.py`` issues — a ``_mapping`` read, one ``size: 0`` search carrying
 the coverage filter and both terms aggregations, and both shapes a ``composite``
 aggregation can return (a page with an ``after_key``, and the terminal page with
@@ -115,7 +115,7 @@ def search_response(
     *,
     total: int,
     with_path: int,
-    categories: Dict[str, int],
+    taxonomy_tags: Dict[str, int],
     category_path: Dict[str, int],
     sum_other_doc_count: int = 0,
     doc_count_error_upper_bound: int = 0,
@@ -124,7 +124,7 @@ def search_response(
     response = copy.deepcopy(ENVELOPES["search_response"])
     response["hits"]["total"]["value"] = total
     response["aggregations"]["with_category_path"]["doc_count"] = with_path
-    for name, counts in (("categories", categories), ("category_path", category_path)):
+    for name, counts in (("taxonomy_tags", taxonomy_tags), ("category_path", category_path)):
         agg = response["aggregations"][name]
         agg["buckets"] = _buckets(counts)
         agg["sum_other_doc_count"] = sum_other_doc_count
@@ -205,7 +205,7 @@ def test_captured_envelopes_carry_the_keys_the_verifier_reads() -> None:
     assert search["hits"]["total"]["relation"] == "eq", "track_total_hits must give an exact total"
     assert isinstance(search["hits"]["total"]["value"], int)
     assert "doc_count" in search["aggregations"]["with_category_path"]
-    for name in ("categories", "category_path"):
+    for name in ("taxonomy_tags", "category_path"):
         agg = search["aggregations"][name]
         assert {"buckets", "sum_other_doc_count", "doc_count_error_upper_bound"} <= set(agg)
         assert {"key", "doc_count"} <= set(agg["buckets"][0])
@@ -214,6 +214,28 @@ def test_captured_envelopes_carry_the_keys_the_verifier_reads() -> None:
     assert "after_key" in page and page["buckets"][0]["key"].keys() == {"v"}
     terminal = ENVELOPES["composite_terminal_response"]["aggregations"]["values"]
     assert terminal["buckets"] == [] and "after_key" not in terminal
+
+
+def test_the_captured_mapping_declares_the_field_the_verifier_aggregates_on() -> None:
+    """The two halves of the rename, tied together inside one capture.
+
+    A ``terms`` aggregation on a field the mapping does not have returns zero
+    buckets rather than an error, so a verifier pointed at the wrong name reports
+    "no values outside the snapshot" for the one reason that proves nothing. On
+    ``catalog_en_v14`` the old name returns 0 buckets against 108,379 documents
+    and ``taxonomy_tags`` returns real ones; nothing in the response says which
+    of the two happened.
+
+    The mapping and the aggregation come from the same captured index, so this
+    is the assertion a half-done rename fails: moving the aggregation key without
+    the field it names, or the reverse, no longer agrees with the capture.
+    """
+    properties = next(iter(ENVELOPES["mapping_response"].values()))["mappings"]["properties"]
+    assert "taxonomy_tags" in properties
+    assert "categories" not in properties
+    assert set(ENVELOPES["search_response"]["aggregations"]) - {"with_category_path"} <= set(
+        properties
+    )
 
 
 def test_the_live_index_records_no_build_identity() -> None:
@@ -235,7 +257,7 @@ def test_the_live_index_records_no_build_identity() -> None:
 def test_count_reconciles_when_the_index_matches_distinct_ids(tmp_path: Path) -> None:
     manifest = write_manifest(tmp_path, distinct_ids=31910)
     client = ReplayClient(
-        search_response(total=31910, with_path=31910, categories={}, category_path={})
+        search_response(total=31910, with_path=31910, taxonomy_tags={}, category_path={})
     )
     result = run(client, manifest)
     assert check(result, "document_count")["status"] == "pass"
@@ -245,7 +267,7 @@ def test_count_reconciles_when_the_index_matches_distinct_ids(tmp_path: Path) ->
 def test_count_fails_on_the_measured_fr_shortfall(tmp_path: Path) -> None:
     manifest = write_manifest(tmp_path, distinct_ids=222955, written=223036)
     client = ReplayClient(
-        search_response(total=195209, with_path=195209, categories={}, category_path={})
+        search_response(total=195209, with_path=195209, taxonomy_tags={}, category_path={})
     )
     result = run(client, manifest)
     count = check(result, "document_count")
@@ -266,26 +288,26 @@ def test_count_uses_distinct_ids_and_not_the_record_count(tmp_path: Path) -> Non
     """
     manifest = write_manifest(tmp_path, distinct_ids=222955, written=223036)
     client = ReplayClient(
-        search_response(total=222955, with_path=222955, categories={}, category_path={})
+        search_response(total=222955, with_path=222955, taxonomy_tags={}, category_path={})
     )
     assert check(run(client, manifest), "document_count")["status"] == "pass"
 
     against_records = ReplayClient(
-        search_response(total=223036, with_path=223036, categories={}, category_path={})
+        search_response(total=223036, with_path=223036, taxonomy_tags={}, category_path={})
     )
     assert check(run(against_records, manifest), "document_count")["status"] == "fail"
 
 
 def test_manifest_without_distinct_ids_fails_loudly(tmp_path: Path) -> None:
     manifest = write_manifest(tmp_path, artifact_verification=None)
-    client = ReplayClient(search_response(total=3, with_path=3, categories={}, category_path={}))
+    client = ReplayClient(search_response(total=3, with_path=3, taxonomy_tags={}, category_path={}))
     with pytest.raises(VerificationError, match="artifact_verification.distinct_ids"):
         run(client, manifest)
 
 
 def test_unknown_locale_is_named(tmp_path: Path) -> None:
     manifest = write_manifest(tmp_path, lang="es")
-    client = ReplayClient(search_response(total=3, with_path=3, categories={}, category_path={}))
+    client = ReplayClient(search_response(total=3, with_path=3, taxonomy_tags={}, category_path={}))
     with pytest.raises(VerificationError, match="no locale 'en'"):
         run(client, manifest)
 
@@ -298,7 +320,7 @@ def test_unknown_locale_is_named(tmp_path: Path) -> None:
 def test_documents_present_without_category_path_are_reported(tmp_path: Path) -> None:
     manifest = write_manifest(tmp_path, distinct_ids=100)
     client = ReplayClient(
-        search_response(total=100, with_path=72, categories={}, category_path={})
+        search_response(total=100, with_path=72, taxonomy_tags={}, category_path={})
     )
     coverage = check(run(client, manifest), "category_path_coverage")
     assert coverage["status"] == "fail"
@@ -315,7 +337,7 @@ def test_full_coverage_separates_a_missing_load_from_a_missed_update(tmp_path: P
     """
     manifest = write_manifest(tmp_path, distinct_ids=222955)
     client = ReplayClient(
-        search_response(total=195209, with_path=195209, categories={}, category_path={})
+        search_response(total=195209, with_path=195209, taxonomy_tags={}, category_path={})
     )
     result = run(client, manifest)
     assert check(result, "category_path_coverage")["status"] == "pass"
@@ -331,7 +353,7 @@ def test_identity_is_unverifiable_when_the_index_says_nothing(tmp_path: Path) ->
     taxonomy = write_taxonomy(tmp_path)
     manifest = write_manifest(tmp_path, distinct_ids=0, taxonomy_sha=_sha(taxonomy))
     client = ReplayClient(
-        search_response(total=0, with_path=0, categories={}, category_path={})
+        search_response(total=0, with_path=0, taxonomy_tags={}, category_path={})
     )
     result = run(client, manifest, taxonomy_path=taxonomy)
     identity = check(result, "manifest_identity")
@@ -348,7 +370,7 @@ def test_identity_fails_when_the_index_claims_a_different_build(tmp_path: Path) 
     taxonomy = write_taxonomy(tmp_path)
     manifest = write_manifest(tmp_path, distinct_ids=0, taxonomy_sha=_sha(taxonomy))
     client = ReplayClient(
-        search_response(total=0, with_path=0, categories={}, category_path={}),
+        search_response(total=0, with_path=0, taxonomy_tags={}, category_path={}),
         meta={
             "off_catalog_build": {
                 "lang": "en",
@@ -368,7 +390,7 @@ def test_identity_accepts_an_index_that_agrees_with_the_manifest(tmp_path: Path)
     taxonomy = write_taxonomy(tmp_path)
     manifest = write_manifest(tmp_path, distinct_ids=0, taxonomy_sha=_sha(taxonomy))
     client = ReplayClient(
-        search_response(total=0, with_path=0, categories={}, category_path={}),
+        search_response(total=0, with_path=0, taxonomy_tags={}, category_path={}),
         meta={
             "off_catalog_build": {
                 "lang": "en",
@@ -388,7 +410,7 @@ def test_a_taxonomy_file_that_is_not_the_pinned_snapshot_is_refused(tmp_path: Pa
     taxonomy = write_taxonomy(tmp_path)
     manifest = write_manifest(tmp_path, distinct_ids=0, taxonomy_sha="deadbeef" * 8)
     client = ReplayClient(
-        search_response(total=0, with_path=0, categories={}, category_path={})
+        search_response(total=0, with_path=0, taxonomy_tags={}, category_path={})
     )
     result = run(client, manifest, taxonomy_path=taxonomy)
     identity = check(result, "manifest_identity")
@@ -415,19 +437,19 @@ def test_saturated_terms_aggregation_escalates_to_composite(tmp_path: Path) -> N
         search_response(
             total=2,
             with_path=2,
-            categories={"Beverages": 2},
+            taxonomy_tags={"Beverages": 2},
             category_path={"Beverages": 2},
             sum_other_doc_count=1,
         ),
         composite={
-            "categories": composite_pages(everything),
+            "taxonomy_tags": composite_pages(everything),
             "category_path": composite_pages(
                 {"Beverages": 2, "Beverages/Hot beverages": 1, "Beverages/Hot beverages/Teas": 1}
             ),
         },
     )
     result = run(client, manifest, taxonomy_path=taxonomy, terms_size=1)
-    truncation = result["aggregation_truncation"]["categories"]
+    truncation = result["aggregation_truncation"]["taxonomy_tags"]
     assert truncation["size_saturated"] is True
     assert truncation["escalated_to_composite"] is True
     assert truncation["exhaustive_distinct_values"] == 3
@@ -439,7 +461,7 @@ def test_saturated_terms_aggregation_escalates_to_composite(tmp_path: Path) -> N
 def test_saturation_escalates_even_when_sum_other_doc_count_is_zero(tmp_path: Path) -> None:
     """The multi-valued-field hazard, made explicit.
 
-    ``categories`` and ``category_path`` are both multi-valued, so a document is
+    ``taxonomy_tags`` and ``category_path`` are both multi-valued, so a document is
     counted in every bucket it lands in and the returned bucket doc counts can
     already account for the whole index. ``sum_other_doc_count`` then reads zero
     while terms are still missing. A verifier that trusted it would report "no
@@ -452,18 +474,18 @@ def test_saturation_escalates_even_when_sum_other_doc_count_is_zero(tmp_path: Pa
         search_response(
             total=2,
             with_path=2,
-            categories={"Beverages": 2},
+            taxonomy_tags={"Beverages": 2},
             category_path={"Beverages": 2},
             sum_other_doc_count=0,
             doc_count_error_upper_bound=0,
         ),
         composite={
-            "categories": composite_pages({"Beverages": 2, "Not in the snapshot": 1}),
+            "taxonomy_tags": composite_pages({"Beverages": 2, "Not in the snapshot": 1}),
             "category_path": composite_pages({"Beverages": 2}),
         },
     )
     result = run(client, manifest, taxonomy_path=taxonomy, terms_size=1)
-    assert result["aggregation_truncation"]["categories"]["escalated_to_composite"] is True
+    assert result["aggregation_truncation"]["taxonomy_tags"]["escalated_to_composite"] is True
     vocabulary = check(result, "category_vocabulary")
     assert vocabulary["values_outside_snapshot"] == 1
     assert vocabulary["status"] == "fail"
@@ -474,14 +496,14 @@ def test_unsaturated_terms_aggregation_does_not_pay_for_composite(tmp_path: Path
     manifest = write_manifest(tmp_path, distinct_ids=2, taxonomy_sha=_sha(taxonomy))
     client = ReplayClient(
         search_response(
-            total=2, with_path=2, categories={"Beverages": 2}, category_path={"Beverages": 2}
+            total=2, with_path=2, taxonomy_tags={"Beverages": 2}, category_path={"Beverages": 2}
         )
     )
     result = run(client, manifest, taxonomy_path=taxonomy, terms_size=100)
     assert client.composite_fields == []
     # One mapping read and one search: the whole default verification.
     assert client.requests == ["/catalog_en_v13/_mapping", "/catalog_en_v13/_search"]
-    assert result["aggregation_truncation"]["categories"]["escalated_to_composite"] is False
+    assert result["aggregation_truncation"]["taxonomy_tags"]["escalated_to_composite"] is False
 
 
 def test_terms_truncation_reads_all_three_signals() -> None:
@@ -512,7 +534,7 @@ def test_vocabulary_reports_values_the_snapshot_does_not_explain(tmp_path: Path)
             # "Plant based foods" is the real shape of the live drift: the
             # snapshot renders the label with a hyphen, the index has an older
             # rendering, and a set difference is the only thing that notices.
-            categories={"Beverages": 2, "Plant based foods": 5},
+            taxonomy_tags={"Beverages": 2, "Plant based foods": 5},
             category_path={"Beverages": 2},
         ),
     )
@@ -528,7 +550,7 @@ def test_vocabulary_reports_snapshot_labels_the_index_never_uses(tmp_path: Path)
     manifest = write_manifest(tmp_path, distinct_ids=2, taxonomy_sha=_sha(taxonomy))
     client = ReplayClient(
         search_response(
-            total=2, with_path=2, categories={"Beverages": 2}, category_path={"Beverages": 2}
+            total=2, with_path=2, taxonomy_tags={"Beverages": 2}, category_path={"Beverages": 2}
         ),
     )
     vocabulary = check(run(client, manifest, taxonomy_path=taxonomy), "category_vocabulary")
@@ -545,7 +567,7 @@ def test_vocabulary_flags_a_path_head_that_is_not_a_taxonomy_root(tmp_path: Path
         search_response(
             total=1,
             with_path=1,
-            categories={"Teas": 1},
+            taxonomy_tags={"Teas": 1},
             category_path={"Hot beverages": 1, "Hot beverages/Teas": 1},
         ),
     )
@@ -564,7 +586,7 @@ def test_vocabulary_flags_an_address_whose_parent_never_reached_the_index(
         search_response(
             total=1,
             with_path=1,
-            categories={"Teas": 1},
+            taxonomy_tags={"Teas": 1},
             category_path={"Beverages": 1, "Beverages/Hot beverages/Teas": 1},
         ),
     )
@@ -581,7 +603,7 @@ def test_vocabulary_flags_a_path_segment_absent_from_the_snapshot(tmp_path: Path
         search_response(
             total=1,
             with_path=1,
-            categories={"Beverages": 1},
+            taxonomy_tags={"Beverages": 1},
             category_path={"Beverages": 1, "Beverages/Invented": 1},
         ),
     )
@@ -593,7 +615,7 @@ def test_vocabulary_flags_a_path_segment_absent_from_the_snapshot(tmp_path: Path
 def test_vocabulary_is_skipped_rather_than_faked_without_a_taxonomy(tmp_path: Path) -> None:
     manifest = write_manifest(tmp_path, distinct_ids=1)
     client = ReplayClient(
-        search_response(total=1, with_path=1, categories={"anything": 1}, category_path={})
+        search_response(total=1, with_path=1, taxonomy_tags={"anything": 1}, category_path={})
     )
     result = run(client, manifest)
     assert check(result, "category_vocabulary")["status"] == "skipped"
@@ -625,7 +647,7 @@ def test_run_profile_separates_scattered_drift_from_dropped_batches(tmp_path: Pa
     catalog = write_catalog(tmp_path, catalog_ids)
 
     scattered = [i for n, i in enumerate(catalog_ids) if n % 10 != 3]
-    client = ReplayClient(search_response(total=0, with_path=0, categories={}, category_path={}))
+    client = ReplayClient(search_response(total=0, with_path=0, taxonomy_tags={}, category_path={}))
     client.composite = {"id": composite_pages({i: 1 for i in scattered})}
     identity = check_document_identity(client.request, "catalog_en_v13", catalog)
     assert identity["status"] == "fail"
@@ -645,7 +667,7 @@ def test_run_profile_separates_scattered_drift_from_dropped_batches(tmp_path: Pa
 
 def test_identity_reports_index_documents_the_catalog_does_not_have(tmp_path: Path) -> None:
     catalog = write_catalog(tmp_path, ["a", "b"])
-    client = ReplayClient(search_response(total=0, with_path=0, categories={}, category_path={}))
+    client = ReplayClient(search_response(total=0, with_path=0, taxonomy_tags={}, category_path={}))
     client.composite = {"id": composite_pages({"a": 1, "b": 1, "stranger": 1})}
     identity = check_document_identity(client.request, "catalog_en_v13", catalog)
     assert identity["status"] == "fail"
@@ -655,7 +677,7 @@ def test_identity_reports_index_documents_the_catalog_does_not_have(tmp_path: Pa
 
 def test_identity_passes_when_both_sides_hold_the_same_ids(tmp_path: Path) -> None:
     catalog = write_catalog(tmp_path, ["a", "b", "c"])
-    client = ReplayClient(search_response(total=0, with_path=0, categories={}, category_path={}))
+    client = ReplayClient(search_response(total=0, with_path=0, taxonomy_tags={}, category_path={}))
     client.composite = {"id": composite_pages({"c": 1, "a": 1, "b": 1})}
     identity = check_document_identity(client.request, "catalog_en_v13", catalog)
     assert identity["status"] == "pass"
@@ -665,7 +687,7 @@ def test_identity_passes_when_both_sides_hold_the_same_ids(tmp_path: Path) -> No
 def test_catalog_duplicate_ids_are_counted_once(tmp_path: Path) -> None:
     """Same rule as the count check: one document per distinct id, not per record."""
     catalog = write_catalog(tmp_path, ["a", "b", "a"])
-    client = ReplayClient(search_response(total=0, with_path=0, categories={}, category_path={}))
+    client = ReplayClient(search_response(total=0, with_path=0, taxonomy_tags={}, category_path={}))
     client.composite = {"id": composite_pages({"a": 1, "b": 1})}
     identity = check_document_identity(client.request, "catalog_en_v13", catalog)
     assert identity["catalog_distinct_ids"] == 2
@@ -730,7 +752,7 @@ def test_the_api_key_is_never_read_from_anywhere_but_the_environment(
 def test_only_the_two_default_requests_are_issued(tmp_path: Path) -> None:
     manifest = write_manifest(tmp_path, distinct_ids=1)
     client = ReplayClient(
-        search_response(total=1, with_path=1, categories={}, category_path={})
+        search_response(total=1, with_path=1, taxonomy_tags={}, category_path={})
     )
     result = run(client, manifest)
     assert result["requests"] == ["/catalog_en_v13/_mapping", "/catalog_en_v13/_search"]
@@ -759,7 +781,7 @@ def test_locale_is_inferred_from_the_index_name(index: str, expected: Optional[s
 
 def test_an_index_whose_name_says_nothing_needs_an_explicit_locale(tmp_path: Path) -> None:
     manifest = write_manifest(tmp_path, distinct_ids=1)
-    client = ReplayClient(search_response(total=1, with_path=1, categories={}, category_path={}))
+    client = ReplayClient(search_response(total=1, with_path=1, taxonomy_tags={}, category_path={}))
     with pytest.raises(VerificationError, match="pass --lang"):
         verify(client, "products", manifest)
     assert check(verify(client, "products", manifest, lang="en"), "document_count")["status"] == (
