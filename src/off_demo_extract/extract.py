@@ -9,7 +9,7 @@ import sys
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Iterable, Iterator, Optional, Set, TextIO, Tuple
+from typing import Any, Dict, Iterable, Iterator, Mapping, Optional, Set, TextIO, Tuple, Union
 
 from off_demo_extract.category_tags import (
     CategoryVocabulary,
@@ -36,6 +36,25 @@ IMAGE_BASE = "https://images.openfoodfacts.org/images/products"
 # Values we should treat as "not meaningful" and avoid emitting in attrs/description.
 _UNDEFINED_LIKE = {"undefined", "unknown", "null", "none", "n/a", "na", ""}
 MAX_NUM_TAXONOMY_TAGS = 20
+
+# The type of a single ``attrs`` value.
+#
+# Most attributes are scalars and stay strings. The ones Open Food Facts
+# supplies as a *list* are written as lists, because ``attrs`` is mapped
+# ``flattened`` in Elasticsearch and ``flattened`` indexes each element of an
+# array as its own keyword. Joining a list into one string before writing makes
+# the *combination* the indexed key: ``{"term": {"attrs.Labels": "no-gluten"}}``
+# then reaches only the products whose sole label is ``no-gluten``, and the term
+# dictionary carries one entry per distinct combination instead of one per
+# value.
+#
+# The union is written out rather than widened to ``Any`` on purpose: the
+# distinction between "a list of two values" and "one value that happens to
+# contain a comma" is the whole content of this field's shape, and four
+# attributes (``Modelled margin``, ``Estimated unit price``, ``Serving size``,
+# ``Quantity``) carry commas *inside* a single legitimate value. ``Any`` would
+# stop the reader from seeing that there is a rule here at all.
+AttrValue = Union[str, list[str]]
 
 
 # ----------------------------
@@ -488,7 +507,20 @@ def derive_margin(bucket_name: str, labels_tags: Optional[list]) -> Tuple[int, s
 # Attributes extraction (OFF -> attrs)
 # ----------------------------
 
-def join_tags(tags: Any, prefix_strip: Optional[str] = None, sep: str = ", ") -> Optional[str]:
+def clean_tags(tags: Any, prefix_strip: Optional[str] = None) -> Optional[list[str]]:
+    """Normalize an Open Food Facts tag list and return it **as a list**.
+
+    This used to be ``join_tags`` and ended with ``sep.join(vals)``. The join is
+    gone, and this call site is the only place it could ever have been undone:
+    here the source is still a list, so "two values" and "one value containing a
+    comma" are still distinguishable. Once joined, they are the same string, and
+    splitting on ``", "`` downstream shreds the four attributes that legitimately
+    carry a comma inside one value (see :data:`AttrValue`).
+
+    Order and duplicates are preserved exactly as the source supplies them.
+    De-duplicating or sorting here would be a change to what the attribute says,
+    which this correction deliberately does not make.
+    """
     if not isinstance(tags, list):
         return None
     vals: list[str] = []
@@ -503,7 +535,7 @@ def join_tags(tags: Any, prefix_strip: Optional[str] = None, sep: str = ", ") ->
         vals.append(s)
     if not vals:
         return None
-    return sep.join(vals)
+    return vals
 
 
 def get_first_str(product: Dict[str, Any], *keys: str) -> Optional[str]:
@@ -529,8 +561,17 @@ def format_nutrient(nutriments: Dict[str, Any], key_100g: str, unit_key: Optiona
 def build_attrs(
     product: Dict[str, Any],
     primary_category_label: Optional[str],
-) -> Dict[str, str]:
-    attrs: Dict[str, str] = {}
+) -> Dict[str, AttrValue]:
+    """Build the ``attrs`` map.
+
+    List-sourced attributes are written as lists; everything else is a string.
+    The four attributes that carry a comma inside one legitimate value are all
+    scalars and are built from scalar sources, so nothing here can split them:
+    ``Quantity`` and ``Serving size`` come straight from :func:`get_first_str`
+    below, and ``Estimated unit price`` and ``Modelled margin`` are debug strings
+    composed in ``main``.
+    """
+    attrs: Dict[str, AttrValue] = {}
 
     qty = get_first_str(product, "quantity")
     if qty:
@@ -552,18 +593,35 @@ def build_attrs(
     if eco and eco.lower() != "unknown":
         attrs["Eco-Score"] = eco.upper()
 
-    allergens = join_tags(product.get("allergens_tags"), prefix_strip="en:")
+    allergens = clean_tags(product.get("allergens_tags"), prefix_strip="en:")
     if allergens:
         attrs["Allergens"] = allergens
 
-    labels = join_tags(product.get("labels_tags"), prefix_strip="en:")
+    labels = clean_tags(product.get("labels_tags"), prefix_strip="en:")
     if labels:
         attrs["Labels"] = labels
 
-    analysis = join_tags(product.get("ingredients_analysis_tags"), prefix_strip="en:")
+    analysis = clean_tags(product.get("ingredients_analysis_tags"), prefix_strip="en:")
     if analysis:
         attrs["Ingredients analysis"] = analysis
 
+    # Countries stays a scalar read from the free-text ``countries`` field, and
+    # is deliberately NOT part of this correction.
+    #
+    # It looks like a sixth multi-valued attribute and it is not one *here*: this
+    # call site never had a list to preserve. Open Food Facts publishes the
+    # canonical list separately as ``countries_tags``; reading it instead would
+    # not be undoing a join, it would be changing which source field the
+    # attribute reads, and with it the displayed value ("United States" becomes
+    # "united-states"). That is a decision about what the catalog shows, not a
+    # shape correction, so it is tracked on its own in #50 rather than made in
+    # passing here.
+    #
+    # What must never happen is the other option: splitting this value on commas.
+    # It is prose written by whoever edited the product -- the dump carries
+    # "France, United States", "Frankreich,Deutschland" and
+    # "France,États-Unis,en:france" -- and a comma split is the same heuristic
+    # that shreds ``Quantity`` and ``Serving size``.
     countries = get_first_str(product, "countries")
     if countries:
         attrs["Countries"] = countries
@@ -607,7 +665,30 @@ def build_attrs(
     return attrs
 
 
-def build_description(title: str, desc: str, attrs: Dict[str, str], *, single_line: bool = True) -> str:
+def render_attr_value(value: Optional[AttrValue]) -> Optional[str]:
+    """Render one ``attrs`` value as display text.
+
+    This is where the join lives now. A list attribute is joined with ``", "``
+    -- the same separator the writer used to apply -- so the human-readable
+    surfaces read exactly as they did before, while the indexed document keeps
+    the values apart.
+
+    Every consumer that wants text out of ``attrs`` must come through here.
+    """
+    if value is None:
+        return None
+    if isinstance(value, list):
+        return ", ".join(value)
+    return value
+
+
+def build_description(
+    title: str,
+    desc: str,
+    attrs: Mapping[str, AttrValue],
+    *,
+    single_line: bool = True,
+) -> str:
     preferred_keys = [
         "Category", "Quantity", "Serving size", "Nutri-Score", "NOVA group", "Eco-Score",
         "Dietary restrictions",
@@ -619,7 +700,12 @@ def build_description(title: str, desc: str, attrs: Dict[str, str], *, single_li
 
     specs: list[str] = []
     for k in preferred_keys:
-        v = attrs.get(k)
+        # The undefined-like test is applied to the *rendered* text, not to each
+        # element, which is what it was applied to before this field could hold a
+        # list: a joined "vegan, undefined" was never suppressed and still is not.
+        # Testing elements instead would have quietly started dropping values
+        # from the description, which is a change to what the catalog says.
+        v = render_attr_value(attrs.get(k))
         if not v:
             continue
         if _is_undefined_like(v):
@@ -1011,7 +1097,12 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
 
             dietary_restrictions = dietary_restrictions_from_off(product)
             if dietary_restrictions:
-                attrs["Dietary restrictions"] = ", ".join(dietary_restrictions)
+                # Written as the list it already is. The derivation rules that
+                # produce this list are untouched; only the shape it is stored in
+                # changes, and the ``dietary_restrictions`` field below has always
+                # carried the same list. Copied rather than aliased so the two
+                # keys of the emitted document never share one mutable object.
+                attrs["Dietary restrictions"] = list(dietary_restrictions)
 
             labels_tags = product.get("labels_tags") if isinstance(product.get("labels_tags"), list) else []
             brand = product.get("brands") if isinstance(product.get("brands"), str) else ""
