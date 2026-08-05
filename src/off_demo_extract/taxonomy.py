@@ -162,6 +162,52 @@ def load_taxonomy(path: Path) -> Dict[str, Any]:
     return obj
 
 
+def _capitalise_first(label: str) -> str:
+    """``label`` with its first character upper-cased, and **nothing else** touched.
+
+    Not :meth:`str.capitalize`, which lower-cases everything after the first
+    character and would destroy exactly what the taxonomy ``name`` is kept for:
+    ``dried Toothed wrack`` would lose its species capital, ``farmed
+    Mediterranean bass`` its proper noun. Only the first character is in
+    question, and only when it is a lowercase letter — a name already starting
+    with a capital, a digit or a punctuation mark comes back byte-identical,
+    because ``str.islower`` is false for all of those. The snapshot has real
+    names of each shape: ``10% red wine``, ``70% fat mayonnaise``, and the French
+    ``% de matières grasses``.
+
+    Why this is applied at all, when the rule everywhere else in this module is
+    to render the upstream ``name`` verbatim: upstream does not capitalise
+    consistently. 92 of the taxonomy's 8,939 ``en:``-prefixed nodes have an
+    English name beginning lowercase — ``ice creams``, ``chorizo``, ``baker's
+    yeast`` — so those segments read ``Desserts/Frozen desserts/Ice creams and
+    sorbets/ice creams/Ice cream tubs`` mid-breadcrumb, measured on a real
+    product, and since the flat tag field renders from the same labeller they
+    read that way in a tag row too. 49 Spanish and 208 French names have the
+    same defect.
+
+    All 92 were enumerated against the pinned snapshot before this rule was
+    chosen, because an unconditional upper-case is the wrong fix if any name is
+    *deliberately* lowercase — a ``pH``-style term, a lowercase brand. None is:
+    they are ordinary common nouns upstream simply did not capitalise, and no
+    name in the snapshot, in any language, is of the ``pH``/``iPhone`` shape (a
+    lowercase first character followed by an upper-case second one). They are
+    recorded verbatim in ``tests/fixtures/off_real_lowercase_names.json`` so the
+    next taxonomy refresh is checked against the same question rather than
+    inheriting the answer.
+
+    It is a presentation rule about the *first character of a label*, not an
+    edit of the source: nothing here writes back to the taxonomy, and the
+    ``name`` the label is taken from is unchanged in every other character.
+
+    The slug fallback below already capitalised its first character, so before
+    this the same node rendered ``Saint-émilion`` when the taxonomy had no name
+    for it and ``saint-émilion`` when it did. One helper is now the single
+    casing rule for both, which is why this is not a second transformation
+    layered on the first.
+    """
+    return label[:1].upper() + label[1:] if label[:1].islower() else label
+
+
 def _prettify_slug(canonical_id: str) -> str:
     """Fallback label for a canonical id with no usable taxonomy ``name``."""
     t = canonical_id
@@ -170,7 +216,7 @@ def _prettify_slug(canonical_id: str) -> str:
     t = t.replace("-", " ").replace("_", " ").strip()
     if not t:
         return canonical_id
-    return t[0].upper() + t[1:]
+    return _capitalise_first(t)
 
 
 def display_label(taxonomy: Dict[str, Any], canonical_id: str, lang: str = "en") -> str:
@@ -199,13 +245,19 @@ def display_label(taxonomy: Dict[str, Any], canonical_id: str, lang: str = "en")
     That is the deliberate trade for keeping their descendants' real lineage; see
     the module docstring. It also remains the fallback for runs with no taxonomy
     at all (``--no-taxonomy``, which passes an empty mapping here).
+
+    Whichever branch produced it, the label's **first character** is
+    upper-cased if it is a lowercase letter, and no other character is touched —
+    see :func:`_capitalise_first` for why upstream makes that necessary and why
+    it is not :meth:`str.capitalize`. Both branches go through the same helper,
+    so this is one casing rule rather than a second one layered on the name.
     """
     node = taxonomy.get(canonical_id) or {}
     names = node.get("name") if isinstance(node.get("name"), dict) else {}
     for key in (lang, "en", "xx"):
         val = names.get(key)
         if isinstance(val, str) and val.strip():
-            label = val.strip()
+            label = _capitalise_first(val.strip())
             break
     else:
         label = _prettify_slug(canonical_id)
