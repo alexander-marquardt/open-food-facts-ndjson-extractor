@@ -291,6 +291,13 @@ def test_fixture_still_exercises_the_divergence() -> None:
     assert "en:plant-based-foods" in divergent, "hyphenation case missing"
     assert "en:crackers-appetizers" in divergent, "parenthetical case missing"
     assert "en:ice-creams" in divergent, "upstream-casing case missing"
+    # The casing case is measured here between the taxonomy *name* and the
+    # de-slug, which is why it still counts. It no longer separates the two rules
+    # at render time: the labeller now upper-cases a lowercase first character,
+    # so `en:ice-creams` renders `Ice creams` from either rule. The nodes that
+    # keep the agreement tests biting are the other 12 — hyphenation,
+    # parentheticals and localisation, which the de-slug cannot reach at all.
+    # See tests/test_lowercase_taxonomy_names.py for the casing rule itself.
 
 
 def test_run_report_audits_the_label_invariants() -> None:

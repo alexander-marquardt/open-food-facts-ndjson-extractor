@@ -283,6 +283,25 @@ and casing that a mechanical de-slug destroys — and, unlike a slug, it is
 localized. All 8,939 English-backbone nodes have an English name, so the slug
 fallback never fires on that backbone.
 
+One thing is changed about that name and only one: **its first character is
+upper-cased when it is a lowercase letter**, and no other character is touched.
+Upstream does not capitalize consistently — 92 of the 8,939 English-backbone
+names begin lowercase (`ice creams`, `chorizo`, `baker's yeast`), as do 49
+Spanish and 208 French names — so a real product reads
+`Desserts/Frozen desserts/Ice creams and sorbets/ice creams/Ice cream tubs`
+mid-breadcrumb and carries the same uncapitalized value in its `taxonomy_tags`
+row, since both fields render from the same labeller. It is not `str.capitalize()`, which would flatten the rest of
+the string and cost `dried Toothed wrack` its species capital; a name starting
+with a capital, a digit or a punctuation mark (`10% red wine`,
+`% de matières grasses`) is returned byte-identical. The slug fallback
+already capitalized its first character, so the same node used to render
+`Saint-émilion` when the taxonomy had no name for it and `saint-émilion` when it
+did; one helper now decides the casing for both. All 92 were read before the rule
+was chosen, and none is deliberately lowercase; they are kept verbatim in
+`tests/fixtures/off_real_lowercase_names.json` so a taxonomy refresh is checked
+against the same question. **The source file is not modified** — this is how a
+label is presented, not what upstream says.
+
 `taxonomy_tags` used to de-slug the tag id itself. That gave the same node two
 spellings across the two fields (`Plant based foods` next to `Plant-based
 foods`), so nothing could relate a flat value to a path segment by string: over
