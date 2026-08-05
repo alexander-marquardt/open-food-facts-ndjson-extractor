@@ -201,7 +201,11 @@ walks a single canonical chain:
 Note where the target language does and does not apply. It decides step 2 —
 which categories a product may be *filed under*, and which values the flat
 `taxonomy_tags` field may carry — and it decides the labels in step 4. It does not
-decide step 1. Filtering the *graph* by language used to delete every edge
+decide step 1. Nor does it reach `xx:`, which is not a language but upstream's
+marker for a node whose name is the same in every language: those 34 nodes are
+filable in **every** catalog.
+
+Filtering the *graph* by language used to delete every edge
 through a filtered node as well, which orphaned that node's children into roots
 of a locale-shaped forest: an English run walked a graph with **161** roots
 where the taxonomy has **92**, a Spanish one 161 and a French one 130, so the
@@ -347,7 +351,9 @@ Each tag now goes through, in order:
    The same node can still appear as an intermediate *path segment*, because a
    path walks the language-blind graph — an English product filed under
    `en:poultry-hams` passes through `fr:charcuteries-cuites`, which is where that
-   category genuinely sits.
+   category genuinely sits. `xx:` is the exception, and is not a language: it
+   marks the 34 nodes upstream names identically in every language (`xx:tofu`,
+   `xx:dumplings`, `xx:sake`), so every catalog files under them.
 
 **A refused value never refuses its record.** Dropping the record on an
 unresolvable tag would cost 19.6% of tagged products; dropping only the offending
