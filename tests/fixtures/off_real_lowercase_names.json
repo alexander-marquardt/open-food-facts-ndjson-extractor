@@ -1,0 +1,2732 @@
+{
+ "_source": "Open Food Facts (openfoodfacts.org), ODbL. Verbatim from the pinned category taxonomy snapshot and the public JSONL export: every en:-prefixed node whose English name begins with a lowercase letter, six control nodes whose names must come back byte-identical, real products carrying them, and the complete upward closure of every id named here. Names are projected to en/es/fr/xx, the languages these tests render in; not one name is edited, which is the point — the fixture records what upstream says, and the fix is about how a label is presented, not about correcting the source.",
+ "snapshot": {
+  "sha256": "74717ecc001cf8661f6ec0bb3fc8c7a0cf317a6355a245004e892348fe575ec5",
+  "nodes": 14457,
+  "en_prefixed_nodes": 8939
+ },
+ "lowercase_first_en_names": {
+  "en:asafoetida": "asafoetida",
+  "en:baker-s-yeast": "baker's yeast",
+  "en:bilberries-spreads": "bilberries spreads",
+  "en:books": "books",
+  "en:broths": "broths",
+  "en:buckwheat-crepe-with-cheese-and-ham": "buckwheat crepe with cheese and ham",
+  "en:cantal": "cantal",
+  "en:caramelised": "caramelised",
+  "en:chicken-meat-without-skin": "chicken meat without skin",
+  "en:chicken-rillettes": "chicken rillettes",
+  "en:chicken-skewers": "chicken skewers",
+  "en:chorizo": "chorizo",
+  "en:common-anchovy": "common anchovy",
+  "en:conger": "conger",
+  "en:corn-salad": "corn salad",
+  "en:cured-smoked-ham-with-reduced-fat": "cured smoked ham with reduced fat",
+  "en:cut": "cut",
+  "en:debrecener": "debrecener",
+  "en:detergents": "detergents",
+  "en:dill-pickles": "dill pickles",
+  "en:distilled-anis": "distilled anis",
+  "en:dried-toothed-wrack": "dried Toothed wrack",
+  "en:extra-fruit-jellies": "extra fruit jellies",
+  "en:farmed-mediterranean-bass": "farmed Mediterranean bass",
+  "en:filled-gnocchi": "filled gnocchi",
+  "en:flavoured": "flavoured",
+  "en:fried-cheese": "fried cheese",
+  "en:frozen-cauliflowers": "frozen cauliflowers",
+  "en:ghee": "ghee",
+  "en:goose-meat-with-skin": "goose meat with skin",
+  "en:granulated-sugars": "granulated sugars",
+  "en:grenadier": "grenadier",
+  "en:grilled-salmon": "grilled salmon",
+  "en:guts": "guts",
+  "en:hare-rillettes": "hare rillettes",
+  "en:ice-creams": "ice creams",
+  "en:kaszanka": "kaszanka",
+  "en:kitchenware": "kitchenware",
+  "en:largehead-hairtail": "largehead hairtail",
+  "en:ling": "ling",
+  "en:lobsters": "lobsters",
+  "en:lupin-grains": "lupin grains",
+  "en:mackerel": "mackerel",
+  "en:marinated-fish": "marinated fish",
+  "en:melt-sandwich": "melt sandwich",
+  "en:mildly-soured-butters": "mildly soured butters",
+  "en:muscat-wine-sauce": "muscat wine sauce",
+  "en:non-homogenized-milks": "non-homogenized milks",
+  "en:nougats": "nougats",
+  "en:nursehound": "nursehound",
+  "en:old-rums": "old rums",
+  "en:onion-powder": "onion powder",
+  "en:pasteurised": "pasteurised",
+  "en:pelinkovac": "pelinkovac",
+  "en:pierogi": "pierogi",
+  "en:pig-head": "pig head",
+  "en:plant-based": "plant-based",
+  "en:prepared-fish": "prepared fish",
+  "en:preserved-duck-gizzards": "preserved duck gizzards",
+  "en:quail-meat-and-skin": "quail meat and skin",
+  "en:ravioli": "ravioli",
+  "en:red-ports": "red ports",
+  "en:rock-candies": "rock candies",
+  "en:rocket": "rocket",
+  "en:salt-cured-pork-belly": "salt-cured pork belly",
+  "en:scallions": "scallions",
+  "en:semi-cured-cheese": "semi-cured cheese",
+  "en:shark": "shark",
+  "en:sheep-s-milk-cheeses": "sheep's-milk cheeses",
+  "en:snow-peas": "snow peas",
+  "en:sour-cream-butters": "sour cream butters",
+  "en:spaghetti-with-cheese-sauce": "spaghetti with cheese sauce",
+  "en:sprouted-alfalfa-seeds": "sprouted alfalfa seeds",
+  "en:sprouted-wheat": "sprouted wheat",
+  "en:strawberry-juice": "strawberry juice",
+  "en:stuffing": "stuffing",
+  "en:sweet-cream-butters": "sweet cream butters",
+  "en:tagliatelle-with-cheese-sauce": "tagliatelle with cheese sauce",
+  "en:tarragon": "tarragon",
+  "en:thin-crust-pizza-shell": "thin-crust pizza shell",
+  "en:tuna-flakes-in-oil": "tuna flakes in oil",
+  "en:tuna-flakes-in-tomato-sauce": "tuna flakes in tomato sauce",
+  "en:turisticky-salami": "turisticky salami",
+  "en:unpasteurised": "unpasteurised",
+  "en:vanilla-extract": "vanilla extract",
+  "en:veal-medallion": "veal medallion",
+  "en:vegetables-macedoines": "vegetables macedoines",
+  "en:vysocina-salami": "vysocina salami",
+  "en:whey": "whey",
+  "en:whey-powder": "whey powder",
+  "en:white-meat-rillettes": "white meat rillettes",
+  "en:wine-jams": "wine jams"
+ },
+ "byte_unchanged_controls": [
+  "en:crackers-appetizers",
+  "en:plant-based-foods",
+  "en:extra-virgin-olive-oils",
+  "en:10-red-wine",
+  "fr:de-matieres-grasses",
+  "en:snacks"
+ ],
+ "taxonomy": {
+  "en:10-red-wine": {
+   "name": {
+    "en": "10% red wine",
+    "es": "Vino tinto al 10%",
+    "fr": "Vin rouge à 10°"
+   },
+   "parents": [
+    "en:red-wines"
+   ]
+  },
+  "en:alcoholic-beverages": {
+   "name": {
+    "fr": "Boissons alcoolisées",
+    "es": "Bebidas alcohólicas",
+    "en": "Alcoholic beverages"
+   },
+   "parents": [
+    "en:beverages"
+   ]
+  },
+  "en:alfalfa-seeds": {
+   "name": {
+    "es": "Semillas de alfalfa",
+    "en": "Alfalfa seeds",
+    "fr": "Graines de alfalfa"
+   },
+   "parents": [
+    "en:legume-seeds"
+   ]
+  },
+  "en:anchovy": {
+   "name": {
+    "en": "Anchovy",
+    "es": "Anchoa",
+    "fr": "Anchois"
+   },
+   "parents": [
+    "en:fatty-fishes",
+    "en:fishes"
+   ]
+  },
+  "en:animal-fats": {
+   "name": {
+    "es": "Grasas animales",
+    "fr": "Matières grasses animales",
+    "en": "Animal fats"
+   },
+   "parents": [
+    "en:fats"
+   ]
+  },
+  "en:appetizers": {
+   "name": {
+    "en": "Appetizers",
+    "es": "Aperitivos",
+    "fr": "Amuse-gueules"
+   },
+   "parents": [
+    "en:salty-snacks"
+   ]
+  },
+  "en:aromatic-plants": {
+   "name": {
+    "es": "Plantas aromáticas",
+    "fr": "Plantes aromatiques",
+    "en": "Aromatic plants"
+   },
+   "parents": [
+    "en:culinary-plants"
+   ]
+  },
+  "en:asafoetida": {
+   "name": {
+    "fr": "ase fétide",
+    "es": "asafétida",
+    "en": "asafoetida"
+   },
+   "parents": [
+    "en:spices"
+   ]
+  },
+  "en:baker-s-yeast": {
+   "name": {
+    "es": "levaduras de pastelería",
+    "fr": "Levures de boulanger",
+    "en": "baker's yeast"
+   },
+   "parents": [
+    "en:food-additives"
+   ]
+  },
+  "en:bakery-products": {
+   "name": {
+    "fr": "Produits de boulangerie",
+    "en": "Bakery products",
+    "es": "Productos de panadería"
+   },
+   "parents": [
+    "en:cereals-and-potatoes"
+   ]
+  },
+  "en:bass": {
+   "name": {
+    "en": "Bass",
+    "fr": "Bars"
+   },
+   "parents": [
+    "en:fishes",
+    "en:lean-fishes"
+   ]
+  },
+  "en:beverages": {
+   "name": {
+    "en": "Beverages",
+    "es": "Bebidas",
+    "fr": "Boissons"
+   },
+   "parents": [
+    "en:beverages-and-beverages-preparations"
+   ]
+  },
+  "en:beverages-and-beverages-preparations": {
+   "name": {
+    "es": "Bebidas y preparaciones de bebidas",
+    "en": "Beverages and beverages preparations",
+    "fr": "Boissons et préparations de boissons"
+   }
+  },
+  "en:bilberries-spreads": {
+   "name": {
+    "en": "bilberries spreads"
+   },
+   "parents": [
+    "en:fruit-and-vegetable-preserves"
+   ]
+  },
+  "en:biscuits-and-crackers": {
+   "name": {
+    "fr": "Biscuits sucrés & biscuits apéritifs",
+    "en": "Biscuits and crackers"
+   }
+  },
+  "en:black-pudding": {
+   "name": {
+    "en": "Black pudding",
+    "fr": "Boudins noirs",
+    "es": "Morcilla"
+   },
+   "parents": [
+    "en:tripe-dishes",
+    "fr:boudins"
+   ]
+  },
+  "en:books": {
+   "name": {
+    "en": "books",
+    "fr": "livres"
+   },
+   "parents": [
+    "en:open-products-facts"
+   ]
+  },
+  "en:breakfasts": {
+   "name": {
+    "en": "Breakfasts",
+    "fr": "Petit-déjeuners",
+    "es": "Desayunos"
+   }
+  },
+  "en:broths": {
+   "name": {
+    "es": "caldos",
+    "fr": "bouillons",
+    "en": "broths"
+   }
+  },
+  "en:buckwheat-crepe-with-cheese-and-ham": {
+   "name": {
+    "en": "buckwheat crepe with cheese and ham",
+    "fr": "Galettes jambon fromage"
+   },
+   "parents": [
+    "en:salty-filled-buckwheat-crepes"
+   ]
+  },
+  "en:butter-fat": {
+   "name": {
+    "fr": "Matière grasse de beurre",
+    "en": "Butter fat"
+   },
+   "parents": [
+    "en:animal-fats"
+   ]
+  },
+  "en:butters": {
+   "name": {
+    "es": "Mantequillas",
+    "fr": "Beurres",
+    "en": "Butters"
+   },
+   "parents": [
+    "en:animal-fats",
+    "en:dairy-spreads",
+    "en:milkfat"
+   ]
+  },
+  "en:canned-fishes": {
+   "name": {
+    "en": "Canned fishes",
+    "es": "Conservas de pescado",
+    "fr": "Poissons en conserve"
+   },
+   "parents": [
+    "en:canned-foods",
+    "en:fishes"
+   ]
+  },
+  "en:canned-foods": {
+   "name": {
+    "en": "Canned foods",
+    "fr": "Conserves",
+    "es": "Conservas"
+   }
+  },
+  "en:canned-tunas": {
+   "name": {
+    "fr": "Thons en conserve",
+    "es": "Atun en conserva",
+    "en": "Canned tunas"
+   },
+   "parents": [
+    "en:canned-fishes",
+    "en:tunas"
+   ]
+  },
+  "en:cantal": {
+   "name": {
+    "xx": "cantal",
+    "en": "cantal",
+    "fr": "Cantal"
+   },
+   "parents": [
+    "en:cow-cheeses",
+    "en:french-cheeses",
+    "en:uncooked-pressed-cheeses"
+   ]
+  },
+  "en:caramelised": {
+   "name": {
+    "en": "caramelised"
+   }
+  },
+  "en:cauliflowers": {
+   "name": {
+    "en": "Cauliflowers",
+    "fr": "Choux-fleurs",
+    "es": "Coliflores"
+   },
+   "parents": [
+    "en:leaf-vegetables"
+   ]
+  },
+  "en:cereal-grains": {
+   "name": {
+    "es": "Cereales en grano",
+    "fr": "Céréales en grains",
+    "en": "Cereal grains"
+   },
+   "parents": [
+    "en:cereals-and-their-products",
+    "en:seeds"
+   ]
+  },
+  "en:cereals-and-potatoes": {
+   "name": {
+    "es": "Cereales y patatas",
+    "fr": "Céréales et pommes de terre",
+    "en": "Cereals and potatoes"
+   },
+   "parents": [
+    "en:plant-based-foods"
+   ]
+  },
+  "en:cereals-and-their-products": {
+   "name": {
+    "en": "Cereals and their products",
+    "es": "Cereales y derivados",
+    "fr": "Céréales et dérivés"
+   },
+   "parents": [
+    "en:cereals-and-potatoes"
+   ]
+  },
+  "en:cheeses": {
+   "name": {
+    "fr": "Fromages",
+    "es": "Quesos",
+    "en": "Cheeses"
+   },
+   "parents": [
+    "en:fermented-milk-products"
+   ]
+  },
+  "en:chicken-and-its-products": {
+   "name": {
+    "fr": "Poulet et dérivés",
+    "en": "Chicken and its products",
+    "es": "Pollo y sus productos"
+   },
+   "parents": [
+    "en:meats-and-their-products"
+   ]
+  },
+  "en:chicken-meat-without-skin": {
+   "name": {
+    "en": "chicken meat without skin",
+    "fr": "Viande de poulet sans peau"
+   },
+   "parents": [
+    "en:chickens"
+   ]
+  },
+  "en:chicken-preparations": {
+   "name": {
+    "en": "Chicken preparations",
+    "fr": "Préparations au poulet"
+   },
+   "parents": [
+    "en:chicken-and-its-products",
+    "en:meat-preparations"
+   ]
+  },
+  "en:chicken-rillettes": {
+   "name": {
+    "en": "chicken rillettes",
+    "fr": "Rillettes de poulet"
+   },
+   "parents": [
+    "en:poultry-rillettes",
+    "en:prepared-chicken-meats"
+   ]
+  },
+  "en:chicken-skewers": {
+   "name": {
+    "es": "Pinchos de pollo",
+    "en": "chicken skewers",
+    "fr": "Brochettes de poulet"
+   },
+   "parents": [
+    "en:chicken-preparations",
+    "en:poultry-skewers"
+   ]
+  },
+  "en:chickens": {
+   "name": {
+    "fr": "Poulets",
+    "es": "pollo",
+    "en": "Chickens"
+   },
+   "parents": [
+    "en:chicken-and-its-products",
+    "en:poultries"
+   ]
+  },
+  "en:chorizo": {
+   "name": {
+    "es": "chorizo",
+    "fr": "chorizo",
+    "en": "chorizo"
+   },
+   "parents": [
+    "en:cured-sausages"
+   ]
+  },
+  "en:clarified-butter": {
+   "name": {
+    "en": "Clarified butter",
+    "fr": "Beurre clarifié"
+   },
+   "parents": [
+    "en:butter-fat"
+   ]
+  },
+  "en:cold-starters": {
+   "name": {
+    "en": "Cold starters",
+    "fr": "Entrées froides",
+    "es": "Entrantes fríos"
+   },
+   "parents": [
+    "en:appetizers"
+   ]
+  },
+  "en:common-anchovy": {
+   "name": {
+    "en": "common anchovy",
+    "fr": "Anchois commun"
+   },
+   "parents": [
+    "en:anchovy"
+   ]
+  },
+  "en:condiments": {
+   "name": {
+    "en": "Condiments",
+    "fr": "Condiments",
+    "es": "Condimentos"
+   }
+  },
+  "en:confectioneries": {
+   "name": {
+    "es": "Dulces",
+    "fr": "Confiseries",
+    "en": "Confectioneries"
+   },
+   "parents": [
+    "en:sweet-snacks"
+   ]
+  },
+  "en:conger": {
+   "name": {
+    "en": "conger",
+    "fr": "Congre"
+   },
+   "parents": [
+    "en:fishes"
+   ]
+  },
+  "en:cooked-salmons": {
+   "name": {
+    "fr": "Saumons cuits",
+    "en": "Cooked salmons"
+   },
+   "parents": [
+    "en:salmons"
+   ]
+  },
+  "en:corn-salad": {
+   "name": {
+    "es": "Canónigos",
+    "fr": "mâches",
+    "en": "corn salad"
+   },
+   "parents": [
+    "en:leaf-vegetables"
+   ]
+  },
+  "en:cow-cheeses": {
+   "name": {
+    "es": "Quesos de vaca",
+    "fr": "Fromages de vache",
+    "en": "Cow cheeses"
+   },
+   "parents": [
+    "en:cheeses"
+   ]
+  },
+  "en:crackers-appetizers": {
+   "name": {
+    "es": "Crackers",
+    "fr": "Biscuits apéritifs",
+    "en": "Crackers (Appetizers)"
+   },
+   "parents": [
+    "en:appetizers",
+    "en:biscuits-and-crackers"
+   ]
+  },
+  "en:croatian-liqueur": {
+   "name": {
+    "en": "Croatian liqueur"
+   },
+   "parents": [
+    "en:liqueurs"
+   ]
+  },
+  "en:crustaceans": {
+   "name": {
+    "en": "Crustaceans",
+    "es": "Crustáceos",
+    "fr": "Crustacés"
+   },
+   "parents": [
+    "en:seafood"
+   ]
+  },
+  "en:culinary-plants": {
+   "name": {
+    "en": "Culinary plants",
+    "fr": "Plantes condimentaires",
+    "es": "Plantas culinarias"
+   },
+   "parents": [
+    "en:condiments",
+    "en:plant-based-foods"
+   ]
+  },
+  "en:cured-hams": {
+   "name": {
+    "es": "jamón de país",
+    "fr": "Jambons crus",
+    "en": "Cured hams"
+   },
+   "parents": [
+    "en:hams",
+    "en:prepared-pork-meats"
+   ]
+  },
+  "en:cured-sausages": {
+   "name": {
+    "fr": "Saucissons",
+    "en": "Cured sausages",
+    "es": "Embutidos curados"
+   },
+   "parents": [
+    "en:prepared-meats"
+   ]
+  },
+  "en:cured-smoked-ham-with-reduced-fat": {
+   "name": {
+    "fr": "Jambon cru fumé allégé en matières grasses",
+    "en": "cured smoked ham with reduced fat"
+   },
+   "parents": [
+    "en:cured-hams"
+   ]
+  },
+  "en:cut": {
+   "name": {
+    "en": "cut"
+   },
+   "parents": [
+    "en:prepared-meats"
+   ]
+  },
+  "en:dairies": {
+   "name": {
+    "es": "Lácteos",
+    "fr": "Produits laitiers",
+    "en": "Dairies"
+   }
+  },
+  "en:dairy-spreads": {
+   "name": {
+    "en": "Dairy spreads",
+    "fr": "Produits laitiers à tartiner",
+    "es": "La pasta de leche"
+   },
+   "parents": [
+    "en:spreads"
+   ]
+  },
+  "en:debrecener": {
+   "name": {
+    "en": "debrecener"
+   },
+   "parents": [
+    "en:sausages"
+   ]
+  },
+  "en:desserts": {
+   "name": {
+    "en": "Desserts",
+    "fr": "Desserts",
+    "es": "Postres"
+   }
+  },
+  "en:detergents": {
+   "name": {
+    "en": "detergents"
+   },
+   "parents": [
+    "en:open-products-facts"
+   ]
+  },
+  "en:dill-pickles": {
+   "name": {
+    "en": "dill pickles",
+    "fr": "Cornichons à l'aneth"
+   },
+   "parents": [
+    "en:pickled-gherkins"
+   ]
+  },
+  "en:distilled-anis": {
+   "name": {
+    "fr": "anis distillé",
+    "en": "distilled anis"
+   },
+   "parents": [
+    "en:distilled-beverages"
+   ]
+  },
+  "en:distilled-beverages": {
+   "name": {
+    "fr": "boissons distillés",
+    "en": "Distilled beverages",
+    "es": "Bebidas destiladas"
+   },
+   "parents": [
+    "en:alcoholic-beverages"
+   ]
+  },
+  "en:dried-plant-based-foods": {
+   "name": {
+    "fr": "Aliments à base de plantes séchées",
+    "es": "Alimentos de origen vegetal deshidratados",
+    "en": "Dried plant-based foods"
+   },
+   "parents": [
+    "en:dried-products",
+    "en:plant-based-foods"
+   ]
+  },
+  "en:dried-products": {
+   "name": {
+    "fr": "Produits déshydratés",
+    "es": "Productos deshidratados",
+    "en": "Dried products"
+   }
+  },
+  "en:dried-toothed-wrack": {
+   "name": {
+    "en": "dried Toothed wrack",
+    "fr": "Fucus vésiculeux séché"
+   },
+   "parents": [
+    "en:toothed-wrack"
+   ]
+  },
+  "en:duck-gizzards": {
+   "name": {
+    "en": "Duck gizzards",
+    "fr": "Gésiers de canard"
+   },
+   "parents": [
+    "en:ducks",
+    "en:gizzards"
+   ]
+  },
+  "en:ducks": {
+   "name": {
+    "en": "Ducks",
+    "es": "Pato",
+    "fr": "Canards"
+   },
+   "parents": [
+    "en:poultries"
+   ]
+  },
+  "en:eaux-de-vie": {
+   "name": {
+    "fr": "Eaux-de-vie",
+    "en": "Eaux de vie"
+   },
+   "parents": [
+    "en:hard-liquors"
+   ]
+  },
+  "en:extra-fruit-jellies": {
+   "name": {
+    "fr": "gelées extra",
+    "es": "jalea extra",
+    "en": "extra fruit jellies"
+   },
+   "parents": [
+    "en:fruit-and-vegetable-preserves"
+   ]
+  },
+  "en:extra-virgin-olive-oils": {
+   "name": {
+    "en": "Extra-virgin olive oils",
+    "es": "Aceites de oliva virgen extra",
+    "fr": "Huiles d'olive vierges extra"
+   },
+   "parents": [
+    "en:virgin-olive-oils"
+   ]
+  },
+  "en:farmed-mediterranean-bass": {
+   "name": {
+    "fr": "Bar commun d'élevage",
+    "en": "farmed Mediterranean bass"
+   },
+   "parents": [
+    "en:bass"
+   ]
+  },
+  "en:fats": {
+   "name": {
+    "en": "Fats",
+    "fr": "Matières grasses",
+    "es": "Aceites y grasas"
+   }
+  },
+  "en:fatty-fishes": {
+   "name": {
+    "fr": "Poissons gras",
+    "en": "Fatty fishes"
+   },
+   "parents": [
+    "en:fishes"
+   ]
+  },
+  "en:fermented-foods": {
+   "name": {
+    "en": "Fermented foods",
+    "fr": "Produits fermentés",
+    "es": "Comidas fermentadas"
+   }
+  },
+  "en:fermented-milk-products": {
+   "name": {
+    "en": "Fermented milk products",
+    "fr": "Produits laitiers fermentés",
+    "es": "Productos fermentados de la leche"
+   },
+   "parents": [
+    "en:dairies",
+    "en:fermented-foods"
+   ]
+  },
+  "en:filled-buckwheat-crepes": {
+   "name": {
+    "fr": "Galettes fourrées",
+    "en": "Filled buckwheat crepes"
+   },
+   "parents": [
+    "en:meals"
+   ]
+  },
+  "en:filled-gnocchi": {
+   "name": {
+    "en": "filled gnocchi",
+    "fr": "gnocchis fourrés"
+   },
+   "parents": [
+    "en:gnocchi"
+   ]
+  },
+  "en:fish-and-meat-and-eggs": {
+   "name": {
+    "fr": "Poissons et viandes et oeufs",
+    "es": "Pescado carne y huevos",
+    "en": "Fish and meat and eggs"
+   }
+  },
+  "en:fishes": {
+   "name": {
+    "en": "Fishes",
+    "es": "Pescados",
+    "fr": "Poissons"
+   },
+   "parents": [
+    "en:fishes-and-their-products"
+   ]
+  },
+  "en:fishes-and-their-products": {
+   "name": {
+    "fr": "Poissons et dérivés",
+    "en": "Fishes and their products"
+   },
+   "parents": [
+    "en:seafood"
+   ]
+  },
+  "en:flavors": {
+   "name": {
+    "en": "Flavors",
+    "fr": "Arômes",
+    "es": "Aromas"
+   },
+   "parents": [
+    "en:food-additives"
+   ]
+  },
+  "en:flavoured": {
+   "name": {
+    "en": "flavoured"
+   }
+  },
+  "en:food-additives": {
+   "name": {
+    "fr": "Additifs alimentaires",
+    "es": "Aditivos alimentarios",
+    "en": "Food additives"
+   }
+  },
+  "en:fortified-wines": {
+   "name": {
+    "fr": "Vins mutés",
+    "en": "Fortified wines"
+   },
+   "parents": [
+    "en:wines"
+   ]
+  },
+  "en:fortified-wines-such-as-natural-sweet-wines": {
+   "name": {
+    "fr": "vins mutés de type vin doux naturel",
+    "en": "Fortified wines such as natural sweet wines"
+   },
+   "parents": [
+    "en:fortified-wines",
+    "en:sweet-wines"
+   ]
+  },
+  "en:french-cheeses": {
+   "name": {
+    "en": "French cheeses",
+    "es": "Quesos Franceses",
+    "fr": "Fromages de France"
+   },
+   "parents": [
+    "en:cheeses"
+   ]
+  },
+  "en:fresh-foods": {
+   "name": {
+    "en": "Fresh foods",
+    "fr": "Frais",
+    "es": "Alimentos frescos"
+   }
+  },
+  "en:fresh-plant-based-foods": {
+   "name": {
+    "es": "Alimentos de origen vegetal frescos",
+    "fr": "Aliments à base de plantes frais",
+    "en": "Fresh plant-based foods"
+   },
+   "parents": [
+    "en:fresh-foods",
+    "en:plant-based-foods"
+   ]
+  },
+  "en:fresh-vegetables": {
+   "name": {
+    "en": "Fresh vegetables",
+    "fr": "Légumes frais",
+    "es": "Verduras y hortalizas frescas"
+   },
+   "parents": [
+    "en:fresh-plant-based-foods",
+    "en:vegetables-based-foods"
+   ]
+  },
+  "en:fried-cheese": {
+   "name": {
+    "en": "fried cheese"
+   },
+   "parents": [
+    "en:cheeses"
+   ]
+  },
+  "en:frozen-cauliflower-florets": {
+   "name": {
+    "en": "Frozen cauliflower florets",
+    "fr": "Choux-fleurs en fleurettes surgelés",
+    "es": "Coliflores en floretes congeladas"
+   },
+   "parents": [
+    "en:cauliflowers",
+    "en:frozen-vegetables"
+   ]
+  },
+  "en:frozen-cauliflowers": {
+   "name": {
+    "en": "frozen cauliflowers",
+    "fr": "Choux-fleurs surgelés"
+   },
+   "parents": [
+    "en:frozen-cauliflower-florets"
+   ]
+  },
+  "en:frozen-desserts": {
+   "name": {
+    "en": "Frozen desserts",
+    "es": "Postres helados",
+    "fr": "Desserts glacés"
+   },
+   "parents": [
+    "en:desserts",
+    "en:frozen-foods"
+   ]
+  },
+  "en:frozen-foods": {
+   "name": {
+    "en": "Frozen foods",
+    "es": "Congelados",
+    "fr": "Surgelés"
+   }
+  },
+  "en:frozen-plant-based-foods": {
+   "name": {
+    "en": "Frozen plant-based foods",
+    "fr": "Aliments à base de plantes surgelés",
+    "es": "Alimentos de origen vegetal congelados"
+   },
+   "parents": [
+    "en:frozen-foods",
+    "en:plant-based-foods"
+   ]
+  },
+  "en:frozen-vegetables": {
+   "name": {
+    "fr": "Légumes surgelés",
+    "es": "Verduras y hortalizas congeladas",
+    "en": "Frozen vegetables"
+   },
+   "parents": [
+    "en:frozen-plant-based-foods",
+    "en:vegetables-based-foods"
+   ]
+  },
+  "en:fruit-and-vegetable-preserves": {
+   "name": {
+    "en": "Fruit and vegetable preserves",
+    "es": "Preparaciones a base de frutas y verduras",
+    "fr": "Confitures et marmelades"
+   },
+   "parents": [
+    "en:plant-based-spreads",
+    "en:sweet-spreads"
+   ]
+  },
+  "en:fruit-based-beverages": {
+   "name": {
+    "es": "Bebidas a base de frutas",
+    "fr": "Boissons aux fruits",
+    "en": "Fruit-based beverages"
+   },
+   "parents": [
+    "en:plant-based-beverages"
+   ]
+  },
+  "en:fruit-juices": {
+   "name": {
+    "en": "Fruit juices",
+    "fr": "Jus de fruits",
+    "es": "Zumos de frutas"
+   },
+   "parents": [
+    "en:fruit-based-beverages",
+    "en:juices-and-nectars"
+   ]
+  },
+  "en:fruits-and-vegetables-based-foods": {
+   "name": {
+    "en": "Fruits and vegetables based foods",
+    "fr": "Aliments à base de fruits et de légumes",
+    "es": "Frutas y verduras y sus productos"
+   },
+   "parents": [
+    "en:plant-based-foods"
+   ]
+  },
+  "en:geese": {
+   "name": {
+    "en": "Geese",
+    "fr": "Oies"
+   },
+   "parents": [
+    "en:poultries"
+   ]
+  },
+  "en:ghee": {
+   "name": {
+    "en": "ghee",
+    "es": "ghee",
+    "fr": "ghi"
+   },
+   "parents": [
+    "en:butter-fat",
+    "en:clarified-butter"
+   ]
+  },
+  "en:gizzards": {
+   "name": {
+    "en": "Gizzards",
+    "fr": "Gésiers"
+   },
+   "parents": [
+    "en:offals"
+   ]
+  },
+  "en:gnocchi": {
+   "name": {
+    "xx": "Gnocchi",
+    "fr": "Gnocchi",
+    "en": "Gnocchi",
+    "es": "Ñoquis"
+   },
+   "parents": [
+    "en:pastas"
+   ]
+  },
+  "en:goose-meat-with-skin": {
+   "name": {
+    "fr": "viande et peau d'oie",
+    "en": "goose meat with skin"
+   },
+   "parents": [
+    "en:geese"
+   ]
+  },
+  "en:granulated-sugars": {
+   "name": {
+    "es": "Azúcar cristalizado",
+    "fr": "Sucres cristal",
+    "en": "granulated sugars"
+   },
+   "parents": [
+    "en:sugars"
+   ]
+  },
+  "en:grenadier": {
+   "name": {
+    "fr": "Hoki",
+    "en": "grenadier"
+   },
+   "parents": [
+    "en:fishes"
+   ]
+  },
+  "en:grilled-salmon": {
+   "name": {
+    "fr": "saumon grillé",
+    "en": "grilled salmon"
+   },
+   "parents": [
+    "en:cooked-salmons"
+   ]
+  },
+  "en:ground-dried-vegetables": {
+   "name": {
+    "es": "Verduras y hortalizas deshidratadas molidas",
+    "fr": "Légumes séchés moulus",
+    "en": "Ground dried vegetables"
+   },
+   "parents": [
+    "en:dried-plant-based-foods",
+    "en:vegetables-based-foods"
+   ]
+  },
+  "en:guts": {
+   "name": {
+    "fr": "boyau",
+    "en": "guts"
+   },
+   "parents": [
+    "en:offals"
+   ]
+  },
+  "en:hams": {
+   "name": {
+    "fr": "Jambons",
+    "es": "jamón",
+    "en": "Hams"
+   },
+   "parents": [
+    "en:prepared-meats"
+   ]
+  },
+  "en:hard-liquors": {
+   "name": {
+    "en": "Hard liquors",
+    "fr": "Alcools forts"
+   },
+   "parents": [
+    "en:distilled-beverages"
+   ]
+  },
+  "en:hare-rillettes": {
+   "name": {
+    "fr": "Rillettes de lapin",
+    "en": "hare rillettes"
+   },
+   "parents": [
+    "en:white-meat-rillettes"
+   ]
+  },
+  "en:herbs": {
+   "name": {
+    "fr": "Herbes aromatiques",
+    "es": "Hierbas aromáticas",
+    "en": "Herbs"
+   },
+   "parents": [
+    "en:aromatic-plants",
+    "en:herbs-and-spices"
+   ]
+  },
+  "en:herbs-and-spices": {
+   "name": {
+    "en": "Herbs and spices"
+   },
+   "parents": [
+    "en:condiments"
+   ]
+  },
+  "en:ice-cream-tubs": {
+   "name": {
+    "fr": "Crèmes glacées en pot",
+    "es": "Tarrinas y bloques de helado",
+    "en": "Ice cream tubs"
+   },
+   "parents": [
+    "en:ice-creams"
+   ]
+  },
+  "en:ice-creams": {
+   "name": {
+    "es": "helado",
+    "fr": "glaces",
+    "en": "ice creams"
+   },
+   "parents": [
+    "en:ice-creams-and-sorbets"
+   ]
+  },
+  "en:ice-creams-and-sorbets": {
+   "name": {
+    "en": "Ice creams and sorbets",
+    "es": "Helados y sorbetes",
+    "fr": "Glaces et sorbets"
+   },
+   "parents": [
+    "en:frozen-desserts"
+   ]
+  },
+  "en:incorrect-product-type": {
+   "name": {
+    "en": "Incorrect product type",
+    "fr": "Mauvais product type",
+    "es": "Tipo de producto incorrecto"
+   }
+  },
+  "en:jams": {
+   "name": {
+    "en": "Jams",
+    "es": "Confitura",
+    "fr": "Confitures"
+   },
+   "parents": [
+    "en:fruit-and-vegetable-preserves"
+   ]
+  },
+  "en:juices-and-nectars": {
+   "name": {
+    "en": "Juices and nectars",
+    "fr": "Jus et nectars",
+    "es": "Zumos y néctares"
+   },
+   "parents": [
+    "en:plant-based-beverages"
+   ]
+  },
+  "en:kaszanka": {
+   "name": {
+    "en": "kaszanka"
+   },
+   "parents": [
+    "en:black-pudding"
+   ]
+  },
+  "en:kitchenware": {
+   "name": {
+    "en": "kitchenware"
+   },
+   "parents": [
+    "en:open-products-facts"
+   ]
+  },
+  "en:largehead-hairtail": {
+   "name": {
+    "en": "largehead hairtail",
+    "fr": "Sabre"
+   },
+   "parents": [
+    "en:fishes"
+   ]
+  },
+  "en:leaf-vegetables": {
+   "name": {
+    "en": "Leaf vegetables",
+    "fr": "Légumes-feuilles",
+    "es": "Verduras de hoja"
+   },
+   "parents": [
+    "en:vegetables"
+   ]
+  },
+  "en:lean-fishes": {
+   "name": {
+    "en": "Lean fishes",
+    "fr": "Poissons maigres"
+   },
+   "parents": [
+    "en:fishes"
+   ]
+  },
+  "en:legume-seeds": {
+   "name": {
+    "es": "Granos de leguminosas",
+    "fr": "Graines de légumineuses",
+    "en": "Legume seeds"
+   },
+   "parents": [
+    "en:legumes",
+    "en:seeds"
+   ]
+  },
+  "en:legumes": {
+   "name": {
+    "en": "Legumes",
+    "fr": "Légumineuses",
+    "es": "Leguminosas"
+   },
+   "parents": [
+    "en:legumes-and-their-products"
+   ]
+  },
+  "en:legumes-and-their-products": {
+   "name": {
+    "es": "Leguminosas y derivados",
+    "fr": "Légumineuses et dérivés",
+    "en": "Legumes and their products"
+   },
+   "parents": [
+    "en:plant-based-foods"
+   ]
+  },
+  "en:ling": {
+   "name": {
+    "fr": "Julienne",
+    "en": "ling"
+   },
+   "parents": [
+    "en:fishes"
+   ]
+  },
+  "en:liqueurs": {
+   "name": {
+    "fr": "Liqueurs",
+    "es": "Licores",
+    "en": "Liqueurs"
+   },
+   "parents": [
+    "en:alcoholic-beverages"
+   ]
+  },
+  "en:lobsters": {
+   "name": {
+    "en": "lobsters",
+    "fr": "homard"
+   },
+   "parents": [
+    "en:crustaceans"
+   ]
+  },
+  "en:lupin-grains": {
+   "name": {
+    "en": "lupin grains",
+    "fr": "Graines de lupin"
+   },
+   "parents": [
+    "en:pulses"
+   ]
+  },
+  "en:mackerel": {
+   "name": {
+    "fr": "Maquereau",
+    "en": "mackerel"
+   },
+   "parents": [
+    "en:mackerels"
+   ]
+  },
+  "en:mackerels": {
+   "name": {
+    "es": "Caballa",
+    "fr": "Maquereaux",
+    "en": "Mackerels"
+   },
+   "parents": [
+    "en:fatty-fishes",
+    "en:fishes"
+   ]
+  },
+  "en:marinated-fish": {
+   "name": {
+    "fr": "poisson mariné",
+    "en": "marinated fish"
+   },
+   "parents": [
+    "en:prepared-fish"
+   ]
+  },
+  "en:meals": {
+   "name": {
+    "es": "Comidas preparadas",
+    "fr": "Plats préparés",
+    "en": "Meals"
+   }
+  },
+  "en:meat-preparations": {
+   "name": {
+    "fr": "Préparations de viande",
+    "en": "Meat preparations",
+    "es": "Preparados de carne"
+   },
+   "parents": [
+    "en:meats-and-their-products"
+   ]
+  },
+  "en:meat-skewers": {
+   "name": {
+    "es": "Pinchos de carne",
+    "en": "Meat skewers",
+    "fr": "Brochettes de viande"
+   },
+   "parents": [
+    "en:meat-preparations",
+    "en:skewers"
+   ]
+  },
+  "en:meats": {
+   "name": {
+    "en": "Meats",
+    "fr": "Viandes",
+    "es": "Carnes"
+   },
+   "parents": [
+    "en:meats-and-their-products"
+   ]
+  },
+  "en:meats-and-their-products": {
+   "name": {
+    "es": "Productos a base de carne",
+    "fr": "Viandes et dérivés",
+    "en": "Meats and their products"
+   }
+  },
+  "en:melt-sandwich": {
+   "name": {
+    "en": "melt sandwich"
+   },
+   "parents": [
+    "en:sandwiches"
+   ]
+  },
+  "en:mildly-soured-butters": {
+   "name": {
+    "fr": "Beurres légèrement aigres",
+    "en": "mildly soured butters"
+   },
+   "parents": [
+    "en:butters"
+   ]
+  },
+  "en:milkfat": {
+   "name": {
+    "en": "Milkfat",
+    "fr": "Matière grasse laitière",
+    "es": "Grasas de la leche"
+   },
+   "parents": [
+    "en:dairies",
+    "en:spreadable-fats"
+   ]
+  },
+  "en:milks": {
+   "name": {
+    "es": "Leches",
+    "fr": "Laits",
+    "en": "Milks"
+   },
+   "parents": [
+    "en:milks-liquid-and-powder"
+   ]
+  },
+  "en:milks-liquid-and-powder": {
+   "name": {
+    "en": "Milks (liquid and powder)",
+    "fr": "Laits (fluide et poudre)"
+   },
+   "parents": [
+    "en:dairies"
+   ]
+  },
+  "en:muscat-wine-sauce": {
+   "name": {
+    "en": "muscat wine sauce"
+   },
+   "parents": [
+    "en:white-wine-sauces"
+   ]
+  },
+  "en:non-food-products": {
+   "name": {
+    "es": "Productos no alimenticios",
+    "fr": "Non alimentaire",
+    "en": "Non food products"
+   },
+   "parents": [
+    "en:incorrect-product-type"
+   ]
+  },
+  "en:non-homogenized-milks": {
+   "name": {
+    "fr": "Laits non-homogénéisés",
+    "en": "non-homogenized milks"
+   },
+   "parents": [
+    "en:milks"
+   ]
+  },
+  "en:nougats": {
+   "name": {
+    "en": "nougats",
+    "fr": "nougats",
+    "es": "nougat"
+   },
+   "parents": [
+    "en:confectioneries"
+   ]
+  },
+  "en:nursehound": {
+   "name": {
+    "fr": "Roussette",
+    "en": "nursehound"
+   },
+   "parents": [
+    "en:fishes"
+   ]
+  },
+  "en:offals": {
+   "name": {
+    "en": "Offals",
+    "fr": "Abats"
+   },
+   "parents": [
+    "en:fish-and-meat-and-eggs"
+   ]
+  },
+  "en:old-rums": {
+   "name": {
+    "fr": "Rhums vieux",
+    "en": "old rums"
+   },
+   "parents": [
+    "en:rums"
+   ]
+  },
+  "en:olive-oils": {
+   "name": {
+    "en": "Olive oils",
+    "es": "Aceites de oliva",
+    "fr": "Huiles d'olive"
+   },
+   "parents": [
+    "en:olive-tree-products",
+    "en:vegetable-oils"
+   ]
+  },
+  "en:olive-tree-products": {
+   "name": {
+    "es": "Productos del olivo",
+    "fr": "Produits de l'olivier",
+    "en": "Olive tree products"
+   },
+   "parents": [
+    "en:plant-based-foods"
+   ]
+  },
+  "en:onion-powder": {
+   "name": {
+    "es": "Cebolla seca molida",
+    "fr": "oignon en poudre",
+    "en": "onion powder"
+   },
+   "parents": [
+    "en:ground-dried-vegetables",
+    "en:onions-and-their-products"
+   ]
+  },
+  "en:onions-and-their-products": {
+   "name": {
+    "en": "Onions and their products",
+    "fr": "Oignons et dérivés",
+    "es": "Cebollas y derivados"
+   },
+   "parents": [
+    "en:vegetables-based-foods"
+   ]
+  },
+  "en:open-products-facts": {
+   "name": {
+    "en": "Open Products Facts",
+    "xx": "Open Products Facts"
+   },
+   "parents": [
+    "en:non-food-products"
+   ]
+  },
+  "en:pasta-dishes": {
+   "name": {
+    "fr": "Plats à base de pâtes",
+    "es": "Platos de pasta",
+    "en": "Pasta dishes"
+   },
+   "parents": [
+    "en:meals"
+   ]
+  },
+  "en:pasta-with-cheese-sauce": {
+   "name": {
+    "fr": "Pâtes en sauce aux fromages",
+    "en": "Pasta with cheese sauce"
+   },
+   "parents": [
+    "en:pasta-dishes"
+   ]
+  },
+  "en:pastas": {
+   "name": {
+    "fr": "pâtes alimentaires",
+    "es": "Pastas alimenticias",
+    "xx": "Pasta",
+    "en": "Pastas"
+   },
+   "parents": [
+    "en:plant-based-foods"
+   ]
+  },
+  "en:pasteurised": {
+   "name": {
+    "en": "pasteurised"
+   }
+  },
+  "en:pelinkovac": {
+   "name": {
+    "en": "pelinkovac"
+   },
+   "parents": [
+    "en:croatian-liqueur"
+   ]
+  },
+  "en:pickled-cucumbers": {
+   "name": {
+    "fr": "Pickles de concombres",
+    "es": "Pepinos encurtidos",
+    "en": "Pickled cucumbers"
+   },
+   "parents": [
+    "en:pickled-vegetables"
+   ]
+  },
+  "en:pickled-gherkins": {
+   "name": {
+    "es": "Pepinillos",
+    "fr": "Cornichons",
+    "en": "Pickled gherkins"
+   },
+   "parents": [
+    "en:pickled-cucumbers"
+   ]
+  },
+  "en:pickled-vegetables": {
+   "name": {
+    "en": "Pickled vegetables",
+    "es": "Verduras y hortalizas encurtidas",
+    "fr": "Pickles de légumes"
+   },
+   "parents": [
+    "en:plant-based-pickles",
+    "en:prepared-vegetables"
+   ]
+  },
+  "en:pickles": {
+   "name": {
+    "en": "Pickles",
+    "fr": "Pickles",
+    "es": "Encurtidos"
+   },
+   "parents": [
+    "en:plant-based-foods"
+   ]
+  },
+  "en:pierogi": {
+   "name": {
+    "en": "pierogi"
+   },
+   "parents": [
+    "en:pasta-dishes",
+    "en:stuffed-pastas"
+   ]
+  },
+  "en:pig-head": {
+   "name": {
+    "fr": "tête de porc",
+    "es": "cabeza de cerdo",
+    "en": "pig head"
+   },
+   "parents": [
+    "en:pork"
+   ]
+  },
+  "en:pizza-dough": {
+   "name": {
+    "es": "Masa De Pizza",
+    "en": "Pizza dough",
+    "fr": "Pâtes à pizza"
+   },
+   "parents": [
+    "en:bakery-products"
+   ]
+  },
+  "en:plant-based": {
+   "name": {
+    "en": "plant-based"
+   }
+  },
+  "en:plant-based-beverages": {
+   "name": {
+    "en": "Plant-based beverages",
+    "es": "Bebidas de origen vegetal",
+    "fr": "Boissons à base de végétaux"
+   },
+   "parents": [
+    "en:beverages",
+    "en:plant-based-foods-and-beverages"
+   ]
+  },
+  "en:plant-based-foods": {
+   "name": {
+    "en": "Plant-based foods",
+    "fr": "Aliments d'origine végétale",
+    "es": "Alimentos de origen vegetal"
+   },
+   "parents": [
+    "en:plant-based-foods-and-beverages"
+   ]
+  },
+  "en:plant-based-foods-and-beverages": {
+   "name": {
+    "fr": "Aliments et boissons à base de végétaux",
+    "es": "Alimentos y bebidas de origen vegetal",
+    "en": "Plant-based foods and beverages"
+   }
+  },
+  "en:plant-based-pickles": {
+   "name": {
+    "es": "Vegetales encurtidos",
+    "fr": "Pickles d'origine végétale",
+    "en": "Plant-based pickles"
+   },
+   "parents": [
+    "en:pickles",
+    "en:plant-based-foods"
+   ]
+  },
+  "en:plant-based-spreads": {
+   "name": {
+    "en": "Plant-based spreads",
+    "es": "Untables vegetales",
+    "fr": "Pâtes à tartiner végétales"
+   },
+   "parents": [
+    "en:plant-based-foods",
+    "en:spreads"
+   ]
+  },
+  "en:pork": {
+   "name": {
+    "fr": "Porc",
+    "es": "Carne de cerdo",
+    "en": "Pork"
+   },
+   "parents": [
+    "en:meats",
+    "en:pork-and-its-products"
+   ]
+  },
+  "en:pork-and-its-products": {
+   "name": {
+    "es": "Carne de cerdo y sus productos",
+    "fr": "Porc et dérivés",
+    "en": "Pork and its products"
+   },
+   "parents": [
+    "en:meats-and-their-products"
+   ]
+  },
+  "en:pork-belly": {
+   "name": {
+    "fr": "Poitrine de porc",
+    "en": "Pork belly"
+   },
+   "parents": [
+    "en:pork"
+   ]
+  },
+  "en:potted-meats": {
+   "name": {
+    "es": "Carnes en maceta",
+    "en": "Potted meats",
+    "fr": "Rillettes de viande"
+   },
+   "parents": [
+    "en:prepared-meats",
+    "en:rillettes"
+   ]
+  },
+  "en:poultries": {
+   "name": {
+    "en": "Poultries",
+    "fr": "Volailles",
+    "es": "Aves"
+   },
+   "parents": [
+    "en:meats"
+   ]
+  },
+  "en:poultry-rillettes": {
+   "name": {
+    "fr": "Rillettes de volaille",
+    "en": "Poultry rillettes"
+   },
+   "parents": [
+    "en:white-meat-rillettes"
+   ]
+  },
+  "en:poultry-skewers": {
+   "name": {
+    "en": "Poultry skewers",
+    "fr": "Brochettes de volailles"
+   },
+   "parents": [
+    "en:meat-skewers"
+   ]
+  },
+  "en:prepared-chicken-meats": {
+   "name": {
+    "en": "Prepared chicken meats",
+    "fr": "Charcuteries de poulet"
+   },
+   "parents": [
+    "en:chicken-and-its-products",
+    "en:prepared-poultry-meats"
+   ]
+  },
+  "en:prepared-fish": {
+   "name": {
+    "en": "prepared fish"
+   },
+   "parents": [
+    "en:fishes"
+   ]
+  },
+  "en:prepared-meats": {
+   "name": {
+    "en": "Prepared meats",
+    "es": "Embutidos",
+    "fr": "Charcuteries"
+   },
+   "parents": [
+    "en:meats-and-their-products"
+   ]
+  },
+  "en:prepared-pork-meats": {
+   "name": {
+    "en": "Prepared pork meats",
+    "fr": "Charcuteries de porc"
+   },
+   "parents": [
+    "en:pork-and-its-products",
+    "en:prepared-meats"
+   ]
+  },
+  "en:prepared-poultry-meats": {
+   "name": {
+    "en": "Prepared poultry meats",
+    "fr": "Charcuteries de volaille"
+   },
+   "parents": [
+    "en:prepared-meats"
+   ]
+  },
+  "en:prepared-vegetables": {
+   "name": {
+    "es": "Preparados vegetales",
+    "fr": "Légumes préparés",
+    "en": "Prepared vegetables"
+   },
+   "parents": [
+    "en:plant-based-foods"
+   ]
+  },
+  "en:preserved-duck-gizzards": {
+   "name": {
+    "fr": "Gésiers de canard confits",
+    "en": "preserved duck gizzards"
+   },
+   "parents": [
+    "en:duck-gizzards"
+   ]
+  },
+  "en:pulses": {
+   "name": {
+    "es": "Legumbres secas",
+    "fr": "Légumineuses sèches",
+    "en": "Pulses"
+   },
+   "parents": [
+    "en:legume-seeds"
+   ]
+  },
+  "en:quail": {
+   "name": {
+    "fr": "Caille",
+    "en": "Quail"
+   },
+   "parents": [
+    "en:poultries"
+   ]
+  },
+  "en:quail-meat-and-skin": {
+   "name": {
+    "fr": "Viande et peau de caille",
+    "en": "quail meat and skin"
+   },
+   "parents": [
+    "en:quail"
+   ]
+  },
+  "en:ravioli": {
+   "name": {
+    "en": "ravioli",
+    "xx": "Ravioli",
+    "fr": "ravioli"
+   },
+   "parents": [
+    "en:stuffed-pastas"
+   ]
+  },
+  "en:red-ports": {
+   "name": {
+    "fr": "porto rouges",
+    "en": "red ports"
+   },
+   "parents": [
+    "en:red-wines",
+    "fr:porto"
+   ]
+  },
+  "en:red-wines": {
+   "name": {
+    "en": "Red wines",
+    "es": "Vinos tintos",
+    "fr": "vins rouges"
+   },
+   "parents": [
+    "en:wines"
+   ]
+  },
+  "en:rillettes": {
+   "name": {
+    "en": "Rillettes",
+    "xx": "Rillettes"
+   },
+   "parents": [
+    "en:salted-spreads"
+   ]
+  },
+  "en:rock-candies": {
+   "name": {
+    "en": "rock candies",
+    "fr": "sucres candi"
+   },
+   "parents": [
+    "en:sugars"
+   ]
+  },
+  "en:rocket": {
+   "name": {
+    "en": "rocket",
+    "fr": "roquette",
+    "es": "rúcula"
+   },
+   "parents": [
+    "en:leaf-vegetables"
+   ]
+  },
+  "en:rums": {
+   "name": {
+    "en": "Rums",
+    "es": "Rones",
+    "fr": "Rhums"
+   },
+   "parents": [
+    "en:eaux-de-vie"
+   ]
+  },
+  "en:salami": {
+   "name": {
+    "fr": "Salamis",
+    "es": "Salami",
+    "en": "Salami"
+   },
+   "parents": [
+    "en:cured-sausages"
+   ]
+  },
+  "en:salmons": {
+   "name": {
+    "es": "Salmóns",
+    "fr": "Saumons",
+    "en": "Salmons"
+   },
+   "parents": [
+    "en:fatty-fishes",
+    "en:fishes"
+   ]
+  },
+  "en:salt-cured-pork-belly": {
+   "name": {
+    "fr": "poitrine de porc demi-sel",
+    "en": "salt-cured pork belly"
+   },
+   "parents": [
+    "en:pork-belly"
+   ]
+  },
+  "en:salted-spreads": {
+   "name": {
+    "es": "Untables salados",
+    "fr": "Produits à tartiner salés",
+    "en": "Salted spreads"
+   },
+   "parents": [
+    "en:spreads"
+   ]
+  },
+  "en:salty-filled-buckwheat-crepes": {
+   "name": {
+    "en": "Salty filled buckwheat crepes",
+    "fr": "Galettes fourrées salées"
+   },
+   "parents": [
+    "en:filled-buckwheat-crepes"
+   ]
+  },
+  "en:salty-snacks": {
+   "name": {
+    "en": "Salty snacks",
+    "fr": "Snacks salés",
+    "es": "Snacks salados"
+   },
+   "parents": [
+    "en:snacks"
+   ]
+  },
+  "en:sandwiches": {
+   "name": {
+    "en": "Sandwiches",
+    "es": "Sándwiches",
+    "fr": "Sandwichs"
+   }
+  },
+  "en:sauces": {
+   "name": {
+    "fr": "Sauces",
+    "es": "Salsas",
+    "en": "Sauces"
+   },
+   "parents": [
+    "en:condiments"
+   ]
+  },
+  "en:sausages": {
+   "name": {
+    "en": "Sausages",
+    "fr": "Saucisses",
+    "es": "Salchichas"
+   },
+   "parents": [
+    "en:prepared-meats"
+   ]
+  },
+  "en:scallions": {
+   "name": {
+    "en": "scallions",
+    "es": "Cebolletas tiernas",
+    "fr": "Oignons verts"
+   },
+   "parents": [
+    "en:vegetables"
+   ]
+  },
+  "en:seafood": {
+   "name": {
+    "en": "Seafood",
+    "fr": "Produits de la mer",
+    "es": "Productos del mar"
+   }
+  },
+  "en:seaweeds-and-their-products": {
+   "name": {
+    "es": "Algas y sus productos",
+    "fr": "Algues et dérivés",
+    "en": "Seaweeds and their products"
+   },
+   "parents": [
+    "en:plant-based-foods",
+    "en:seafood"
+   ]
+  },
+  "en:seeds": {
+   "name": {
+    "en": "Seeds",
+    "fr": "Graines",
+    "es": "Semillas"
+   },
+   "parents": [
+    "en:plant-based-foods"
+   ]
+  },
+  "en:semi-cured-cheese": {
+   "name": {
+    "en": "semi-cured cheese",
+    "es": "Queso semicurado"
+   },
+   "parents": [
+    "en:cheeses"
+   ]
+  },
+  "en:shark": {
+   "name": {
+    "en": "shark",
+    "fr": "Requin"
+   },
+   "parents": [
+    "en:fishes"
+   ]
+  },
+  "en:sheep-s-milk-cheeses": {
+   "name": {
+    "fr": "Fromages de brebis",
+    "es": "Quesos de leche de oveja",
+    "en": "sheep's-milk cheeses"
+   },
+   "parents": [
+    "en:cheeses"
+   ]
+  },
+  "en:skewers": {
+   "name": {
+    "es": "Pinchos",
+    "en": "Skewers",
+    "fr": "Brochettes"
+   }
+  },
+  "en:snacks": {
+   "name": {
+    "en": "Snacks",
+    "es": "Botanas",
+    "fr": "Snacks"
+   }
+  },
+  "en:snow-peas": {
+   "name": {
+    "fr": "Pois mange-tout",
+    "en": "snow peas"
+   },
+   "parents": [
+    "en:pulses"
+   ]
+  },
+  "en:sour-cream-butters": {
+   "name": {
+    "fr": "Beurre de culture",
+    "en": "sour cream butters"
+   },
+   "parents": [
+    "en:butters"
+   ]
+  },
+  "en:spaghetti-with-cheese-sauce": {
+   "name": {
+    "en": "spaghetti with cheese sauce",
+    "fr": "spaghetti en sauce aux fromages"
+   },
+   "parents": [
+    "en:pasta-with-cheese-sauce"
+   ]
+  },
+  "en:spices": {
+   "name": {
+    "fr": "Epices",
+    "es": "Especias",
+    "en": "Spices"
+   },
+   "parents": [
+    "en:herbs-and-spices",
+    "en:plant-based-foods"
+   ]
+  },
+  "en:spreadable-fats": {
+   "name": {
+    "es": "Grasas para untar",
+    "en": "Spreadable fats",
+    "fr": "Matières grasses à tartiner"
+   },
+   "parents": [
+    "en:spreads"
+   ]
+  },
+  "en:spreads": {
+   "name": {
+    "en": "Spreads",
+    "fr": "Produits à tartiner",
+    "es": "Untables"
+   }
+  },
+  "en:sprouted-alfalfa-seeds": {
+   "name": {
+    "fr": "Graines de luzerne germées",
+    "en": "sprouted alfalfa seeds"
+   },
+   "parents": [
+    "en:alfalfa-seeds"
+   ]
+  },
+  "en:sprouted-wheat": {
+   "name": {
+    "en": "sprouted wheat",
+    "fr": "Blé germé"
+   },
+   "parents": [
+    "en:sprouts",
+    "en:wheats"
+   ]
+  },
+  "en:sprouts": {
+   "name": {
+    "es": "Germinados",
+    "fr": "Pousses",
+    "en": "Sprouts"
+   },
+   "parents": [
+    "en:plant-based-foods"
+   ]
+  },
+  "en:strawberry-juice": {
+   "name": {
+    "en": "strawberry juice",
+    "fr": "Jus de fraise",
+    "es": "Zumos de fresa"
+   },
+   "parents": [
+    "en:fruit-juices"
+   ]
+  },
+  "en:stuffed-pastas": {
+   "name": {
+    "fr": "Pâtes farcies",
+    "en": "Stuffed pastas",
+    "es": "Pastas rellenas"
+   },
+   "parents": [
+    "en:pasta-dishes"
+   ]
+  },
+  "en:stuffing": {
+   "name": {
+    "en": "stuffing",
+    "fr": "farces"
+   }
+  },
+  "en:sugars": {
+   "name": {
+    "es": "Azúcar",
+    "fr": "Sucres",
+    "en": "Sugars"
+   },
+   "parents": [
+    "en:sweeteners"
+   ]
+  },
+  "en:sundae-ice-cream": {
+   "name": {
+    "en": "Sundae ice cream",
+    "fr": "Sundae"
+   },
+   "parents": [
+    "en:frozen-desserts"
+   ]
+  },
+  "en:sweet-cream-butters": {
+   "name": {
+    "en": "sweet cream butters",
+    "fr": "Beurres de crème douce"
+   },
+   "parents": [
+    "en:butters"
+   ]
+  },
+  "en:sweet-snacks": {
+   "name": {
+    "en": "Sweet snacks",
+    "fr": "Snacks sucrés",
+    "es": "Snacks dulces"
+   },
+   "parents": [
+    "en:snacks"
+   ]
+  },
+  "en:sweet-spreads": {
+   "name": {
+    "es": "Untables dulces",
+    "fr": "Produits à tartiner sucrés",
+    "en": "Sweet spreads"
+   },
+   "parents": [
+    "en:breakfasts",
+    "en:spreads"
+   ]
+  },
+  "en:sweet-wines": {
+   "name": {
+    "es": "Vinos dulces",
+    "fr": "Vins doux",
+    "en": "Sweet wines"
+   },
+   "parents": [
+    "en:wines"
+   ]
+  },
+  "en:sweeteners": {
+   "name": {
+    "en": "Sweeteners",
+    "fr": "Édulcorants",
+    "es": "Endulzantes"
+   }
+  },
+  "en:tagliatelle-with-cheese-sauce": {
+   "name": {
+    "fr": "tagliatelle en sauce aux fromages",
+    "en": "tagliatelle with cheese sauce"
+   },
+   "parents": [
+    "en:pasta-with-cheese-sauce"
+   ]
+  },
+  "en:tarragon": {
+   "name": {
+    "es": "dragón",
+    "fr": "estragon",
+    "en": "tarragon"
+   },
+   "parents": [
+    "en:herbs"
+   ]
+  },
+  "en:thin-crust-pizza-shell": {
+   "name": {
+    "en": "thin-crust pizza shell",
+    "fr": "Pâte à pizza fine"
+   },
+   "parents": [
+    "en:pizza-dough"
+   ]
+  },
+  "en:toothed-wrack": {
+   "name": {
+    "fr": "Fucus vésiculeux",
+    "en": "Toothed wrack"
+   },
+   "parents": [
+    "en:seaweeds-and-their-products"
+   ]
+  },
+  "en:tripe-dishes": {
+   "name": {
+    "fr": "Produits tripiers",
+    "en": "Tripe dishes"
+   },
+   "parents": [
+    "en:offals"
+   ]
+  },
+  "en:tuna-flakes-in-oil": {
+   "name": {
+    "fr": "Miettes de thon à l'huile",
+    "en": "tuna flakes in oil"
+   },
+   "parents": [
+    "en:canned-tunas"
+   ]
+  },
+  "en:tuna-flakes-in-tomato-sauce": {
+   "name": {
+    "en": "tuna flakes in tomato sauce",
+    "fr": "Miettes de thon à la tomate"
+   },
+   "parents": [
+    "en:canned-tunas"
+   ]
+  },
+  "en:tunas": {
+   "name": {
+    "fr": "Thons",
+    "es": "Atunes",
+    "en": "Tunas"
+   },
+   "parents": [
+    "en:fatty-fishes",
+    "en:fishes"
+   ]
+  },
+  "en:turisticky-salami": {
+   "name": {
+    "en": "turisticky salami"
+   },
+   "parents": [
+    "en:salami"
+   ]
+  },
+  "en:uncooked-pressed-cheeses": {
+   "name": {
+    "es": "Quesos prensados sin cocer",
+    "en": "Uncooked pressed cheeses",
+    "fr": "Fromages à pâte pressée non cuite"
+   },
+   "parents": [
+    "en:cheeses"
+   ]
+  },
+  "en:unpasteurised": {
+   "name": {
+    "en": "unpasteurised"
+   }
+  },
+  "en:vanilla": {
+   "name": {
+    "en": "Vanilla",
+    "fr": "Vanille",
+    "es": "Vainilla"
+   },
+   "parents": [
+    "en:spices"
+   ]
+  },
+  "en:vanilla-extract": {
+   "name": {
+    "en": "vanilla extract",
+    "es": "extracto de vainilla",
+    "fr": "extrait de vanille"
+   },
+   "parents": [
+    "en:vanilla",
+    "fr:aromes-patisserie"
+   ]
+  },
+  "en:veal-meat": {
+   "name": {
+    "en": "Veal meat",
+    "fr": "Viandes de veau",
+    "es": "Carne de ternera"
+   },
+   "parents": [
+    "en:meats"
+   ]
+  },
+  "en:veal-medallion": {
+   "name": {
+    "en": "veal medallion"
+   },
+   "parents": [
+    "en:veal-meat"
+   ]
+  },
+  "en:vegetable-based-foods-and-beverages": {
+   "name": {
+    "en": "Vegetable-based foods and beverages",
+    "es": "Comida y bebida vegetal",
+    "fr": "Aliments et boissons à base de légumes"
+   },
+   "parents": [
+    "en:plant-based-foods-and-beverages"
+   ]
+  },
+  "en:vegetable-fats": {
+   "name": {
+    "en": "Vegetable fats",
+    "fr": "Matières grasses végétales",
+    "es": "Grasas vegetales"
+   },
+   "parents": [
+    "en:fats",
+    "en:plant-based-foods"
+   ]
+  },
+  "en:vegetable-oils": {
+   "name": {
+    "en": "Vegetable oils",
+    "es": "Aceites vegetales",
+    "fr": "Huiles"
+   },
+   "parents": [
+    "en:vegetable-fats"
+   ]
+  },
+  "en:vegetables": {
+   "name": {
+    "es": "Hortalizas",
+    "fr": "Légumes",
+    "en": "Vegetables"
+   },
+   "parents": [
+    "en:vegetables-based-foods"
+   ]
+  },
+  "en:vegetables-based-foods": {
+   "name": {
+    "fr": "Légumes et dérivés",
+    "es": "Verduras y hortalizas y sus productos",
+    "en": "Vegetables based foods"
+   },
+   "parents": [
+    "en:fruits-and-vegetables-based-foods",
+    "en:vegetable-based-foods-and-beverages"
+   ]
+  },
+  "en:vegetables-macedoines": {
+   "name": {
+    "en": "vegetables macedoines",
+    "es": "Macedonia de verduras",
+    "fr": "Macédoines de légumes"
+   },
+   "parents": [
+    "en:cold-starters",
+    "en:prepared-vegetables"
+   ]
+  },
+  "en:virgin-olive-oils": {
+   "name": {
+    "en": "Virgin olive oils",
+    "es": "Aceites de oliva virgen",
+    "fr": "Huiles d'olive vierges"
+   },
+   "parents": [
+    "en:olive-oils"
+   ]
+  },
+  "en:vysocina-salami": {
+   "name": {
+    "en": "vysocina salami"
+   },
+   "parents": [
+    "en:salami"
+   ]
+  },
+  "en:wheats": {
+   "name": {
+    "en": "Wheats",
+    "fr": "Blés",
+    "es": "Trigos"
+   },
+   "parents": [
+    "en:cereal-grains"
+   ]
+  },
+  "en:whey": {
+   "name": {
+    "en": "whey",
+    "fr": "lactosérum"
+   },
+   "parents": [
+    "en:dairies"
+   ]
+  },
+  "en:whey-powder": {
+   "name": {
+    "es": "suero en polvo",
+    "fr": "lactosérum en poudre",
+    "en": "whey powder"
+   },
+   "parents": [
+    "en:dairies"
+   ]
+  },
+  "en:white-meat-rillettes": {
+   "name": {
+    "en": "white meat rillettes",
+    "fr": "Rillettes de viande blanche"
+   },
+   "parents": [
+    "en:potted-meats"
+   ]
+  },
+  "en:white-wine-sauces": {
+   "name": {
+    "en": "White wine sauces",
+    "fr": "Sauces au vin blanc"
+   },
+   "parents": [
+    "en:wine-sauces"
+   ]
+  },
+  "en:wine-jams": {
+   "name": {
+    "en": "wine jams"
+   },
+   "parents": [
+    "en:jams"
+   ]
+  },
+  "en:wine-sauces": {
+   "name": {
+    "fr": "Sauces au vin",
+    "en": "Wine sauces"
+   },
+   "parents": [
+    "en:sauces"
+   ]
+  },
+  "en:wines": {
+   "name": {
+    "es": "Vinos",
+    "fr": "Vins",
+    "en": "Wines"
+   },
+   "parents": [
+    "en:alcoholic-beverages"
+   ]
+  },
+  "en:wines-from-portugal": {
+   "name": {
+    "es": "Vinos de Portugal",
+    "en": "Wines from Portugal",
+    "fr": "Vins portugais"
+   },
+   "parents": [
+    "en:wines"
+   ]
+  },
+  "fr:aromes-patisserie": {
+   "name": {
+    "fr": "Arômes pâtisserie"
+   },
+   "parents": [
+    "en:flavors"
+   ]
+  },
+  "fr:boudins": {
+   "name": {
+    "fr": "Boudins"
+   },
+   "parents": [
+    "en:prepared-meats"
+   ]
+  },
+  "fr:de-matieres-grasses": {
+   "name": {
+    "fr": "% de matières grasses"
+   }
+  },
+  "fr:porto": {
+   "name": {
+    "fr": "Porto"
+   },
+   "parents": [
+    "en:fortified-wines-such-as-natural-sweet-wines",
+    "en:wines-from-portugal"
+   ]
+  }
+ },
+ "products": [
+  {
+   "code": "00012444",
+   "categories_tags": [
+    "en:desserts",
+    "en:frozen-foods",
+    "en:frozen-desserts",
+    "en:ice-creams-and-sorbets",
+    "en:ice-creams",
+    "en:ice-cream-tubs",
+    "en:sundae-ice-cream"
+   ],
+   "_why": "ice creams sits mid-breadcrumb: the shape the issue reports"
+  },
+  {
+   "code": "0012438000095",
+   "categories_tags": [
+    "en:meats-and-their-products",
+    "en:meats",
+    "en:prepared-meats",
+    "en:cured-sausages",
+    "en:chorizo"
+   ],
+   "_why": "chorizo is the leaf; every other segment of its chain is already capitalised"
+  },
+  {
+   "code": "2000491211006",
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:plant-based-foods",
+    "en:fruits-and-vegetables-based-foods",
+    "en:vegetables-based-foods",
+    "en:vegetables",
+    "en:fresh-foods",
+    "en:fresh-plant-based-foods",
+    "en:leaf-vegetables",
+    "en:fresh-vegetables",
+    "en:corn-salad"
+   ],
+   "_why": "corn salad is the leaf, under hyphenated ancestors that must not move"
+  }
+ ]
+}
