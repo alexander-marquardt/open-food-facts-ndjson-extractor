@@ -44,7 +44,11 @@ The three rejection reasons
     No node with this id, in the pinned snapshot or upstream. The long tail.
 ``out_of_language``
     A real taxonomy node, but in a language this catalog does not file products
-    under (see ``taxonomy.default_keep_prefixes``). ``fr:charcuteries-cuites`` is
+    under (see ``taxonomy.default_keep_prefixes``). Never an ``xx:`` node: that
+    prefix marks a category named identically in every language, so it is
+    eligible in every catalog and this reason cannot apply to it. It used to,
+    which put ``xx:tofu`` in a bucket meaning "wrong language for this catalog"
+    when it is the language-neutral node. ``fr:charcuteries-cuites`` is
     a genuine node and still has no business being a searchable English
     category: ``category_chain`` will not choose it as a leaf either, so leaving
     it in the flat field produces a value that can be searched but never faceted
