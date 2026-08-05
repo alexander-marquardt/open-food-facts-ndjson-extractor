@@ -1,0 +1,466 @@
+{
+ "_source": "Open Food Facts (openfoodfacts.org), ODbL. Three real product records from the public JSONL export (openfoodfacts-products.jsonl.gz, sha256 f06f34f7ecd19405bf3e91a31d638d96ba91cd364bee69f9530a6c6380dd2f5f, the same dump the 2026-08-03 build manifest pins), reduced to the keys the extractor reads and otherwise verbatim, together with the ancestor closure of their category tags from the public category taxonomy (sha256 74717ecc001cf8661f6ec0bb3fc8c7a0cf317a6355a245004e892348fe575ec5).",
+ "products": [
+  {
+   "code": "0022506002357",
+   "lang": "en",
+   "lc": "en",
+   "brands": "Spectrum,Spectrum Naturals",
+   "quantity": "473 ml",
+   "serving_size": "1 tbsp (14 g)",
+   "product_name_en": "Organic Mayonnaise",
+   "product_name": "Organic Mayonnaise",
+   "generic_name_en": "",
+   "generic_name": "",
+   "ingredients_text_en": "Organic expeller pressed soy and/or canola oil, organic whole eggs, organic egg yolks, organic distilled white vinegar, organic honey, filtered water, sea salt, organic mustard (organic distilled vinegar, water, organic mustard seed, salt, organic spices), organic lemon juice concentrate.",
+   "ingredients_text": "Organic expeller pressed soy and/or canola oil, organic whole eggs, organic egg yolks, organic distilled white vinegar, organic honey, filtered water, sea salt, organic mustard (organic distilled vinegar, water, organic mustard seed, salt, organic spices), organic lemon juice concentrate.",
+   "nutrition_grades": "e",
+   "nutriscore_grade": "e",
+   "nova_group": 3,
+   "environmental_score_grade": "c",
+   "categories_tags": [
+    "en:condiments",
+    "en:sauces",
+    "en:mayonnaises",
+    "en:groceries"
+   ],
+   "labels_tags": [
+    "en:no-gluten",
+    "en:organic",
+    "en:kosher",
+    "en:no-gmos",
+    "en:usda-organic",
+    "en:non-gmo-project",
+    "en:orthodox-union-kosher"
+   ],
+   "allergens_tags": [
+    "en:eggs",
+    "en:mustard"
+   ],
+   "ingredients_analysis_tags": [
+    "en:palm-oil-free",
+    "en:non-vegan",
+    "en:vegetarian-status-unknown"
+   ],
+   "countries_tags": [
+    "en:united-states",
+    "en:world"
+   ],
+   "countries": "United States, World",
+   "unique_scans_n": 4,
+   "images": {
+    "front_en": {
+     "rev": "21",
+     "sizes": {
+      "200": {
+       "h": 200,
+       "w": 120
+      },
+      "full": {
+       "h": 1200,
+       "w": 717
+      },
+      "100": {
+       "h": 100,
+       "w": 60
+      },
+      "400": {
+       "h": 400,
+       "w": 239
+      }
+     },
+     "x2": "-1",
+     "angle": 0,
+     "x1": "-1",
+     "imgid": "6",
+     "white_magic": null,
+     "y2": "-1",
+     "y1": "-1",
+     "normalize": null,
+     "coordinates_image_size": "full",
+     "geometry": "0x0--1--1"
+    },
+    "front": {
+     "imgid": "3",
+     "rev": "6",
+     "sizes": {
+      "200": {
+       "h": 200,
+       "w": 108
+      },
+      "400": {
+       "w": 215,
+       "h": 400
+      },
+      "full": {
+       "w": 1555,
+       "h": 2893
+      },
+      "100": {
+       "w": 54,
+       "h": 100
+      }
+     },
+     "normalize": "checked",
+     "geometry": "1555x2893-630-831",
+     "white_magic": null
+    },
+    "6": {
+     "uploaded_t": 1613689058,
+     "sizes": {
+      "400": {
+       "w": 239,
+       "h": 400
+      },
+      "full": {
+       "w": 717,
+       "h": 1200
+      },
+      "100": {
+       "h": 100,
+       "w": 60
+      }
+     },
+     "uploader": "kiliweb"
+    },
+    "3": {
+     "sizes": {
+      "full": {
+       "h": 4208,
+       "w": 3120
+      },
+      "100": {
+       "w": 74,
+       "h": 100
+      },
+      "400": {
+       "h": 400,
+       "w": 297
+      }
+     },
+     "uploader": "tacinte",
+     "uploaded_t": 1422687752
+    }
+   },
+   "nutriments": {
+    "energy-kcal_100g": 707,
+    "energy-kcal_unit": "kcal",
+    "fat_100g": 78.6,
+    "fat_unit": "g",
+    "saturated-fat_100g": 10.7,
+    "saturated-fat_unit": "g",
+    "salt_100g": 1.61,
+    "salt_unit": "g",
+    "proteins_100g": 0,
+    "proteins_unit": "g"
+   }
+  },
+  {
+   "code": "0065633074712",
+   "lang": "fr",
+   "lc": "fr",
+   "brands": "Nature Valley Crunch • General Mills USA, Val Nature Croquantes • General Mills USA",
+   "quantity": "10x 23g (5x 46 g), Net: 230 g",
+   "serving_size": "per 2-pk, 46 g",
+   "product_name_en": "Peanut Butter Granola bars",
+   "product_name": "Beurre D’archide, Croquantes barres granola",
+   "generic_name": "",
+   "ingredients_text_en": "Whole grain rolled oats, Sugars (sugar and/or golden sugar, golden syrup), High monounsaturated canola, canola and/or high monounsaturated sunflower oil, Peanut butter (peanuts, salt), Rice flour, Salt, Baking soda, Soy lecithin. \n_Contains: Peanut, Soy, Oat. May contain: Wheat, Almond, Pecan._",
+   "ingredients_text": "Flocons d'avoine entière, Sucres (sucre et [ou] sucre doré, sirop doré), Huile de canola riche en gras monoinsaturés, huile de canola et (ou) huile de tournesol riche en gras monoinsaturés, Beurre d'arachide (arachides, sel), Farine de riz, Sel, Bicarbonate de sodium, Lécithine de soya. _Contient : Arachide, Soya, Avoine. Peut contenir : Blé, Amande, Pacane._",
+   "nutrition_grades": "d",
+   "nutriscore_grade": "d",
+   "nova_group": 4,
+   "environmental_score_grade": "unknown",
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:plant-based-foods",
+    "en:snacks",
+    "en:sweet-snacks",
+    "en:nuts-and-their-products",
+    "en:individually-wrapped-snacks",
+    "en:snack-bars"
+   ],
+   "labels_tags": [
+    "en:kosher",
+    "en:no-artificial-flavors",
+    "en:no-artificial-colors",
+    "en:no-artificial-colours-or-flavours",
+    "en:orthodox-union-kosher",
+    "en:2-bars-per-pouch",
+    "en:made-with-peanut-butter",
+    "en:made-with-whole-grain-oats",
+    "en:recyclable-wrappers"
+   ],
+   "allergens_tags": [
+    "en:peanuts",
+    "en:soybeans"
+   ],
+   "ingredients_analysis_tags": [
+    "en:palm-oil-content-unknown",
+    "en:vegan-status-unknown",
+    "en:vegetarian-status-unknown"
+   ],
+   "countries_tags": [
+    "en:canada",
+    "en:france"
+   ],
+   "countries": "Canada, France",
+   "unique_scans_n": 2,
+   "images": {
+    "front_en": {
+     "y2": "3381",
+     "y1": "1078",
+     "white_magic": null,
+     "coordinates_image_size": "full",
+     "geometry": "2531x2303-150-1078",
+     "normalize": null,
+     "imgid": "7",
+     "rev": "65",
+     "x1": "150",
+     "angle": "0",
+     "x2": "2681",
+     "sizes": {
+      "full": {
+       "h": 2303,
+       "w": 2531
+      },
+      "200": {
+       "h": 182,
+       "w": 200
+      },
+      "400": {
+       "h": 364,
+       "w": 400
+      },
+      "100": {
+       "w": 100,
+       "h": 91
+      }
+     }
+    },
+    "7": {
+     "uploaded_t": 1745961681,
+     "uploader": "jimminycricket",
+     "sizes": {
+      "100": {
+       "w": 81,
+       "h": 100
+      },
+      "400": {
+       "w": 323,
+       "h": 400
+      },
+      "full": {
+       "w": 2797,
+       "h": 3463
+      }
+     }
+    }
+   },
+   "nutriments": {
+    "energy-kcal_100g": 457,
+    "energy-kcal_unit": "kcal",
+    "fat_100g": 19.6,
+    "fat_unit": "g",
+    "saturated-fat_100g": 2.17,
+    "saturated-fat_unit": "g",
+    "sugars_100g": 26.1,
+    "sugars_unit": "g",
+    "salt_100g": 0.978,
+    "salt_unit": "g",
+    "proteins_100g": 8.7,
+    "proteins_unit": "g",
+    "fiber_100g": 6.52,
+    "fiber_unit": "g"
+   }
+  },
+  {
+   "code": "0011152145969",
+   "lang": "en",
+   "lc": "en",
+   "brands": "Hapi",
+   "quantity": "140 g",
+   "serving_size": "28 g (28 g)",
+   "product_name_en": "Snack pea sriracha spcy",
+   "product_name": "Snack pea sriracha spcy",
+   "ingredients_text_en": "Green pea, sugar, wheat flour, glutinous rice flour, modified starch, vegetable oil (palm/coconut/sunflower), salt, yeast extract powder, dextrose, tapioca starch, silicon dioxide, citric acid, garlic powder, artificial coloring, artificial flavoring, onion powder, spices.",
+   "ingredients_text": "Green pea, sugar, wheat flour, glutinous rice flour, modified starch, vegetable oil (palm/coconut/sunflower), salt, yeast extract powder, dextrose, tapioca starch, silicon dioxide, citric acid, garlic powder, artificial coloring, artificial flavoring, onion powder, spices.",
+   "nutrition_grades": "d",
+   "nutriscore_grade": "d",
+   "nova_group": 4,
+   "environmental_score_grade": "unknown",
+   "categories_tags": [
+    "en:snacks",
+    "en:salty-snacks"
+   ],
+   "labels_tags": [],
+   "allergens_tags": [
+    "en:gluten"
+   ],
+   "ingredients_analysis_tags": [
+    "en:palm-oil",
+    "en:vegan-status-unknown",
+    "en:vegetarian-status-unknown"
+   ],
+   "countries_tags": [
+    "en:france",
+    "en:united-states"
+   ],
+   "countries": "France,États-Unis,en:france",
+   "unique_scans_n": 1,
+   "images": {
+    "front_en": {
+     "y1": "-1",
+     "angle": 0,
+     "coordinates_image_size": "full",
+     "white_magic": null,
+     "geometry": "0x0--1--1",
+     "x2": "-1",
+     "imgid": "4",
+     "x1": "-1",
+     "normalize": null,
+     "rev": "16",
+     "y2": "-1",
+     "sizes": {
+      "100": {
+       "w": 94,
+       "h": 100
+      },
+      "400": {
+       "h": 400,
+       "w": 376
+      },
+      "200": {
+       "w": 188,
+       "h": 200
+      },
+      "full": {
+       "w": 449,
+       "h": 478
+      }
+     }
+    },
+    "4": {
+     "uploaded_t": 1675659303,
+     "sizes": {
+      "400": {
+       "w": 376,
+       "h": 400
+      },
+      "100": {
+       "w": 94,
+       "h": 100
+      },
+      "full": {
+       "w": 449,
+       "h": 478
+      }
+     },
+     "uploader": "kiliweb"
+    }
+   },
+   "nutriments": {
+    "energy-kcal_100g": 433.33333333333,
+    "energy-kcal_unit": "kcal",
+    "fat_100g": 11.666666666667,
+    "fat_unit": "g",
+    "saturated-fat_100g": 3.3333333333333,
+    "saturated-fat_unit": "g",
+    "sugars_100g": 13.333333333333,
+    "sugars_unit": "g",
+    "salt_100g": 1.8333333333333,
+    "salt_unit": "g",
+    "proteins_100g": 13.333333333333,
+    "proteins_unit": "g",
+    "fiber_100g": 6.6666666666667,
+    "fiber_unit": "g"
+   }
+  }
+ ],
+ "taxonomy": {
+  "en:salty-snacks": {
+   "name": {
+    "en": "Salty snacks",
+    "fr": "Snacks salés",
+    "es": "Snacks salados"
+   },
+   "parents": [
+    "en:snacks"
+   ]
+  },
+  "en:snacks": {
+   "name": {
+    "en": "Snacks",
+    "es": "Botanas",
+    "fr": "Snacks"
+   },
+   "parents": []
+  },
+  "en:nuts-and-their-products": {
+   "name": {
+    "fr": "Fruits à coques et dérivés",
+    "es": "Frutos de cáscara y derivados",
+    "en": "Nuts and their products"
+   },
+   "parents": [
+    "en:plant-based-foods"
+   ]
+  },
+  "en:plant-based-foods": {
+   "name": {
+    "en": "Plant-based foods",
+    "fr": "Aliments d'origine végétale",
+    "es": "Alimentos de origen vegetal"
+   },
+   "parents": [
+    "en:plant-based-foods-and-beverages"
+   ]
+  },
+  "en:plant-based-foods-and-beverages": {
+   "name": {
+    "fr": "Aliments et boissons à base de végétaux",
+    "es": "Alimentos y bebidas de origen vegetal",
+    "en": "Plant-based foods and beverages"
+   },
+   "parents": []
+  },
+  "en:sweet-snacks": {
+   "name": {
+    "en": "Sweet snacks",
+    "fr": "Snacks sucrés",
+    "es": "Snacks dulces"
+   },
+   "parents": [
+    "en:snacks"
+   ]
+  },
+  "en:mayonnaises": {
+   "name": {
+    "en": "Mayonnaises",
+    "es": "Mayonesas",
+    "fr": "Mayonnaises"
+   },
+   "parents": [
+    "en:sauces"
+   ]
+  },
+  "en:sauces": {
+   "name": {
+    "fr": "Sauces",
+    "es": "Salsas",
+    "en": "Sauces"
+   },
+   "parents": [
+    "en:condiments"
+   ]
+  },
+  "en:condiments": {
+   "name": {
+    "en": "Condiments",
+    "fr": "Condiments",
+    "es": "Condimentos"
+   },
+   "parents": []
+  }
+ }
+}

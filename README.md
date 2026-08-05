@@ -23,7 +23,7 @@ This tool transforms raw, complex Open Food Facts data into a flattened, search-
 | `image_url` | string | Computed primary product image URL. |
 | `taxonomy_tags` | list | Cleaned, flat list of the product's own category tags, de-duplicated, **validated against the taxonomy** (see [Tags that are not taxonomy categories](#tags-that-are-not-taxonomy-categories)) and rendered with the taxonomy's display name for `--lang` — the **same** label the matching `category_path` segment carries, so the two fields can be joined on string. |
 | `category_path` | list | **Hierarchical** category path — a single root→leaf chain as cumulative `/`-joined strings (e.g. `["Snacks", "Snacks/Salty snacks", "Snacks/Salty snacks/Crisps"]`), reconstructed from the Open Food Facts category taxonomy graph. Powers breadcrumb-style, drill-down category facets. |
-| `attrs` | object | **Flattened Dictionary** of key-value attributes (e.g., Nutri-Score, Energy). |
+| `attrs` | object | **Flattened Dictionary** of key-value attributes (e.g., Nutri-Score, Energy). Most values are strings; the four attributes read from an Open Food Facts list — `Labels`, `Allergens`, `Ingredients analysis`, `Dietary restrictions` — are **lists of values** (see [Multi-valued attributes](#multi-valued-attributes)). |
 | `attr_keys` | list | List of all keys available in `attrs` for faceting. |
 | `dietary_restrictions` | list | Extracted dietary tags (e.g., vegan, vegetarian). |
 
@@ -37,7 +37,7 @@ This script transforms the raw data into a clean, consistent, and search-ready f
 *   **Constructs a reliable image URL:** It navigates nested image metadata to build a single, high-quality `image_url`.
 *   **Synthesizes a full description:** It combines the title, generic name, and key attributes into a comprehensive `description` field.
 *   **Generates a synthetic price:** It creates a deterministic, plausible price to enable e-commerce simulations.
-*   **Flattens the structure:** It extracts key attributes into a simple key-value `attrs` object.
+*   **Flattens the structure:** It extracts key attributes into a simple key-value `attrs` object, keeping list-valued attributes as lists so each value stays exactly matchable (see [Multi-valued attributes](#multi-valued-attributes)).
 *   **Reconstructs a category hierarchy:** It resolves the product's categories against the Open Food Facts category taxonomy graph to emit a single clean root→leaf `category_path` (see [Category hierarchy](#category-hierarchy)).
 
 ### Before: Raw Open Food Facts Data Example
@@ -125,7 +125,11 @@ The output is a clean, flat JSON object, ready to be indexed into a search engin
     "Nutri-Score": "B",
     "NOVA group": "2",
     "Eco-Score": "E",
-    "Ingredients analysis": "palm-oil-free, vegan, vegetarian",
+    "Ingredients analysis": [
+      "palm-oil-free",
+      "vegan",
+      "vegetarian"
+    ],
     "Countries": "United States",
     "Category": "Plant-based foods and beverages",
     "Energy (kcal/100g)": "800 kcal",
@@ -134,7 +138,10 @@ The output is a clean, flat JSON object, ready to be indexed into a search engin
     "Sugars (g/100g)": "0 g",
     "Salt (g/100g)": "0 g",
     "Protein (g/100g)": "0 g",
-    "Dietary restrictions": "vegan, vegetarian",
+    "Dietary restrictions": [
+      "vegan",
+      "vegetarian"
+    ],
     "Price source": "estimated_unit_model",
     "Pricing bucket": "olive_oil",
     "Estimated unit price": "28.68 USD/l (default 500ml (no package qty), source=none, bucket=olive_oil)",
@@ -172,6 +179,48 @@ The output is a clean, flat JSON object, ready to be indexed into a search engin
   ]
 }
 ```
+
+### Multi-valued attributes
+
+`attrs` is intended to be indexed as an Elasticsearch `flattened` field, and
+`flattened` indexes **each element of an array** as its own keyword. So the
+shape a value is written in decides whether it can be queried:
+
+| written as | `{"term": {"attrs.Labels": "no-gluten"}}` | `terms` aggregation |
+| :--- | :--- | :--- |
+| `["no-gluten", "vegetarian", "green-dot"]` | matches | three buckets, one per value |
+| `"no-gluten, vegetarian, green-dot"` | no match | one bucket: the whole string |
+
+Four attributes are read from an Open Food Facts **list** field and are
+therefore written as lists:
+
+| attribute | Open Food Facts source |
+| :--- | :--- |
+| `Labels` | `labels_tags` |
+| `Allergens` | `allergens_tags` |
+| `Ingredients analysis` | `ingredients_analysis_tags` |
+| `Dietary restrictions` | derived from `labels_tags` + `ingredients_analysis_tags` |
+
+Every other attribute is a single value and stays a string. **That distinction
+cannot be recovered from the value itself**: `Modelled margin`, `Estimated unit
+price`, `Serving size` and `Quantity` all carry commas *inside* one legitimate
+value — `"10x 23g (5x 46 g), Net: 230 g"` is one quantity, not two. Splitting
+`attrs` values on `", "` anywhere downstream shreds them. The list/scalar
+distinction is made once, at the writer, where the source is still a list.
+
+`Countries` is the attribute that looks like a fifth and is not one. It is read
+from the free-text `countries` field, which is prose written by whoever edited
+the product — the dump carries `"France, United States"`,
+`"Frankreich,Deutschland"` and `"France,États-Unis,en:france"` — so there is no
+list at this call site to preserve. Open Food Facts publishes the canonical list
+separately as `countries_tags`; reading that instead would change both the source
+field and the displayed value (`United States` → `united-states`), which is a
+decision about the catalog rather than a join to undo. Tracked in
+[#50](https://github.com/alexander-marquardt/open-food-facts-ndjson-extractor/issues/50).
+
+Display is unaffected: the generated `description` joins list attributes with
+`", "` at render time, exactly as the values used to be joined at write time, so
+every description is byte-identical to the one the joined form produced.
 
 ## Category hierarchy
 
