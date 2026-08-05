@@ -87,7 +87,10 @@ holds, and nowhere else:
 * **Leaf choice is language-filtered.** ``keep_prefixes`` still decides which of
   the product's *own* tags may be the leaf, which is what keeps a French-only
   category from being the thing an English product is filed under, and it is the
-  same set :func:`eligible_nodes` hands the flat ``categories`` field.
+  same set :func:`eligible_nodes` hands the flat ``categories`` field. The one
+  prefix that is exempt is ``xx``, which marks a node named identically in every
+  language and is therefore eligible in every catalog rather than in none; see
+  :func:`default_keep_prefixes`.
 * **Labels are localized, by fallback.** A traversed foreign node renders
   through :func:`display_label` like any other — ``lang`` → English → ``xx`` →
   slug — so the ``fr:`` hop in ``en:pate``'s lineage reads ``Charcuteries
@@ -221,7 +224,9 @@ def _lang_filter(keep_prefixes: Optional[Set[str]]):
     French-only node like ``fr:pates-a-tartiner``: it decides which ids may be a
     product's leaf and which may be a value of the flat ``categories`` field.
     English is the taxonomy's backbone language, so callers typically include
-    ``"en"``.
+    ``"en"`` — and ``"xx"``, which is not a language at all but upstream's marker
+    for a node named identically everywhere; see
+    :func:`default_keep_prefixes`, which is where that reasoning lives.
 
     It deliberately does **not** decide which nodes a chain may walk *through*.
     Filtering the graph deleted the edges through every filtered node too, which
@@ -528,12 +533,24 @@ def default_keep_prefixes(lang: str) -> Set[str]:
     localized-only nodes are still filable while foreign-language noise stays out
     of the leaf and out of the flat ``categories`` field.
 
+    ``xx`` is always in the set, and is not a language. Upstream uses that prefix
+    for a node whose name is *the same in every language* — 34 of them in the
+    pinned snapshot, ``xx:tofu``, ``xx:dumplings``, ``xx:sake`` and the
+    like. Refusing it is not the deliberate refusal ``fr:pates-a-tartiner`` gets
+    from an English catalog: a French-only node genuinely has no business being a
+    searchable English category, whereas a language-neutral node belongs to
+    **every** catalog by construction, and refusing it from all of them left 34
+    real categories that no catalog could ever emit. The inconsistency was
+    already visible one function away, in :func:`display_label`, which reads an
+    ``xx`` *name* happily — so ``xx`` was accepted as a legitimate way to name a
+    node while being refused as a way to *be* one.
+
     It does not bound what a chain may *pass through*: a path's intermediate
     nodes come from the language-blind graph and are localized by
     :func:`display_label` instead. Applying this to the graph is what created 90
     phantom roots for an English run.
     """
-    return {"en", lang} if lang else {"en"}
+    return {"en", "xx", lang} if lang else {"en", "xx"}
 
 
 def build_category_path(

@@ -1,0 +1,1185 @@
+{
+ "_source": "Open Food Facts (openfoodfacts.org), ODbL. Verbatim from the public JSONL export and the pinned category taxonomy snapshot: the 34 xx:-prefixed nodes, three foreign-language control nodes, real products carrying them, and the complete upward closure of every id named here. The closure is complete on purpose — a trimmed one tops out wherever it was cut, so an anchoring or depth assertion over it asserts nothing. Names are projected to en/es/fr/xx, which are the languages these tests render in; no name is edited.",
+ "snapshot": {
+  "sha256": "74717ecc001cf8661f6ec0bb3fc8c7a0cf317a6355a245004e892348fe575ec5",
+  "nodes": 14457,
+  "language_neutral_nodes": 34
+ },
+ "language_neutral_nodes": [
+  "xx:besan-laddu",
+  "xx:chikki",
+  "xx:dumplings",
+  "xx:el-gueddid",
+  "xx:elenski-but",
+  "xx:empanadas",
+  "xx:frozen-khinkali",
+  "xx:gulab-jamun",
+  "xx:kakuni",
+  "xx:kermaviili",
+  "xx:khinkali",
+  "xx:laddu",
+  "xx:lamian",
+  "xx:langos",
+  "xx:liverwurst",
+  "xx:manti",
+  "xx:mileram",
+  "xx:oden",
+  "xx:pommes-dauphines",
+  "xx:pommes-noisettes",
+  "xx:pomodoro-san-marzano-dell-agro-sarnese-nocerino",
+  "xx:ryazhenka",
+  "xx:sake",
+  "xx:sashimi",
+  "xx:shrikhand",
+  "xx:soan-papdi",
+  "xx:suho-meso",
+  "xx:tangyuan",
+  "xx:tofu",
+  "xx:varenyky",
+  "xx:viili",
+  "xx:yakibuta",
+  "xx:zakvaska",
+  "xx:zakys"
+ ],
+ "foreign_only_controls": [
+  "fr:pates-a-tartiner",
+  "fr:charcuteries-cuites",
+  "ca:cervesa-ipa"
+ ],
+ "taxonomy": {
+  "ca:cervesa-ipa": {
+   "name": {
+    "fr": "Bières IPA",
+    "xx": "India Pale Ale (IPA)",
+    "es": "Cerveza IPA",
+    "en": "India Pale Ale (IPA)"
+   },
+   "parents": [
+    "en:pale-ales"
+   ]
+  },
+  "en:alcoholic-beverages": {
+   "name": {
+    "fr": "Boissons alcoolisées",
+    "es": "Bebidas alcohólicas",
+    "en": "Alcoholic beverages"
+   },
+   "parents": [
+    "en:beverages"
+   ]
+  },
+  "en:ales": {
+   "name": {
+    "en": "Ales",
+    "xx": "Ales"
+   },
+   "parents": [
+    "en:beers"
+   ]
+  },
+  "en:artisan-products": {
+   "name": {
+    "en": "Artisan products",
+    "fr": "Produits artisanaux",
+    "es": "Productos artesanales"
+   }
+  },
+  "en:artisanal-spirits": {
+   "name": {
+    "es": "Bebidas alcohólicas artesanas",
+    "fr": "Alcools artisanaux",
+    "en": "Artisanal spirits"
+   },
+   "parents": [
+    "en:alcoholic-beverages",
+    "en:artisan-products"
+   ]
+  },
+  "en:beef-and-its-products": {
+   "name": {
+    "fr": "Viande de bœuf et dérivés",
+    "es": "Carne de vacuno y sus productos",
+    "en": "Beef and its products"
+   },
+   "parents": [
+    "en:meats-and-their-products"
+   ]
+  },
+  "en:beef-pastrami": {
+   "name": {
+    "en": "Beef pastrami",
+    "fr": "Pastrami de bœuf"
+   },
+   "parents": [
+    "en:prepared-beef-meats"
+   ]
+  },
+  "en:beers": {
+   "name": {
+    "fr": "Bières",
+    "es": "Cervezas",
+    "en": "Beers"
+   },
+   "parents": [
+    "en:alcoholic-beverages"
+   ]
+  },
+  "en:beverages": {
+   "name": {
+    "en": "Beverages",
+    "es": "Bebidas",
+    "fr": "Boissons"
+   },
+   "parents": [
+    "en:beverages-and-beverages-preparations"
+   ]
+  },
+  "en:beverages-and-beverages-preparations": {
+   "name": {
+    "es": "Bebidas y preparaciones de bebidas",
+    "en": "Beverages and beverages preparations",
+    "fr": "Boissons et préparations de boissons"
+   }
+  },
+  "en:braised-hams": {
+   "name": {
+    "en": "Braised hams",
+    "fr": "Jambons braisés",
+    "es": "Jamón braceado"
+   },
+   "parents": [
+    "en:hams"
+   ]
+  },
+  "en:breakfasts": {
+   "name": {
+    "en": "Breakfasts",
+    "fr": "Petit-déjeuners",
+    "es": "Desayunos"
+   }
+  },
+  "en:cereals-and-potatoes": {
+   "name": {
+    "es": "Cereales y patatas",
+    "fr": "Céréales et pommes de terre",
+    "en": "Cereals and potatoes"
+   },
+   "parents": [
+    "en:plant-based-foods"
+   ]
+  },
+  "en:chips-and-fries": {
+   "name": {
+    "fr": "Chips et frites",
+    "en": "Chips and fries"
+   }
+  },
+  "en:chocolate-spreads": {
+   "name": {
+    "es": "Cremas de chocolate",
+    "fr": "Pâtes à tartiner au chocolat",
+    "en": "Chocolate spreads"
+   },
+   "parents": [
+    "en:sweet-spreads",
+    "fr:pates-a-tartiner"
+   ]
+  },
+  "en:cocoa-and-hazelnuts-spreads": {
+   "name": {
+    "es": "Cremas de cacao y avellanas",
+    "en": "Cocoa and hazelnuts spreads",
+    "fr": "Pâtes à tartiner aux noisettes et au cacao"
+   },
+   "parents": [
+    "en:chocolate-spreads",
+    "en:hazelnut-spreads"
+   ]
+  },
+  "en:confectioneries": {
+   "name": {
+    "es": "Dulces",
+    "fr": "Confiseries",
+    "en": "Confectioneries"
+   },
+   "parents": [
+    "en:sweet-snacks"
+   ]
+  },
+  "en:cooked-meats": {
+   "name": {
+    "fr": "Viandes cuites",
+    "en": "Cooked meats"
+   },
+   "parents": [
+    "en:meats"
+   ]
+  },
+  "en:cooked-pork-meat": {
+   "name": {
+    "fr": "Viande de porc cuite",
+    "en": "Cooked pork meat"
+   },
+   "parents": [
+    "en:cooked-white-meat",
+    "en:pork"
+   ]
+  },
+  "en:cooked-pork-roast": {
+   "name": {
+    "fr": "Rôti de porc cuit",
+    "en": "Cooked pork roast"
+   },
+   "parents": [
+    "en:cooked-pork-meat"
+   ]
+  },
+  "en:cooked-white-meat": {
+   "name": {
+    "en": "Cooked white meat",
+    "fr": "Viande blanche cuite"
+   },
+   "parents": [
+    "en:cooked-meats"
+   ]
+  },
+  "en:country-specific-beers": {
+   "name": {
+    "en": "Country specific beers"
+   },
+   "parents": [
+    "en:beers"
+   ]
+  },
+  "en:craft-beers": {
+   "name": {
+    "en": "Craft beers",
+    "fr": "Bières artisanales",
+    "es": "Cervezas artesanales"
+   },
+   "parents": [
+    "en:beers"
+   ]
+  },
+  "en:creams": {
+   "name": {
+    "fr": "Crèmes",
+    "es": "Nata",
+    "en": "Creams"
+   },
+   "parents": [
+    "en:dairies"
+   ]
+  },
+  "en:cured-hams": {
+   "name": {
+    "es": "jamón de país",
+    "fr": "Jambons crus",
+    "en": "Cured hams"
+   },
+   "parents": [
+    "en:hams",
+    "en:prepared-pork-meats"
+   ]
+  },
+  "en:dairies": {
+   "name": {
+    "es": "Lácteos",
+    "fr": "Produits laitiers",
+    "en": "Dairies"
+   }
+  },
+  "en:dairy-desserts": {
+   "name": {
+    "es": "Postres lácteos",
+    "fr": "Desserts lactés",
+    "en": "Dairy desserts"
+   },
+   "parents": [
+    "en:dairies",
+    "en:desserts"
+   ]
+  },
+  "en:dairy-drinks": {
+   "name": {
+    "es": "Bebida lácteas",
+    "fr": "Boissons lactées",
+    "en": "Dairy drinks"
+   },
+   "parents": [
+    "en:beverages",
+    "en:dairies"
+   ]
+  },
+  "en:desserts": {
+   "name": {
+    "en": "Desserts",
+    "fr": "Desserts",
+    "es": "Postres"
+   }
+  },
+  "en:dried-hams": {
+   "name": {
+    "es": "Jamones secos",
+    "fr": "Jambons secs",
+    "en": "Dried hams"
+   },
+   "parents": [
+    "en:cured-hams"
+   ]
+  },
+  "en:fermented-creams": {
+   "name": {
+    "fr": "Crèmes épaisses",
+    "en": "Fermented creams"
+   },
+   "parents": [
+    "en:creams",
+    "en:fermented-milk-products"
+   ]
+  },
+  "en:fermented-dairy-desserts": {
+   "name": {
+    "fr": "Desserts lactés fermentés",
+    "en": "Fermented dairy desserts"
+   },
+   "parents": [
+    "en:dairy-desserts",
+    "en:fermented-milk-products"
+   ]
+  },
+  "en:fermented-drinks": {
+   "name": {
+    "fr": "Boissons fermentées",
+    "es": "Bebidas fermentadas",
+    "en": "Fermented drinks"
+   },
+   "parents": [
+    "en:beverages",
+    "en:fermented-foods"
+   ]
+  },
+  "en:fermented-foods": {
+   "name": {
+    "en": "Fermented foods",
+    "fr": "Produits fermentés",
+    "es": "Comidas fermentadas"
+   }
+  },
+  "en:fermented-milk-drinks": {
+   "name": {
+    "fr": "Boissons lactées fermentées",
+    "es": "Bebidas de leche fermentada",
+    "en": "Fermented milk drinks"
+   },
+   "parents": [
+    "en:dairy-drinks",
+    "en:fermented-drinks",
+    "en:fermented-milk-products"
+   ]
+  },
+  "en:fermented-milk-products": {
+   "name": {
+    "en": "Fermented milk products",
+    "fr": "Produits laitiers fermentés",
+    "es": "Productos fermentados de la leche"
+   },
+   "parents": [
+    "en:dairies",
+    "en:fermented-foods"
+   ]
+  },
+  "en:fruits-and-vegetables-based-foods": {
+   "name": {
+    "en": "Fruits and vegetables based foods",
+    "fr": "Aliments à base de fruits et de légumes",
+    "es": "Frutas y verduras y sus productos"
+   },
+   "parents": [
+    "en:plant-based-foods"
+   ]
+  },
+  "en:hams": {
+   "name": {
+    "fr": "Jambons",
+    "es": "jamón",
+    "en": "Hams"
+   },
+   "parents": [
+    "en:prepared-meats"
+   ]
+  },
+  "en:hazelnut-spreads": {
+   "name": {
+    "fr": "Pâtes à tartiner aux noisettes",
+    "es": "Cremas a base de avellanas",
+    "en": "Hazelnut spreads"
+   },
+   "parents": [
+    "en:sweet-spreads",
+    "fr:pates-a-tartiner"
+   ]
+  },
+  "en:knuckle-of-ham-cooked": {
+   "name": {
+    "en": "Knuckle of ham cooked",
+    "fr": "Jambonneau cuit"
+   },
+   "parents": [
+    "en:braised-hams"
+   ]
+  },
+  "en:legumes-and-their-products": {
+   "name": {
+    "es": "Leguminosas y derivados",
+    "fr": "Légumineuses et dérivés",
+    "en": "Legumes and their products"
+   },
+   "parents": [
+    "en:plant-based-foods"
+   ]
+  },
+  "en:meals": {
+   "name": {
+    "es": "Comidas preparadas",
+    "fr": "Plats préparés",
+    "en": "Meals"
+   }
+  },
+  "en:meat-alternatives": {
+   "name": {
+    "en": "Meat alternatives",
+    "fr": "Alternatives à la viande"
+   }
+  },
+  "en:meat-analogues": {
+   "name": {
+    "en": "Meat analogues",
+    "es": "Carnes vegetales",
+    "fr": "Substituts de viande"
+   },
+   "parents": [
+    "en:meat-alternatives"
+   ]
+  },
+  "en:meat-ravioli": {
+   "name": {
+    "fr": "Ravioli à la viande",
+    "en": "Meat ravioli",
+    "es": "Ravioli de carne"
+   },
+   "parents": [
+    "en:pasta-stuffed-with-meat",
+    "en:ravioli"
+   ]
+  },
+  "en:meats": {
+   "name": {
+    "en": "Meats",
+    "fr": "Viandes",
+    "es": "Carnes"
+   },
+   "parents": [
+    "en:meats-and-their-products"
+   ]
+  },
+  "en:meats-and-their-products": {
+   "name": {
+    "es": "Productos a base de carne",
+    "fr": "Viandes et dérivés",
+    "en": "Meats and their products"
+   }
+  },
+  "en:nabe": {
+   "name": {
+    "en": "Nabe",
+    "fr": "Nabe"
+   },
+   "parents": [
+    "en:stews"
+   ]
+  },
+  "en:pale-ales": {
+   "name": {
+    "xx": "Pale ales",
+    "en": "Pale ales"
+   },
+   "parents": [
+    "en:ales"
+   ]
+  },
+  "en:pasta-dishes": {
+   "name": {
+    "fr": "Plats à base de pâtes",
+    "es": "Platos de pasta",
+    "en": "Pasta dishes"
+   },
+   "parents": [
+    "en:meals"
+   ]
+  },
+  "en:pasta-stuffed-with-meat": {
+   "name": {
+    "es": "Pasta rellena de carne",
+    "en": "Pasta stuffed with meat",
+    "fr": "Pâtes farcies à la viande"
+   },
+   "parents": [
+    "en:stuffed-pastas"
+   ]
+  },
+  "en:pastas": {
+   "name": {
+    "fr": "pâtes alimentaires",
+    "es": "Pastas alimenticias",
+    "xx": "Pasta",
+    "en": "Pastas"
+   },
+   "parents": [
+    "en:plant-based-foods"
+   ]
+  },
+  "en:plant-based-foods": {
+   "name": {
+    "en": "Plant-based foods",
+    "fr": "Aliments d'origine végétale",
+    "es": "Alimentos de origen vegetal"
+   },
+   "parents": [
+    "en:plant-based-foods-and-beverages"
+   ]
+  },
+  "en:plant-based-foods-and-beverages": {
+   "name": {
+    "fr": "Aliments et boissons à base de végétaux",
+    "es": "Alimentos y bebidas de origen vegetal",
+    "en": "Plant-based foods and beverages"
+   }
+  },
+  "en:pork": {
+   "name": {
+    "fr": "Porc",
+    "es": "Carne de cerdo",
+    "en": "Pork"
+   },
+   "parents": [
+    "en:meats",
+    "en:pork-and-its-products"
+   ]
+  },
+  "en:pork-and-its-products": {
+   "name": {
+    "es": "Carne de cerdo y sus productos",
+    "fr": "Porc et dérivés",
+    "en": "Pork and its products"
+   },
+   "parents": [
+    "en:meats-and-their-products"
+   ]
+  },
+  "en:pork-belly": {
+   "name": {
+    "fr": "Poitrine de porc",
+    "en": "Pork belly"
+   },
+   "parents": [
+    "en:pork"
+   ]
+  },
+  "en:potato-preparations": {
+   "name": {
+    "fr": "Préparations à base de pommes de terre",
+    "en": "Potato preparations"
+   },
+   "parents": [
+    "en:potatoes-and-their-products"
+   ]
+  },
+  "en:potatoes-and-their-products": {
+   "name": {
+    "en": "Potatoes and their products"
+   },
+   "parents": [
+    "en:cereals-and-potatoes"
+   ]
+  },
+  "en:prepared-beef-meats": {
+   "name": {
+    "fr": "Charcuteries de bœuf",
+    "en": "Prepared beef meats"
+   },
+   "parents": [
+    "en:beef-and-its-products",
+    "en:prepared-meats"
+   ]
+  },
+  "en:prepared-meats": {
+   "name": {
+    "en": "Prepared meats",
+    "es": "Embutidos",
+    "fr": "Charcuteries"
+   },
+   "parents": [
+    "en:meats-and-their-products"
+   ]
+  },
+  "en:prepared-pork-meats": {
+   "name": {
+    "en": "Prepared pork meats",
+    "fr": "Charcuteries de porc"
+   },
+   "parents": [
+    "en:pork-and-its-products",
+    "en:prepared-meats"
+   ]
+  },
+  "en:ravioli": {
+   "name": {
+    "en": "ravioli",
+    "xx": "Ravioli",
+    "fr": "ravioli"
+   },
+   "parents": [
+    "en:stuffed-pastas"
+   ]
+  },
+  "en:seafood": {
+   "name": {
+    "en": "Seafood",
+    "fr": "Produits de la mer",
+    "es": "Productos del mar"
+   }
+  },
+  "en:snacks": {
+   "name": {
+    "en": "Snacks",
+    "es": "Botanas",
+    "fr": "Snacks"
+   }
+  },
+  "en:sour-creams": {
+   "name": {
+    "es": "Nata agria",
+    "fr": "Crèmes aigres",
+    "en": "Sour creams"
+   },
+   "parents": [
+    "en:fermented-creams"
+   ]
+  },
+  "en:spanish-beers": {
+   "name": {
+    "en": "Spanish beers",
+    "fr": "Bières espagnoles"
+   },
+   "parents": [
+    "en:country-specific-beers"
+   ]
+  },
+  "en:spreads": {
+   "name": {
+    "en": "Spreads",
+    "fr": "Produits à tartiner",
+    "es": "Untables"
+   }
+  },
+  "en:stews": {
+   "name": {
+    "es": "Guisos",
+    "fr": "Ragoûts",
+    "en": "Stews"
+   },
+   "parents": [
+    "en:meals"
+   ]
+  },
+  "en:stuffed-pastas": {
+   "name": {
+    "fr": "Pâtes farcies",
+    "en": "Stuffed pastas",
+    "es": "Pastas rellenas"
+   },
+   "parents": [
+    "en:pasta-dishes"
+   ]
+  },
+  "en:sweet-snacks": {
+   "name": {
+    "en": "Sweet snacks",
+    "fr": "Snacks sucrés",
+    "es": "Snacks dulces"
+   },
+   "parents": [
+    "en:snacks"
+   ]
+  },
+  "en:sweet-spreads": {
+   "name": {
+    "es": "Untables dulces",
+    "fr": "Produits à tartiner sucrés",
+    "en": "Sweet spreads"
+   },
+   "parents": [
+    "en:breakfasts",
+    "en:spreads"
+   ]
+  },
+  "en:tomatoes": {
+   "name": {
+    "es": "Tomates",
+    "fr": "Tomates",
+    "en": "Tomatoes"
+   },
+   "parents": [
+    "en:tomatoes-and-their-products",
+    "en:vegetables"
+   ]
+  },
+  "en:tomatoes-and-their-products": {
+   "name": {
+    "es": "Tomates y sus productos",
+    "fr": "Tomates et dérivés",
+    "en": "Tomatoes and their products"
+   },
+   "parents": [
+    "en:vegetables-based-foods"
+   ]
+  },
+  "en:vegetable-based-foods-and-beverages": {
+   "name": {
+    "en": "Vegetable-based foods and beverages",
+    "es": "Comida y bebida vegetal",
+    "fr": "Aliments et boissons à base de légumes"
+   },
+   "parents": [
+    "en:plant-based-foods-and-beverages"
+   ]
+  },
+  "en:vegetables": {
+   "name": {
+    "es": "Hortalizas",
+    "fr": "Légumes",
+    "en": "Vegetables"
+   },
+   "parents": [
+    "en:vegetables-based-foods"
+   ]
+  },
+  "en:vegetables-based-foods": {
+   "name": {
+    "fr": "Légumes et dérivés",
+    "es": "Verduras y hortalizas y sus productos",
+    "en": "Vegetables based foods"
+   },
+   "parents": [
+    "en:fruits-and-vegetables-based-foods",
+    "en:vegetable-based-foods-and-beverages"
+   ]
+  },
+  "fr:charcuteries-cuites": {
+   "name": {
+    "fr": "Charcuteries cuites"
+   },
+   "parents": [
+    "en:prepared-meats"
+   ]
+  },
+  "fr:pates-a-tartiner": {
+   "name": {
+    "fr": "Pâtes à tartiner"
+   },
+   "parents": [
+    "en:sweet-spreads"
+   ]
+  },
+  "xx:besan-laddu": {
+   "name": {
+    "xx": "Besan Laddu",
+    "en": "Besan Laddu"
+   },
+   "parents": [
+    "xx:laddu"
+   ]
+  },
+  "xx:chikki": {
+   "name": {
+    "xx": "Chikki",
+    "en": "Chikki"
+   },
+   "parents": [
+    "en:confectioneries"
+   ]
+  },
+  "xx:dumplings": {
+   "name": {
+    "en": "Dumplings",
+    "xx": "Dumplings"
+   },
+   "parents": [
+    "en:meals"
+   ]
+  },
+  "xx:el-gueddid": {
+   "name": {
+    "xx": "El Gueddid"
+   },
+   "parents": [
+    "en:prepared-meats"
+   ]
+  },
+  "xx:elenski-but": {
+   "name": {
+    "xx": "Elenski but"
+   },
+   "parents": [
+    "en:dried-hams"
+   ]
+  },
+  "xx:empanadas": {
+   "name": {
+    "en": "Empanadas",
+    "es": "Empanadas",
+    "xx": "Empanadas"
+   },
+   "parents": [
+    "xx:dumplings"
+   ]
+  },
+  "xx:frozen-khinkali": {
+   "name": {
+    "xx": "Frozen khinkali"
+   },
+   "parents": [
+    "xx:khinkali"
+   ]
+  },
+  "xx:gulab-jamun": {
+   "name": {
+    "en": "Gulab jamun",
+    "xx": "Gulab jamun"
+   },
+   "parents": [
+    "en:confectioneries"
+   ]
+  },
+  "xx:kakuni": {
+   "name": {
+    "xx": "Kakuni"
+   },
+   "parents": [
+    "en:pork-belly"
+   ]
+  },
+  "xx:kermaviili": {
+   "name": {
+    "xx": "Kermaviili"
+   },
+   "parents": [
+    "en:fermented-milk-products"
+   ]
+  },
+  "xx:khinkali": {
+   "name": {
+    "xx": "Khinkali"
+   },
+   "parents": [
+    "en:meat-ravioli"
+   ]
+  },
+  "xx:laddu": {
+   "name": {
+    "xx": "Laddu",
+    "en": "Laddu"
+   },
+   "parents": [
+    "en:confectioneries"
+   ]
+  },
+  "xx:lamian": {
+   "name": {
+    "fr": "Nouilles pour ramen",
+    "xx": "lamian",
+    "en": "ramen noodles"
+   },
+   "parents": [
+    "en:pastas"
+   ]
+  },
+  "xx:langos": {
+   "name": {
+    "xx": "Langòs"
+   },
+   "parents": [
+    "en:meals"
+   ]
+  },
+  "xx:liverwurst": {
+   "name": {
+    "xx": "Liverwurst",
+    "en": "Liverwurst"
+   },
+   "parents": [
+    "en:prepared-meats"
+   ]
+  },
+  "xx:manti": {
+   "name": {
+    "xx": "manti"
+   },
+   "parents": [
+    "en:meat-ravioli"
+   ]
+  },
+  "xx:mileram": {
+   "name": {
+    "xx": "Mileram"
+   },
+   "parents": [
+    "en:sour-creams"
+   ]
+  },
+  "xx:oden": {
+   "name": {
+    "en": "Oden",
+    "xx": "Oden"
+   },
+   "parents": [
+    "en:nabe"
+   ]
+  },
+  "xx:pommes-dauphines": {
+   "name": {
+    "fr": "Pommes dauphines",
+    "xx": "Pommes dauphines"
+   },
+   "parents": [
+    "en:chips-and-fries",
+    "en:potato-preparations"
+   ]
+  },
+  "xx:pommes-noisettes": {
+   "name": {
+    "fr": "Pommes noisettes",
+    "xx": "Pommes noisettes"
+   },
+   "parents": [
+    "en:chips-and-fries",
+    "en:potato-preparations"
+   ]
+  },
+  "xx:pomodoro-san-marzano-dell-agro-sarnese-nocerino": {
+   "name": {
+    "xx": "Pomodoro San Marzano dell'Agro Sarnese-Nocerino",
+    "en": "San Marzano tomatoes"
+   },
+   "parents": [
+    "en:tomatoes"
+   ]
+  },
+  "xx:ryazhenka": {
+   "name": {
+    "xx": "Ryazhenka"
+   },
+   "parents": [
+    "en:fermented-milk-drinks"
+   ]
+  },
+  "xx:sake": {
+   "name": {
+    "xx": "Sake",
+    "fr": "Saké",
+    "en": "Sake"
+   },
+   "parents": [
+    "en:alcoholic-beverages"
+   ]
+  },
+  "xx:sashimi": {
+   "name": {
+    "xx": "Sashimi"
+   },
+   "parents": [
+    "en:meals",
+    "en:seafood"
+   ]
+  },
+  "xx:shrikhand": {
+   "name": {
+    "en": "Shrikhand",
+    "xx": "Shrikhand"
+   },
+   "parents": [
+    "en:dairy-desserts"
+   ]
+  },
+  "xx:soan-papdi": {
+   "name": {
+    "en": "Soan papdi",
+    "xx": "Soan papdi"
+   },
+   "parents": [
+    "en:confectioneries"
+   ]
+  },
+  "xx:suho-meso": {
+   "name": {
+    "xx": "Suho meso"
+   },
+   "parents": [
+    "en:beef-pastrami"
+   ]
+  },
+  "xx:tangyuan": {
+   "name": {
+    "xx": "Tangyuan"
+   },
+   "parents": [
+    "en:desserts"
+   ]
+  },
+  "xx:tofu": {
+   "name": {
+    "en": "tofu",
+    "xx": "Tofu",
+    "es": "Tofu"
+   },
+   "parents": [
+    "en:legumes-and-their-products",
+    "en:meat-alternatives"
+   ]
+  },
+  "xx:varenyky": {
+   "name": {
+    "xx": "Varenyky"
+   },
+   "parents": [
+    "en:meals"
+   ]
+  },
+  "xx:viili": {
+   "name": {
+    "xx": "Viili"
+   },
+   "parents": [
+    "en:fermented-dairy-desserts"
+   ]
+  },
+  "xx:yakibuta": {
+   "name": {
+    "xx": "Yakibuta"
+   },
+   "parents": [
+    "en:cooked-pork-roast"
+   ]
+  },
+  "xx:zakvaska": {
+   "name": {
+    "xx": "Zakvaska"
+   },
+   "parents": [
+    "en:fermented-milk-products"
+   ]
+  },
+  "xx:zakys": {
+   "name": {
+    "xx": "Zakys"
+   },
+   "parents": [
+    "en:fermented-milk-drinks"
+   ]
+  }
+ },
+ "products": [
+  {
+   "code": "0084391434088",
+   "categories_tags": [
+    "en:beverages-and-beverages-preparations",
+    "en:beverages",
+    "en:alcoholic-beverages",
+    "xx:sake"
+   ],
+   "_why": "xx:sake is this product's most specific tag: the leaf case, which no catalog could reach"
+  },
+  {
+   "code": "0018513003388",
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:plant-based-foods",
+    "en:legumes-and-their-products",
+    "en:meat-alternatives",
+    "en:meat-analogues",
+    "en:tofu"
+   ],
+   "_why": "carries en:tofu, which upstream retired in favour of xx:tofu: the flat-value case"
+  },
+  {
+   "code": "0025484000124",
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:plant-based-foods",
+    "en:legumes-and-their-products",
+    "en:meat-alternatives",
+    "en:meat-analogues",
+    "en:tofu",
+    "en:undefined"
+   ],
+   "_why": "carries en:tofu, which upstream retired in favour of xx:tofu: the flat-value case"
+  },
+  {
+   "code": "0025484006577",
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:plant-based-foods",
+    "en:legumes-and-their-products",
+    "en:meat-alternatives",
+    "en:meat-analogues",
+    "en:tofu",
+    "en:organic-tofu"
+   ],
+   "_why": "carries en:tofu, which upstream retired in favour of xx:tofu: the flat-value case"
+  },
+  {
+   "code": "0000101209159",
+   "categories_tags": [
+    "en:breakfasts",
+    "en:spreads",
+    "en:sweet-spreads",
+    "fr:pates-a-tartiner",
+    "en:hazelnut-spreads",
+    "en:chocolate-spreads",
+    "en:cocoa-and-hazelnuts-spreads"
+   ],
+   "_why": "carries fr:pates-a-tartiner alongside an English lineage: the language filter must still refuse it"
+  },
+  {
+   "code": "0006345049070",
+   "categories_tags": [
+    "en:meats-and-their-products",
+    "en:meats",
+    "en:prepared-meats",
+    "en:hams",
+    "fr:charcuteries-cuites",
+    "en:braised-hams",
+    "en:knuckle-of-ham-cooked"
+   ],
+   "_why": "carries fr:charcuteries-cuites alongside an English lineage: the language filter must still refuse it"
+  },
+  {
+   "code": "0013189953166",
+   "categories_tags": [
+    "en:beverages",
+    "en:alcoholic-beverages",
+    "en:beers",
+    "en:ales",
+    "en:pale-ales",
+    "ca:cervesa-ipa",
+    "en:artisan-products",
+    "en:country-specific-beers",
+    "en:artisanal-spirits",
+    "en:craft-beers",
+    "en:spanish-beers"
+   ],
+   "_why": "carries ca:cervesa-ipa alongside an English lineage: the language filter must still refuse it"
+  }
+ ]
+}
