@@ -283,35 +283,50 @@ def test_every_other_attribute_is_still_a_string() -> None:
                 assert isinstance(value, str), f"{code} {key}: expected a string, got {type(value)}"
 
 
-def test_the_description_still_joins_at_render() -> None:
-    """The human-readable surface reads exactly as it did before the change.
+def test_no_surface_rejoins_the_values_the_writer_kept_apart() -> None:
+    """The one-value-per-element shape survives all the way to the document.
 
-    ``build_description`` composes ``attrs`` into display text and is the reason
-    the join existed at all. It now joins with the same ``", "`` at render, so
-    every generated description is byte-identical to the one the parent commit
-    produced -- the shape change is invisible to a reader and visible only to a
-    query.
+    This assertion used to be made on the generated ``description``, because that
+    was where the join lived: ``attrs`` values were written joined, and the
+    correction in #45 moved the join to render time so the human-readable surface
+    stayed byte-identical while the indexed values came apart.
+
+    That surface is gone -- ``description`` now carries the product's own prose
+    and no attributes at all -- so the assertion moves to where those values are
+    now read: the promoted top-level fields. The property is the same one and it
+    is asserted on the same product; what changed is that a re-joined value would
+    now be visible in a *field* rather than in a sentence.
+
+    The comma-carrying scalars are the other half, and they stay in ``attrs``:
+    ``test_comma_carrying_scalars_round_trip_whole`` above covers them, so a diff
+    that reintroduced a split would still fail whichever half it touched.
     """
     record = _records()[MULTI_LABEL]
-    description = record["description"]
 
-    assert (
-        "Labels: no-gluten, organic, kosher, no-gmos, usda-organic, "
-        "non-gmo-project, orthodox-union-kosher" in description
-    ), description
-    assert "Allergens: eggs, mustard" in description, description
-    assert "Dietary restrictions: kosher, organic" in description, description
-    assert "Countries: United States, World" in description, description
-    assert (
-        "Ingredients analysis: palm-oil-free, non-vegan, vegetarian-status-unknown"
-        in description
-    ), description
-    # A comma-carrying scalar goes into the same rendered list of specs, whole.
-    # If rendering ever split values, this is where it would show as
-    # "Quantity: 10x 23g (5x 46 g); Net: 230 g".
-    scalars = _records()[COMMA_IN_SCALARS]["description"]
-    assert "Quantity: 10x 23g (5x 46 g), Net: 230 g" in scalars, scalars
-    assert "Serving size: per 2-pk, 46 g" in scalars, scalars
+    assert record["labels"] == [
+        "no-gluten",
+        "organic",
+        "kosher",
+        "no-gmos",
+        "usda-organic",
+        "non-gmo-project",
+        "orthodox-union-kosher",
+    ], record["labels"]
+    assert record["allergens"] == ["eggs", "mustard"], record["allergens"]
+    assert record["ingredients_analysis"] == [
+        "palm-oil-free",
+        "non-vegan",
+        "vegetarian-status-unknown",
+    ], record["ingredients_analysis"]
+    assert record["dietary_restrictions"] == ["kosher", "organic"], record["dietary_restrictions"]
+    # ``Countries`` is the scalar that looks like a list: one string, unsplit.
+    assert record["countries"] == "United States, World", record["countries"]
+
+    for code, emitted in _records().items():
+        assert "Key specifications" not in emitted["description"], (
+            f"{code}: the description carries an attribute block again, and with it "
+            "a second, joined spelling of every value this module keeps apart"
+        )
 
 
 def test_countries_is_still_a_scalar_read_from_the_free_text_field() -> None:
