@@ -7,6 +7,7 @@ import json
 import math
 import sys
 import time
+from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, Iterable, Iterator, Mapping, Optional, Set, TextIO, Tuple, Union
@@ -35,6 +36,21 @@ IMAGE_BASE = "https://images.openfoodfacts.org/images/products"
 
 # Values we should treat as "not meaningful" and avoid emitting in attrs/description.
 _UNDEFINED_LIKE = {"undefined", "unknown", "null", "none", "n/a", "na", ""}
+
+# How many *incidental* tags the flat ``taxonomy_tags`` field carries. It bounds
+# the field for the very long tag lists Open Food Facts occasionally holds; it
+# does not bound the product's own category chain, which
+# :func:`select_category_label_entries` keeps whole (see that function).
+#
+# The number is a display-era default, not a storage limit: the field was
+# introduced carrying 3 values and raised to 20 in "Increased the number of
+# categories extracted" with no recorded reason, and nothing downstream reads it
+# — PRISM maps ``taxonomy_tags`` as a ``terms`` facet field, which has no length
+# rule. So it is kept because it is harmless and because an unbounded field has
+# no ceiling at all, not because a measured cost forces it: over the first
+# 200,000 records of the public export only 6 of 135,716 tagged products (0.004%)
+# have more eligible tags than this, and removing the cap outright would add 205
+# bytes to 10.5 MB of emitted tag payload (+0.002%).
 MAX_NUM_TAXONOMY_TAGS = 20
 
 # The type of a single ``attrs`` value.
@@ -287,12 +303,96 @@ def pick_primary_category_tag(tags: list[str]) -> Optional[str]:
     return tags[0] if tags else None
 
 
+@dataclass
+class FlatTagSelection:
+    """What :func:`select_category_label_entries` emitted, and what it left out.
+
+    The dropped labels are carried rather than counted so the run report can name
+    them. A truncation nothing reports is invisible in the built catalog: the
+    field is a flat list with no marker for "there was more", so a shortened list
+    and a genuinely short one read identically.
+    """
+
+    entries: list[tuple[str, str]]
+    eligible: int
+    dropped: list[str]
+    chain_over_cap: int = 0
+
+    @property
+    def truncated(self) -> bool:
+        return bool(self.dropped)
+
+
+class TagCapAudit:
+    """Per-run totals for flat tag lists the cap shortened.
+
+    Reported for every run, including the runs where it is zero — the same rule
+    the refused-tag and unanchored-chain audits follow. The cap is the one place
+    in the category pipeline that discards a *valid* value, and until #14 it did
+    so with nothing counting it.
+    """
+
+    def __init__(self, max_n: int = MAX_NUM_TAXONOMY_TAGS, top_n: int = 20) -> None:
+        self.max_n = max_n
+        self.top_n = top_n
+        self.products = 0
+        self.tags_dropped = 0
+        self.max_eligible = 0
+        self.products_with_chain_over_cap = 0
+        self.chain_over_cap_examples: list[str] = []
+        self.dropped_labels: Counter = Counter()
+
+    def record(self, code: str, selection: FlatTagSelection) -> None:
+        self.max_eligible = max(self.max_eligible, selection.eligible)
+        if selection.truncated:
+            self.products += 1
+            self.tags_dropped += len(selection.dropped)
+            self.dropped_labels.update(selection.dropped)
+        if selection.chain_over_cap:
+            self.products_with_chain_over_cap += 1
+            if len(self.chain_over_cap_examples) < self.top_n:
+                self.chain_over_cap_examples.append(code)
+
+    def summary(self) -> Dict[str, Any]:
+        return {
+            "max_taxonomy_tags": self.max_n,
+            "max_eligible_tags_seen": self.max_eligible,
+            "products_truncated": self.products,
+            "tags_dropped": self.tags_dropped,
+            "top_dropped_labels": [
+                {"label": label, "products": n}
+                for label, n in self.dropped_labels.most_common(self.top_n)
+            ],
+            # Products whose own chain is longer than the cap, so keeping the
+            # chain whole took the list past ``max_taxonomy_tags``. Zero over the
+            # first 200,000 records of the public export (deepest chain: 9
+            # nodes), and reported so a taxonomy that grows deeper says so.
+            "products_with_chain_over_cap": self.products_with_chain_over_cap,
+            "chain_over_cap_examples": list(self.chain_over_cap_examples),
+        }
+
+    def log_lines(self) -> list[str]:
+        lines = [
+            f"Flat tag cap: {self.products:,} products truncated at "
+            f"{self.max_n} tags ({self.tags_dropped:,} labels dropped); "
+            f"longest eligible list seen {self.max_eligible:,}"
+        ]
+        if self.products_with_chain_over_cap:
+            lines.append(
+                f"  {self.products_with_chain_over_cap:,} products carry a category "
+                f"chain longer than the cap; their taxonomy_tags exceed "
+                f"{self.max_n} so the chain stays whole "
+                f"(e.g. {', '.join(self.chain_over_cap_examples[:5])})"
+            )
+        return lines
+
+
 def build_category_label_entries(
     primary_tag: Optional[str],
     tags_filtered: list[str],
     taxonomy: Optional[Dict[str, Any]],
     lang: str = "en",
-    max_n: int = MAX_NUM_TAXONOMY_TAGS,
+    max_n: Optional[int] = MAX_NUM_TAXONOMY_TAGS,
     vocabulary: Optional[CategoryVocabulary] = None,
 ) -> list[tuple[str, str]]:
     """``(tag_id, label)`` for the flat ``taxonomy_tags`` field, primary tag first.
@@ -306,7 +406,11 @@ def build_category_label_entries(
     field and not the other.
 
     Ids ride along so a run can audit the two fields against each other. Callers
-    that only want the strings want :func:`build_taxonomy_tags_list`.
+    that only want the strings want :func:`build_taxonomy_tags_list`; callers
+    that have a chain to protect from the cap want
+    :func:`select_category_label_entries`, which is what the extraction run uses.
+    ``max_n`` of ``None`` means no cap, which is how that function builds the
+    eligible list it then selects from.
 
     ``vocabulary`` is the set of ids this run may emit. Every tag is checked
     against it before it is labelled, because this function is what writes the
@@ -341,11 +445,82 @@ def build_category_label_entries(
         add(primary_tag)
 
     for t in tags_filtered:
-        if len(out) >= max_n:
+        if max_n is not None and len(out) >= max_n:
             break
         add(t)
 
     return out
+
+
+def select_category_label_entries(
+    primary_tag: Optional[str],
+    tags_filtered: list[str],
+    taxonomy: Optional[Dict[str, Any]],
+    lang: str = "en",
+    max_n: int = MAX_NUM_TAXONOMY_TAGS,
+    vocabulary: Optional[CategoryVocabulary] = None,
+    chain_tags: Optional[Set[str]] = None,
+) -> FlatTagSelection:
+    """Choose the flat field's values, keeping the product's own chain whole.
+
+    The cap used to be applied by walking the tags in order and stopping at
+    ``max_n``, which drops the *tail* of the list. Open Food Facts orders
+    ``categories_tags`` roughly general-to-specific, so the tail is where a
+    product's most specific tags are — including, for three products in the first
+    200,000 records of the public export, a node on its own emitted
+    ``category_path``: ``0036800388352`` lost ``Basmati rices``, ``0051933012707``
+    and ``0078742086774`` lost ``Peas``. The chain still showed the segment; the
+    flat field no longer carried it, so a label-to-segment join missed a node the
+    product genuinely tagged and the miss looked exactly like a labelling
+    divergence (#14).
+
+    ``chain_tags`` are the ids on the product's emitted chain. Every eligible tag
+    among them is kept whatever the cap says, and the cap then governs the
+    remaining, *incidental* tags. That makes the post-#10 invariant — every
+    self-tagged chain node appears verbatim in ``taxonomy_tags`` — hold by
+    construction rather than by there happening to be few enough tags: raising
+    the cap to 24 would have covered today's longest list and left the same
+    defect waiting for a 25-tag product to arrive, silently.
+
+    The primary tag is reserved on the same footing, because the field's first
+    value is read back as the product's primary category label (``attrs`` and the
+    generated description both carry it), so it cannot be a truncation casualty.
+
+    **Selection changes; order does not.** The kept entries stay in the order the
+    tags arrived, so ``entries[0]`` is still the primary tag's label and a
+    consumer reading position is unaffected. Only *which* tags survive a
+    truncation changes — for 3 of 135,716 tagged products in that sample.
+    """
+    reserved: Set[str] = set(chain_tags or ())
+    if primary_tag:
+        reserved.add(primary_tag)
+
+    eligible = build_category_label_entries(
+        primary_tag, tags_filtered, taxonomy, lang, max_n=None, vocabulary=vocabulary
+    )
+    if len(eligible) <= max_n:
+        return FlatTagSelection(entries=eligible, eligible=len(eligible), dropped=[])
+
+    kept_reserved = [entry for entry in eligible if entry[0] in reserved]
+    budget = max_n - len(kept_reserved)
+
+    entries: list[tuple[str, str]] = []
+    dropped: list[str] = []
+    for tag, label in eligible:
+        if tag in reserved:
+            entries.append((tag, label))
+        elif budget > 0:
+            budget -= 1
+            entries.append((tag, label))
+        else:
+            dropped.append(label)
+
+    return FlatTagSelection(
+        entries=entries,
+        eligible=len(eligible),
+        dropped=dropped,
+        chain_over_cap=max(0, len(kept_reserved) - max_n),
+    )
 
 
 def build_taxonomy_tags_list(
@@ -769,6 +944,8 @@ class Counters:
     labels_shared_by_multiple_categories: int = 0
     products_with_refused_category_tags: int = 0
     refused_category_tags: int = 0
+    products_with_truncated_taxonomy_tags: int = 0
+    truncated_taxonomy_tags: int = 0
 
 
 def _fmt_int(n: int) -> str:
@@ -974,6 +1151,7 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
 
     address_audit = AddressAudit()
     tag_audit = TagCurationAudit()
+    cap_audit = TagCapAudit(MAX_NUM_TAXONOMY_TAGS)
     root_audit = RootAnchorAudit(
         taxonomy_roots=taxonomy_roots,
         traversal_roots={
@@ -1039,23 +1217,17 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
                 c.missing_category += 1
                 continue
 
-            flat_entries = build_category_label_entries(
-                primary_tag,
-                tags_curated,
-                taxonomy,
-                lang,
-                max_n=MAX_NUM_TAXONOMY_TAGS,
-                vocabulary=vocabulary,
-            )
-            taxonomy_tags = [label for _tag, label in flat_entries]
-            primary_category_label = taxonomy_tags[0] if taxonomy_tags else None
-
             # Hierarchical category path derived from the OFF taxonomy graph, in
             # the shape retail catalogs typically expose (a single clean root→leaf
             # chain as cumulative path strings). The flat ``taxonomy_tags`` list
-            # above is still used for pricing-bucket matching and attrs;
+            # below is still used for pricing-bucket matching and attrs;
             # ``category_path`` is the field PRISM's hierarchical category facet
             # renders.
+            #
+            # It is derived *before* the flat list because the flat list's cap
+            # needs to know which tags are on this chain, so that truncating the
+            # incidental ones cannot take a segment's flat counterpart with them
+            # (#14).
             path_entries = (
                 category_path_entries(
                     tags_curated,
@@ -1068,6 +1240,19 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
                 else []
             )
             category_path = [path for _node, path in path_entries]
+
+            flat_selection = select_category_label_entries(
+                primary_tag,
+                tags_curated,
+                taxonomy,
+                lang,
+                max_n=MAX_NUM_TAXONOMY_TAGS,
+                vocabulary=vocabulary,
+                chain_tags={node for node, _path in path_entries},
+            )
+            flat_entries = flat_selection.entries
+            taxonomy_tags = [label for _tag, label in flat_entries]
+            primary_category_label = taxonomy_tags[0] if taxonomy_tags else None
 
             # A chain is walked to a root of *this run's* parent map, which is a
             # global taxonomy root unless --category-exclude stranded the head's
@@ -1177,6 +1362,10 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
             # actually written. The flat entries go in even when no path
             # resolved, so a tag that never reaches a chain is still audited.
             address_audit.record(path_entries, flat_entries)
+            # What the cap discarded from the written record. Counted here, with
+            # the address audit, so the number describes the catalog that was
+            # emitted rather than the records a later gate dropped.
+            cap_audit.record(gtin, flat_selection)
 
             out.write(json.dumps(doc, ensure_ascii=False) + "\n")
             c.written += 1
@@ -1203,9 +1392,13 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
 
     for line in tag_audit.log_lines():
         log(line)
+    for line in cap_audit.log_lines():
+        log(line)
     for line in root_audit.log_lines(dropped=require_category_path):
         log(line)
 
+    c.products_with_truncated_taxonomy_tags = cap_audit.products
+    c.truncated_taxonomy_tags = cap_audit.tags_dropped
     c.categories_at_multiple_addresses = address_audit.conflict_count
     c.categories_under_multiple_labels = address_audit.label_conflict_count
     c.labels_shared_by_multiple_categories = address_audit.shared_label_count
@@ -1255,6 +1448,12 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
         # records what never got in. Without it the unresolvable-tag rate is only
         # discoverable by reverse-mapping a built index against the taxonomy.
         "category_tag_curation": tag_audit.summary(),
+        # What the flat field's cap discarded. A tag dropped here is valid — it
+        # survived curation — so it appears nowhere else in this report, and the
+        # emitted field has no marker distinguishing a shortened list from a
+        # short one. The product's own chain is never what gets dropped (#14);
+        # this block says how much else did.
+        "taxonomy_tags_cap": cap_audit.summary(),
         # Chains that resolved but stopped short of a global taxonomy root. The
         # gate refuses these; this is where a run that keeps them (or a run that
         # wants to know what it lost) reads the number and the offending heads.

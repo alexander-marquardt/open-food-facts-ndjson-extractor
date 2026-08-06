@@ -21,7 +21,7 @@ This tool transforms raw, complex Open Food Facts data into a flattened, search-
 | `price` | float | Synthetic, deterministic price for e-commerce simulation. |
 | `currency` | string | Currency code (default: USD). |
 | `image_url` | string | Computed primary product image URL. |
-| `taxonomy_tags` | list | Cleaned, flat list of the product's own category tags, de-duplicated, **validated against the taxonomy** (see [Tags that are not taxonomy categories](#tags-that-are-not-taxonomy-categories)) and rendered with the taxonomy's display name for `--lang` — the **same** label the matching `category_path` segment carries, so the two fields can be joined on string. |
+| `taxonomy_tags` | list | Cleaned, flat list of the product's own category tags, de-duplicated, **validated against the taxonomy** (see [Tags that are not taxonomy categories](#tags-that-are-not-taxonomy-categories)) and rendered with the taxonomy's display name for `--lang` — the **same** label the matching `category_path` segment carries, so the two fields can be joined on string. At most 20 values, and never at the expense of a node on the product's own `category_path` (see [How long the flat list is](#how-long-the-flat-list-is)). |
 | `category_path` | list | **Hierarchical** category path — a single root→leaf chain as cumulative `/`-joined strings (e.g. `["Snacks", "Snacks/Salty snacks", "Snacks/Salty snacks/Crisps"]`), reconstructed from the Open Food Facts category taxonomy graph. Powers breadcrumb-style, drill-down category facets. |
 | `attrs` | object | **Flattened Dictionary** of key-value attributes (e.g., Nutri-Score, Energy). Most values are strings; the four attributes read from an Open Food Facts list — `Labels`, `Allergens`, `Ingredients analysis`, `Dietary restrictions` — are **lists of values** (see [Multi-valued attributes](#multi-valued-attributes)). |
 | `attr_keys` | list | List of all keys available in `attrs` for faceting. |
@@ -355,7 +355,9 @@ label is presented, not what upstream says.
 spellings across the two fields (`Plant based foods` next to `Plant-based
 foods`), so nothing could relate a flat value to a path segment by string: over
 the first 200,000 lines of the public export, only 75.1% of products had every
-self-tagged chain node's label present verbatim in `taxonomy_tags`; it is now 100%.
+self-tagged chain node's label present verbatim in `taxonomy_tags`; it is now
+100% — the last 0.002% being the three products the flat field's length cap used
+to truncate, described in [How long the flat list is](#how-long-the-flat-list-is).
 Because the de-slug worked off the `en:`-prefixed tag id, it also emitted English
 labels in **every** locale — a Spanish catalog rendered `Plant based foods` in
 `taxonomy_tags` and `Alimentos de origen vegetal` in `category_path`, in the same
@@ -372,6 +374,51 @@ never tagged, and those ancestors are legitimately absent from `taxonomy_tags`.
 `tests/test_category_label_agreement.py` pins the direction that must hold —
 every chain node the product *did* tag appears verbatim in `taxonomy_tags` — by
 exact string, on real Open Food Facts records.
+
+### How long the flat list is
+
+`taxonomy_tags` carries at most 20 values. The cap is not a storage rule: the
+field was introduced carrying 3 values and raised to 20 in "Increased the number
+of categories extracted" with no reason recorded, and nothing downstream reads a
+length — PRISM maps the field as a `terms` facet, which has none. It is kept
+because Open Food Facts occasionally tags a product very heavily (33 tags is the
+most in the first million records) and an unbounded field has no ceiling at all,
+not because a measured cost forces one: removing it outright would add 205 bytes
+to 10.5 MB of emitted tag payload, +0.002%.
+
+What the cap must not do is drop a tag the product's own `category_path` needs.
+It used to. The cap was applied by walking the tags in order and stopping, which
+drops the *tail* — and Open Food Facts orders `categories_tags` roughly
+general-to-specific, so the tail is where a product's most specific tags are. Over
+the first 200,000 records of the public export, 6 of 135,716 tagged products
+have more eligible tags than the cap and 3 of those lost a node of their own
+chain to it: `0036800388352` its `Basmati rices`, `0051933012707` and
+`0078742086774` their `Peas` — a `category_path` segment with no flat
+counterpart, which reads exactly like the labelling divergence fixed above and is
+not one.
+
+So the product's chain is reserved: every tag on it survives, and the cap governs
+the remaining, *incidental* tags. That makes the invariant hold by construction
+rather than by there happening to be few enough tags — raising the cap to 24
+would have covered the longest list in that sample and left the same defect
+waiting for the 25-tag product two paragraphs up. Selection changes; **order does
+not**, so `taxonomy_tags[0]` is still the primary tag's label, which `attrs` and
+the generated description read back. On the 15,687-record English catalog that
+those 200,000 lines produce, the fix changes 2 documents (both gain `Peas` in
+place of `Cooked garden peas`) and the file shrinks by 28 bytes.
+
+A chain longer than the cap would take the list past 20 rather than lose a
+segment. None exists today — the deepest chain in that sample is 9 nodes — and
+the run report counts the case so a deeper taxonomy says so rather than
+silently reopening the defect.
+
+Every run reports what the cap discarded, in a `taxonomy_tags_cap` block: the
+number of products truncated, the number of labels dropped, the labels
+themselves, and the longest eligible list seen. A tag dropped here is *valid* —
+it survived curation — so it appears nowhere else in the report, and the emitted
+field has no marker distinguishing a shortened list from a short one.
+`tests/test_category_tag_cap.py` pins both halves on real records: no chain node
+is ever the casualty, and the incidental tags past the cap are still dropped.
 
 ### Tags that are not taxonomy categories
 
