@@ -578,6 +578,28 @@ rather than pretending the manifest on the command line was confirmed by
 anything; it prints the `_meta` block a loader would have to write to make the
 answer real.
 
+**A check that read nothing does not report clean here either.** This is the
+same rule as the catalog side's, applied to the same class of gate: every check
+here counts things that are wrong, and a count over an empty read is zero, so a
+check handed nothing used to report `pass`. It is not hypothetical — against
+`catalog_en_v14` before the `taxonomy_tags` rename, the flat half of
+`category_vocabulary` read 0 distinct values, found 0 outside the snapshot,
+reported all 14,453 snapshot labels unused, and still passed, hiding 46 real
+vocabulary defects that appeared the moment the field name was corrected. A
+`terms` aggregation on a field the mapping does not have is not an error:
+Elasticsearch answers with an empty bucket list, `sum_other_doc_count: 0`,
+`doc_count_error_upper_bound: 0` and `_shards.failed: 0`, and no signal in that
+response distinguishes it from a field the index genuinely holds no values of.
+
+So the mapping — which this script reads anyway — now confirms the fields the run
+is about to aggregate on before a single bucket is counted (`mapped_fields`), and
+an empty vocabulary read is a failure that names which of the two it was: the
+mapping does not declare the field (a **blind** read, fix the verifier), or it
+declares it and the index holds no value of it (a **legitimately empty** read,
+fix the index). `snapshot_labels_unused_by_index == snapshot_labels` — "the index
+uses none of the taxonomy" — stays informational, because it is now reachable
+only through one of those two states, and both are already fatal.
+
 Adding `--catalog <ndjson>` diffs the two id sets exactly and profiles the
 missing ids by run length in catalog order, which is what separates a load that
 dropped batches from two extracts that merely disagree record by record. It is

@@ -223,5 +223,115 @@
         "buckets": []
       }
     }
+  },
+  "blind_read_note": "A live capture of the read this file exists to make impossible to miss (#52). catalog_en_v13 predates the taxonomy_tags rename (#42/#43): its mapping declares categories and category_path but not taxonomy_tags. The search below is the exact request verify_index.py issues today, run against it. The taxonomy_tags aggregation comes back with buckets: [], sum_other_doc_count: 0, doc_count_error_upper_bound: 0 and _shards.failed: 0 over 107,451 documents - nothing in the response says the field does not exist. Only the mapping says so. category_path's 4,601 real buckets are trimmed to the first 5 here; taxonomy_tags' empty bucket list is the cluster's own.",
+  "blind_read_index": "catalog_en_v13",
+  "blind_read_captured_utc": "2026-08-06T01:46:30Z",
+  "blind_read_mappings_properties": {
+    "id": {
+      "type": "keyword",
+      "fields": {
+        "concat": {
+          "type": "text",
+          "analyzer": "product_number"
+        },
+        "no_zeros": {
+          "type": "text",
+          "analyzer": "product_number_no_zeros"
+        },
+        "no_zeros_prefix": {
+          "type": "text",
+          "analyzer": "product_number_no_zeros_prefix",
+          "search_analyzer": "product_number_no_zeros"
+        },
+        "prefix": {
+          "type": "text",
+          "analyzer": "product_number_prefix",
+          "search_analyzer": "product_number"
+        }
+      }
+    },
+    "categories": {
+      "type": "keyword",
+      "fields": {
+        "normalized": {
+          "type": "keyword",
+          "normalizer": "keyword_normalizer"
+        },
+        "text": {
+          "type": "text",
+          "analyzer": "base"
+        }
+      },
+      "copy_to": [
+        "fulltext"
+      ]
+    },
+    "category_path": {
+      "type": "keyword",
+      "fields": {
+        "normalized": {
+          "type": "keyword",
+          "normalizer": "keyword_normalizer"
+        },
+        "text": {
+          "type": "text",
+          "analyzer": "base"
+        }
+      }
+    }
+  },
+  "blind_read_search_response": {
+    "timed_out": false,
+    "_shards": {
+      "total": 1,
+      "successful": 1,
+      "skipped": 0,
+      "failed": 0
+    },
+    "hits": {
+      "total": {
+        "value": 107451,
+        "relation": "eq"
+      },
+      "max_score": null,
+      "hits": []
+    },
+    "aggregations": {
+      "with_category_path": {
+        "doc_count": 107451
+      },
+      "taxonomy_tags": {
+        "doc_count_error_upper_bound": 0,
+        "sum_other_doc_count": 0,
+        "buckets": []
+      },
+      "category_path": {
+        "doc_count_error_upper_bound": 0,
+        "sum_other_doc_count": 0,
+        "buckets": [
+          {
+            "key": "Plant-based foods and beverages",
+            "doc_count": 33564
+          },
+          {
+            "key": "Plant-based foods and beverages/Plant-based foods",
+            "doc_count": 28955
+          },
+          {
+            "key": "Snacks",
+            "doc_count": 24127
+          },
+          {
+            "key": "Snacks/Sweet snacks",
+            "doc_count": 16018
+          },
+          {
+            "key": "Plant-based foods and beverages/Plant-based foods/Cereals and potatoes",
+            "doc_count": 9680
+          }
+        ]
+      }
+    }
   }
 }
