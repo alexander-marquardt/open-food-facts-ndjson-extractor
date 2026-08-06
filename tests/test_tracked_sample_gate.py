@@ -50,12 +50,19 @@ What this module covers
   cumulative root-to-leaf chain, ``taxonomy_tags[0]`` equal to
   ``attrs["Category"]``, and every path segment present in ``taxonomy_tags`` so
   the two fields join on string as the schema table promises.
-* **The rendered description tail** — the "Key specifications" run is rebuilt
-  from the record's own ``attrs`` through ``build_description``. This is the arm
-  that catches a *hand edit*: the drift was partly propagated by patching the
-  file in place (a key renamed here, a value replaced there), and an in-place
-  edit that touches ``attrs`` without re-rendering the description leaves the two
-  disagreeing.
+* **The promoted per-fact fields** — ``labels``, ``allergens``, ``countries``,
+  ``ingredients_analysis``, ``nutri_score``, ``eco_score`` and ``nova_group`` are
+  re-derived from the record's own ``attrs`` through ``promoted_attr_fields`` and
+  compared exactly, presence included. This is the arm that catches a *hand
+  edit*: the drift was partly propagated by patching the file in place (a key
+  renamed here, a value replaced there), and an edit that touches ``attrs``
+  without touching the field promoted from it leaves the two disagreeing.
+* **The description** — rebuilt from the record's own ``title`` through
+  ``build_description``, which is as much as this file can check without the
+  dump (the source text half is read, not computed). What it *can* state
+  completely is that the description carries no attribute block: the
+  "Key specifications" run was removed from the extractor, and a sample still
+  carrying it is a sample an older working copy produced.
 * **The recorded command** — the regeneration command in the README is parsed by
   the extractor's *own* ``build_parser``, so a renamed or deleted flag fails here
   rather than when someone next tries to follow the instructions. The record
@@ -68,7 +75,10 @@ document already carries: ``title``, ``brand``, ``image_url``, the ingredient
 text inside ``description``, and the ``attrs`` entries sourced from the raw
 record (``Quantity``, ``Serving size``, ``Nutri-Score``, ``NOVA group``,
 ``Eco-Score``, ``Allergens``, ``Labels``, ``Ingredients analysis``, ``Countries``
-and the nutrition values). It also cannot see the *membership and labelling* of
+and the nutrition values) — and, through them, the promoted fields, which this
+module can only prove *consistent with* the attributes they were taken from, not
+faithful to the dump those attributes were read from. It also cannot see the
+*membership and labelling* of
 ``taxonomy_tags`` and ``category_path`` — the tag cap, the curation rules, the
 anchoring, and the taxonomy display labels all need the taxonomy snapshot. It
 checks that those two fields are internally well-formed and mutually consistent,
@@ -106,10 +116,12 @@ import pytest
 from off_demo_extract.extract import (
     MARGIN_SOURCE_STAMP,
     POPULARITY_SOURCE_STAMP,
+    PROMOTED_ATTR_FIELDS,
     build_description,
     build_parser,
     derive_margin,
     derive_popularity,
+    promoted_attr_fields,
 )
 from off_demo_extract.pricing import estimate_price, load_pricing_config
 
@@ -136,6 +148,20 @@ TOP_LEVEL_FIELDS: Dict[str, Any] = {
     "attrs": dict,
     "attr_keys": list,
     "dietary_restrictions": list,
+}
+
+# The per-fact fields promoted out of ``attrs``. Optional by construction: each
+# one is written only for a product whose ``attrs`` carries the source key, so
+# absence is data rather than drift, and the arm below checks presence *against
+# that key* instead of demanding the field unconditionally.
+PROMOTED_FIELD_TYPES: Dict[str, Any] = {
+    "labels": list,
+    "allergens": list,
+    "countries": str,
+    "ingredients_analysis": list,
+    "nutri_score": str,
+    "eco_score": str,
+    "nova_group": str,
 }
 
 
@@ -253,7 +279,13 @@ def _shape_violations(record: Mapping[str, Any]) -> List[str]:
                 f"{field} is {type(record[field]).__name__}, expected {want_type.__name__}"
             )
 
-    extra = sorted(set(record) - set(TOP_LEVEL_FIELDS))
+    for field, want_type in PROMOTED_FIELD_TYPES.items():
+        if field in record and not isinstance(record[field], want_type):
+            violations.append(
+                f"{field} is {type(record[field]).__name__}, expected {want_type.__name__}"
+            )
+
+    extra = sorted(set(record) - set(TOP_LEVEL_FIELDS) - set(PROMOTED_FIELD_TYPES))
     if extra:
         violations.append(f"top-level fields no current run writes: {extra}")
 
@@ -303,25 +335,71 @@ def _shape_violations(record: Mapping[str, Any]) -> List[str]:
     return violations
 
 
-def _description_violations(record: Mapping[str, Any]) -> List[str]:
-    """Rebuild the "Key specifications" tail from ``attrs`` and compare it."""
+def _promoted_field_violations(record: Mapping[str, Any]) -> List[str]:
+    """Re-derive the per-fact fields from ``attrs`` and compare them exactly.
+
+    Every promoted field is a pure function of an ``attrs`` entry the record
+    itself carries, so this arm needs neither the dump nor the taxonomy — and it
+    is what makes an in-place edit of the sample visible. Editing
+    ``attrs["Labels"]`` without editing ``labels`` (or the reverse) leaves the
+    document saying two different things about one fact, which is exactly the
+    kind of drift this module exists to catch.
+
+    Presence is part of the comparison in both directions: a field written for an
+    attribute the record does not carry is as wrong as a missing one.
+    """
     attrs = record.get("attrs")
+    if not isinstance(attrs, dict):
+        return ["attrs is missing or is not an object, so nothing can be re-derived"]
+
+    expected = promoted_attr_fields(attrs)
+    violations: List[str] = []
+
+    for key, field in PROMOTED_ATTR_FIELDS.items():
+        if field in expected and field not in record:
+            violations.append(
+                f"{field} is absent; a current run promotes it from attrs[{key!r}]"
+            )
+        elif field in record and field not in expected:
+            violations.append(
+                f"{field} is written but attrs carries no {key!r}, so no run could have produced it"
+            )
+        elif field in record and record[field] != expected[field]:
+            violations.append(
+                f"{field}: sample has {record[field]!r}, attrs[{key!r}] is {expected[field]!r}"
+            )
+
+    return violations
+
+
+def _description_violations(record: Mapping[str, Any]) -> List[str]:
+    """Check the description against the title, and against carrying no attributes.
+
+    The source-text half is read from the dump, so this file cannot reconstruct
+    it. Both halves of what it *can* state are checked: the description begins
+    the way ``build_description`` builds it from this record's own title, and it
+    carries no attribute block — that block was removed from the extractor, so a
+    sample still carrying one was produced by an older working copy.
+    """
     description = record.get("description")
-    if not isinstance(attrs, dict) or not isinstance(description, str):
-        return ["description or attrs is missing, so the tail cannot be rebuilt"]
+    title = record.get("title")
+    if not isinstance(description, str) or not isinstance(title, str):
+        return ["description or title is missing, so neither check can run"]
 
-    rendered = build_description(title="", desc="", attrs=attrs, single_line=True)
-    marker = "Key specifications: "
-    if marker not in rendered:
-        return [] if marker not in description else ["description carries a spec run that attrs cannot explain"]
+    violations: List[str] = []
+    if "Key specifications" in description:
+        violations.append(
+            "description carries a 'Key specifications' block; the extractor no "
+            "longer writes one"
+        )
 
-    tail = rendered.split(marker, 1)[1]
-    if not description.endswith(f"{marker}{tail}"):
-        return [
-            "the description's spec run disagrees with attrs; expected it to end with "
-            f"{marker + tail!r}"
-        ]
-    return []
+    prefix = build_description(title=title, desc="")
+    if not description.startswith(prefix):
+        violations.append(
+            f"description does not start with its own title as build_description renders "
+            f"it: expected {prefix!r}"
+        )
+    return violations
 
 
 def _documented_command() -> List[str]:
@@ -375,15 +453,27 @@ def test_the_sample_has_the_shape_a_current_run_emits() -> None:
     )
 
 
-def test_the_sample_descriptions_agree_with_their_own_attrs() -> None:
+def test_the_sample_promotes_the_fields_its_own_attrs_derive() -> None:
+    failures = {
+        record.get("id"): violations
+        for record in _load_sample()
+        if (violations := _promoted_field_violations(record))
+    }
+    assert not failures, (
+        "a promoted field does not match the attrs entry it is taken from, which is "
+        "what an in-place edit of the sample looks like:\n" + json.dumps(failures, indent=2)
+    )
+
+
+def test_the_sample_descriptions_are_prose_and_carry_no_attributes() -> None:
     failures = {
         record.get("id"): violations
         for record in _load_sample()
         if (violations := _description_violations(record))
     }
     assert not failures, (
-        "a description does not match the attrs it is rendered from, which is what "
-        "an in-place edit of the sample looks like:\n" + json.dumps(failures, indent=2)
+        "a description is not what build_description now produces:\n"
+        + json.dumps(failures, indent=2)
     )
 
 
@@ -482,8 +572,13 @@ def test_stale_sample_fails_the_shape_arm() -> None:
 
 @pytest.mark.parametrize(
     "arm",
-    [_derived_value_violations, _shape_violations],
-    ids=["derived_values", "shape"],
+    [
+        _derived_value_violations,
+        _shape_violations,
+        _promoted_field_violations,
+        _description_violations,
+    ],
+    ids=["derived_values", "shape", "promoted_fields", "description"],
 )
 def test_each_arm_clears_the_current_sample_and_rejects_the_stale_one(arm) -> None:
     """Both directions, per arm, in one place: green on current, red on stale."""
