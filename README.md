@@ -17,7 +17,7 @@ This tool transforms raw, complex Open Food Facts data into a flattened, search-
 | `id` | string | GTIN-13 barcode (padded). |
 | `title` | string | Product name (English). |
 | `brand` | string | Manufacturer or brand name. |
-| `description` | string | Synthesized description (Title + Ingredients + Key Specs). |
+| `description` | string | The product's own prose: its title, then the source text (`generic_name_<lang>`, else `ingredients_text_<lang>`), capped at 600 characters. **No attributes** — see [Why the description carries no attributes](#why-the-description-carries-no-attributes). |
 | `price` | float | Synthetic, deterministic price for e-commerce simulation. |
 | `currency` | string | Currency code (default: USD). |
 | `image_url` | string | Computed primary product image URL. |
@@ -25,7 +25,20 @@ This tool transforms raw, complex Open Food Facts data into a flattened, search-
 | `category_path` | list | **Hierarchical** category path — a single root→leaf chain as cumulative `/`-joined strings (e.g. `["Snacks", "Snacks/Salty snacks", "Snacks/Salty snacks/Crisps"]`), reconstructed from the Open Food Facts category taxonomy graph. Powers breadcrumb-style, drill-down category facets. |
 | `attrs` | object | **Flattened Dictionary** of key-value attributes (e.g., Nutri-Score, Energy). Most values are strings; the four attributes read from an Open Food Facts list — `Labels`, `Allergens`, `Ingredients analysis`, `Dietary restrictions` — are **lists of values** (see [Multi-valued attributes](#multi-valued-attributes)). |
 | `attr_keys` | list | List of all keys available in `attrs` for faceting. |
-| `dietary_restrictions` | list | Extracted dietary tags (e.g., vegan, vegetarian). |
+| `dietary_restrictions` | list | Extracted dietary tags (e.g., vegan, vegetarian), derived from `labels_tags` + `ingredients_analysis_tags`, positive-only. |
+| `labels` | list | `attrs["Labels"]` as its own field — the product's Open Food Facts label tags (`organic`, `no-gluten`, `fair-trade`, …). |
+| `allergens` | list | `attrs["Allergens"]` as its own field. |
+| `countries` | string | `attrs["Countries"]` as its own field — free-text prose, not a list; see [Multi-valued attributes](#multi-valued-attributes). |
+| `ingredients_analysis` | list | `attrs["Ingredients analysis"]` as its own field (`palm-oil-free`, `vegan`, `vegetarian-status-unknown`, …). |
+| `nutri_score` | string | `attrs["Nutri-Score"]` as its own field. **Data only** — see [Per-fact fields](#per-fact-fields). |
+| `eco_score` | string | `attrs["Eco-Score"]` as its own field. **Data only.** |
+| `nova_group` | string | `attrs["NOVA group"]` as its own field. **Data only.** |
+
+The last seven are **written only for a product that carries the attribute**. An
+absent field means Open Food Facts has no such value for that product; the writer
+never emits `""` or `[]` to stand for "nothing", because an empty string indexes
+as a real (empty) keyword and an empty list claims the source was read and found
+empty. This is the same rule `attrs` itself follows.
 
 ## Why this tool is necessary
 
@@ -35,7 +48,7 @@ This script transforms the raw data into a clean, consistent, and search-ready f
 
 *   **Selects a primary language:** It extracts titles and descriptions from a complex, multi-language structure into single `title` and `description` fields.
 *   **Constructs a reliable image URL:** It navigates nested image metadata to build a single, high-quality `image_url`.
-*   **Synthesizes a full description:** It combines the title, generic name, and key attributes into a comprehensive `description` field.
+*   **Keeps the description to the product's own prose:** `description` is the title plus the source text, and nothing else. The facts worth reaching exactly are fields of their own instead (see [Per-fact fields](#per-fact-fields)).
 *   **Generates a synthetic price:** It creates a deterministic, plausible price to enable e-commerce simulations.
 *   **Flattens the structure:** It extracts key attributes into a simple key-value `attrs` object, keeping list-valued attributes as lists so each value stays exactly matchable (see [Multi-valued attributes](#multi-valued-attributes)).
 *   **Reconstructs a category hierarchy:** It resolves the product's categories against the Open Food Facts category taxonomy graph to emit a single clean root→leaf `category_path` (see [Category hierarchy](#category-hierarchy)).
@@ -95,7 +108,7 @@ The output is a clean, flat JSON object, ready to be indexed into a search engin
   "id": "0008127000019",
   "title": "Extra virgin olive oil",
   "brand": "Athena Imports",
-  "description": "Extra virgin olive oil. Extra virgin olive oil Key specifications: Category: Plant-based foods and beverages; Serving size: 15 ml; Nutri-Score: B; NOVA group: 2; Eco-Score: E; Dietary restrictions: vegan, vegetarian; Ingredients analysis: palm-oil-free, vegan, vegetarian; Energy (kcal/100g): 800 kcal; Fat (g/100g): 93.3 g; Saturated fat (g/100g): 13.3 g; Sugars (g/100g): 0 g; Salt (g/100g): 0 g; Protein (g/100g): 0 g; Countries: United States",
+  "description": "Extra virgin olive oil. Extra virgin olive oil",
   "image_url": "https://images.openfoodfacts.org/images/products/000/812/700/0019/front_en.5.400.jpg",
   "price": 14.29,
   "margin": 22,
@@ -176,7 +189,16 @@ The output is a clean, flat JSON object, ready to be indexed into a search engin
   "dietary_restrictions": [
     "vegan",
     "vegetarian"
-  ]
+  ],
+  "countries": "United States",
+  "ingredients_analysis": [
+    "palm-oil-free",
+    "vegan",
+    "vegetarian"
+  ],
+  "nutri_score": "B",
+  "eco_score": "E",
+  "nova_group": "2"
 }
 ```
 
@@ -218,9 +240,79 @@ field and the displayed value (`United States` → `united-states`), which is a
 decision about the catalog rather than a join to undo. Tracked in
 [#50](https://github.com/alexander-marquardt/open-food-facts-ndjson-extractor/issues/50).
 
-Display is unaffected: the generated `description` joins list attributes with
-`", "` at render time, exactly as the values used to be joined at write time, so
-every description is byte-identical to the one the joined form produced.
+The same distinction carries into the per-fact fields below: `labels`,
+`allergens` and `ingredients_analysis` are lists, `countries` is one string, and
+each is written exactly as its `attrs` entry holds it.
+
+## Per-fact fields
+
+Seven attributes are **also** written as top-level fields of their own:
+
+| field | from `attrs` | shape |
+| :--- | :--- | :--- |
+| `labels` | `Labels` | list |
+| `allergens` | `Allergens` | list |
+| `countries` | `Countries` | string |
+| `ingredients_analysis` | `Ingredients analysis` | list |
+| `nutri_score` | `Nutri-Score` | string |
+| `eco_score` | `Eco-Score` | string |
+| `nova_group` | `NOVA group` | string |
+
+**Why a field and not just an attribute.** `attrs` is one `flattened` blob. A
+field of its own is individually weightable, individually facetable, and visible
+in the schema — so a query can reach *that fact* rather than reach into a blob.
+`no-gluten` is the example that made the case: it is the second most common label
+in the catalog, and inside `attrs` it was reachable only where a product carried
+no other label.
+
+**Values are the source's.** Nothing here cleans, normalises or re-cases a value.
+Each field is the `attrs` entry verbatim, so the two can never disagree about one
+fact — and `attrs` keeps every promoted key, because it is the inspection surface
+and downstream readers target it by name.
+
+**`Nutri-Score`, `Eco-Score` and `NOVA group` are data only.** They are emitted
+because they are in the source, and they should not be presented as graded health
+claims. Open Food Facts contributors enter per-serving figures into the per-100g
+fields, and the grades are computed from those: this dump contains confectionery
+recording `Sugars = 0 g/100g` and therefore graded Nutri-Score A at roughly 94%
+sugar. Emitting the value is faithful; displaying it as a health grade would make
+an unreliable number more prominent rather than less.
+
+**Not promoted, deliberately.** The merchandising internals (`Modelled margin`,
+`Margin source`, `Price source`, `Pricing bucket`, `Popularity source`,
+`Estimated unit price`, `Unique scans`) stay inside `attrs`: they are reachable
+for inspection and never belong in shopper-facing recall. So do the nutrition
+numerics (`Fat`, `Protein`, `Sugars`, `Salt`, `Fiber`, `Energy`, `Saturated fat`,
+`Serving size`, `Quantity`) — a number rendered as text (`"1.2775 g"`) matches no
+useful query. `Category` is not promoted either: it is `taxonomy_tags[0]` by
+construction and the hierarchy facet reads `category_path`, so a field would be a
+third spelling of a fact the document already carries twice. `Dietary
+restrictions` already *is* a top-level field, derived from the same two sources
+`labels` and `ingredients_analysis` are read from.
+
+## Why the description carries no attributes
+
+`description` used to end with a `Key specifications:` run of eighteen `attrs`
+entries, appended to compensate for products whose source text is thin. Measured
+on 500 documents of a built catalog, that tail is far smaller than the cost:
+
+| source text | share |
+| :--- | ---: |
+| absent (title only) | 1% |
+| ≈ a restatement of the title | 4% |
+| short, `generic_name`-ish (<45 chars) | 15% |
+| **a substantial ingredient list (≥45 chars)** | **79%** |
+
+79% of products already carry real retail text, and the block diluted exactly
+those: the median description was 592 characters and 153 after removing the block
+and the title prefix, so roughly three quarters of the field was not product
+prose. BM25 normalises by field length, so the padding actively down-weighted the
+text it was glued to. Its label words discriminate nothing either — a search for
+`Allergens` or `Nutri-Score` in `description` matched **every** document in the
+catalog.
+
+The facts are not lost. The ones worth reaching exactly are now
+[fields of their own](#per-fact-fields), and every attribute remains in `attrs`.
 
 ## Category hierarchy
 

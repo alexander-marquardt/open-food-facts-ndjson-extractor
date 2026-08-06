@@ -840,72 +840,108 @@ def build_attrs(
     return attrs
 
 
-def render_attr_value(value: Optional[AttrValue]) -> Optional[str]:
-    """Render one ``attrs`` value as display text.
+# The ``attrs`` entries that are also written as their own top-level field, and
+# the field each one is written to. Source key -> emitted field name.
+#
+# Why these seven and not the rest: an attribute earns a field when a query would
+# want to reach that *fact* exactly -- a label, an allergen, a country, an
+# ingredients-analysis verdict, a grade. The merchandising internals (margin,
+# pricing bucket, price/popularity provenance) and the nutrition numerics stay in
+# ``attrs`` only: the first are retailer-private and belong nowhere near shopper
+# recall, and the second are numbers rendered as text ("1.2775 g"), which no
+# useful query matches.
+#
+# ``Category`` is deliberately absent. It is ``taxonomy_tags[0]`` by construction
+# (``build_attrs`` writes ``primary_category_label``), and every ``category_path``
+# segment already joins to ``taxonomy_tags`` on string, so a promoted field would
+# be a third spelling of a fact this document already carries twice.
+#
+# ``Dietary restrictions`` is absent for the same reason: it is already the
+# top-level ``dietary_restrictions`` field, derived from ``labels_tags`` and
+# ``ingredients_analysis_tags`` -- the same two sources ``labels`` and
+# ``ingredients_analysis`` below are read from. Promoting it would be a second
+# spelling of a field that already exists.
+#
+# The values are written exactly as ``build_attrs`` read them: a list-sourced
+# attribute stays a list, and ``Countries`` stays the free-text scalar it is read
+# from (see :func:`build_attrs` and #50). Nothing here cleans, normalises or
+# re-cases a value -- these fields are the source's, and a "tidier" copy of a
+# value would disagree with the ``attrs`` entry it was taken from.
+PROMOTED_ATTR_FIELDS: Dict[str, str] = {
+    "Labels": "labels",
+    "Allergens": "allergens",
+    "Countries": "countries",
+    "Ingredients analysis": "ingredients_analysis",
+    # Data-only, and named as such here so the next reader does not promote them
+    # further. The reason is in the corpus: Open Food Facts contributors enter
+    # per-serving figures into the per-100g fields, and the grades are computed
+    # from those. Six confectionery SKUs in this dump record ``Sugars = 0
+    # g/100g`` and are therefore graded Nutri-Score A at ~94% sugar. Emitting the
+    # value is honest -- it is what the source says. Displaying it as a health
+    # claim, or faceting on it, would make an unreliable number more prominent
+    # rather than less, and the lie would be ours rather than the source's.
+    "Nutri-Score": "nutri_score",
+    "Eco-Score": "eco_score",
+    "NOVA group": "nova_group",
+}
 
-    This is where the join lives now. A list attribute is joined with ``", "``
-    -- the same separator the writer used to apply -- so the human-readable
-    surfaces read exactly as they did before, while the indexed document keeps
-    the values apart.
 
-    Every consumer that wants text out of ``attrs`` must come through here.
+def promoted_attr_fields(attrs: Mapping[str, AttrValue]) -> Dict[str, AttrValue]:
+    """Return the top-level fields promoted out of ``attrs``.
+
+    A key absent from ``attrs`` is absent here too: the writer omits a field
+    rather than emitting ``""`` or ``[]``, which is the same rule ``build_attrs``
+    already follows. An empty string would index as a real (empty) keyword term
+    and an empty list would claim the attribute was read and found empty, and
+    neither is what "Open Food Facts does not carry this for this product" means.
+
+    ``attrs`` keeps every promoted key. The blob is the inspection surface, and
+    live readers target it by name -- a business signal filters on
+    ``attrs.NOVA group``, a script derives the modelled margin from
+    ``attrs.Labels``, and a retailer plugin iterates ``attrs.items()``
+    generically. Removing a key here would silently change all three: no error,
+    just a clause that stops matching.
+
+    Lists are copied, so the emitted document never has two keys sharing one
+    mutable object.
     """
-    if value is None:
-        return None
-    if isinstance(value, list):
-        return ", ".join(value)
-    return value
-
-
-def build_description(
-    title: str,
-    desc: str,
-    attrs: Mapping[str, AttrValue],
-    *,
-    single_line: bool = True,
-) -> str:
-    preferred_keys = [
-        "Category", "Quantity", "Serving size", "Nutri-Score", "NOVA group", "Eco-Score",
-        "Dietary restrictions",
-        "Allergens", "Labels", "Ingredients analysis",
-        "Energy (kcal/100g)", "Fat (g/100g)", "Saturated fat (g/100g)",
-        "Sugars (g/100g)", "Salt (g/100g)", "Protein (g/100g)", "Fiber (g/100g)",
-        "Countries"
-    ]
-
-    specs: list[str] = []
-    for k in preferred_keys:
-        # The undefined-like test is applied to the *rendered* text, not to each
-        # element, which is what it was applied to before this field could hold a
-        # list: a joined "vegan, undefined" was never suppressed and still is not.
-        # Testing elements instead would have quietly started dropping values
-        # from the description, which is a change to what the catalog says.
-        v = render_attr_value(attrs.get(k))
-        if not v:
+    fields: Dict[str, AttrValue] = {}
+    for key, field in PROMOTED_ATTR_FIELDS.items():
+        value = attrs.get(key)
+        if value is None:
             continue
-        if _is_undefined_like(v):
-            continue
-        specs.append(f"{k}: {v}")
+        fields[field] = list(value) if isinstance(value, list) else value
+    return fields
 
+
+def build_description(title: str, desc: str) -> str:
+    """The product's own prose: its title, then the source text.
+
+    ``desc`` is ``generic_name_<lang>`` or ``ingredients_text_<lang>`` (see
+    :func:`get_description`) -- retail text a person wrote about the product.
+
+    It used to carry a ``Key specifications:`` run of eighteen ``attrs`` entries
+    appended to that prose, and that block is gone. It was
+    added to compensate for products whose source text is thin, and the tail it
+    compensated for is far smaller than the cost: measured on 500 live catalog
+    documents, 79% already carry a substantial ingredient list and only 1% carry
+    nothing, while the block made up roughly three quarters of the median
+    description. Because BM25 normalises by field length, that padding
+    down-weighted the real text it was glued to, and its label words discriminate
+    nothing -- ``description ~ "Allergens"`` and ``~ "Nutri-Score"`` each matched
+    *every* document in the catalog.
+
+    The facts are not lost: the ones worth reaching exactly are now their own
+    fields (:data:`PROMOTED_ATTR_FIELDS`), and every attribute remains in
+    ``attrs``.
+    """
     t = title.strip()
     d = desc.strip()
 
     # Avoid double periods ("Title..")
     if t.endswith("."):
-        base = f"{t} {d}".strip()
-    else:
-        base = f"{t}. {d}".strip()
-
-    if not specs:
-        return base
-
-    if single_line:
-        return f"{base} Key specifications: " + "; ".join(specs)
-
-    # Multiline (plain text, no markdown)
-    lines = [t, "", d, "", "Key specifications:"]
-    lines += [f"- {s}" for s in specs]
-    return "\n".join(lines)
+        return f"{t} {d}".strip()
+    return f"{t}. {d}".strip()
 
 
 # ----------------------------
@@ -1326,7 +1362,11 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
             attrs["Unique scans (Open Food Facts)"] = str(unique_scans_n or 0)
 
             attr_keys = sorted(attrs.keys())
-            description = build_description(title=title, desc=desc, attrs=attrs, single_line=True)
+            description = build_description(title=title, desc=desc)
+            # The per-fact fields. Built from ``attrs`` after every writer above
+            # has run, so a key added later is promoted by adding it to
+            # PROMOTED_ATTR_FIELDS and nowhere else.
+            promoted = promoted_attr_fields(attrs)
 
             # ``taxonomy_tags`` is the flat, display-only tag set: the product's
             # own category tags, validated against the taxonomy and labelled. It
@@ -1353,6 +1393,9 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
                 "attrs": attrs,
                 "attr_keys": attr_keys,
                 "dietary_restrictions": dietary_restrictions,
+                # Present only for the attributes this product actually carries;
+                # see :func:`promoted_attr_fields`.
+                **promoted,
             }
 
             if category_path:
@@ -1487,6 +1530,13 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
             ),
             "price": "category baseline unit model + deterministic noise + label premiums + retail rounding",
             "dietary_restrictions": "keyword list derived from labels_tags and ingredients_analysis_tags (positive-only)",
+            # Recorded per run so a build report says which per-fact fields that
+            # run could emit, without anyone reading the source to find out.
+            "promoted_attr_fields": (
+                "written as top-level fields, verbatim from the attrs entry named, "
+                "and omitted on a product that carries no such attribute: "
+                + "; ".join(f"{field} <- attrs[{key!r}]" for key, field in PROMOTED_ATTR_FIELDS.items())
+            ),
             "progress": f"every {args.progress_every} records and/or {args.progress_seconds}s",
         },
     }
