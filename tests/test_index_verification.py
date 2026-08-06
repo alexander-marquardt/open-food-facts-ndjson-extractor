@@ -775,7 +775,7 @@ def test_both_ends_of_the_rule_refuse_a_run_that_verified_nothing() -> None:
 
     catalog_side = verify_catalog.gate(
         {"records": 10, "values_checked_against_snapshot": 0},
-        verify_catalog.Tolerance(),
+        verify_catalog.values_tolerance(),
     )
     assert [name for name, _ in catalog_side] == ["nothing_verified"]
 

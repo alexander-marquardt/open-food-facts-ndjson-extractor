@@ -63,7 +63,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import math
 import os
 import sys
 import time
@@ -72,6 +71,8 @@ import urllib.request
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple
+
+from tolerance import Tolerance
 
 MAX_EXAMPLES = 3
 
@@ -142,34 +143,23 @@ def _exists(index: str) -> bool:
         raise ReindexError(f"HEAD /{index} -> {exc.reason}") from exc
 
 
-@dataclass
-class Tolerance:
+def missing_tolerance(
+    allow_missing: Optional[int] = None,
+    allow_missing_fraction: Optional[float] = None,
+) -> Tolerance:
     """How many uncopied documents the operator has explicitly agreed to.
 
-    Same two flags, same names and the same floor-never-round rule as
-    ``inject_category_path.py``: a fraction can never round up into permitting
-    one more missing document than anybody wrote down.
+    Same two flags and the same names as ``inject_category_path.py``, and now
+    literally the same rule: both call ``scripts/tolerance.py``, so a fraction
+    cannot round up into permitting one more missing document than anybody
+    wrote down, and cannot start doing so here without starting there.
     """
-
-    allow_missing: Optional[int] = None
-    allow_missing_fraction: Optional[float] = None
-
-    def permitted(self, src_count: int) -> int:
-        if self.allow_missing is not None:
-            return self.allow_missing
-        if self.allow_missing_fraction is not None:
-            return math.floor(self.allow_missing_fraction * src_count)
-        return 0
-
-    def describe(self, src_count: int) -> str:
-        if self.allow_missing is not None:
-            return f"--allow-missing {self.allow_missing}"
-        if self.allow_missing_fraction is not None:
-            return (
-                f"--allow-missing-fraction {self.allow_missing_fraction:g} "
-                f"({self.permitted(src_count):,} of {src_count:,})"
-            )
-        return "0 (default: zero tolerance)"
+    return Tolerance(
+        "--allow-missing",
+        "--allow-missing-fraction",
+        allow_missing,
+        allow_missing_fraction,
+    )
 
 
 @dataclass
@@ -476,12 +466,11 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
     )
     args = ap.parse_args(list(argv) if argv is not None else None)
 
-    if args.allow_missing is not None and args.allow_missing < 0:
-        ap.error("--allow-missing must not be negative")
-    if args.allow_missing_fraction is not None and not 0.0 <= args.allow_missing_fraction <= 1.0:
-        ap.error("--allow-missing-fraction must be between 0 and 1")
+    tolerance = missing_tolerance(args.allow_missing, args.allow_missing_fraction)
+    problem = tolerance.problem()
+    if problem is not None:
+        ap.error(problem)
 
-    tolerance = Tolerance(args.allow_missing, args.allow_missing_fraction)
     copy = Copy(source=args.source, dest=args.dest)
 
     try:

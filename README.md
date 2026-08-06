@@ -845,9 +845,11 @@ ecommerce-open-food-facts/
 │   ├── verify_index.py    # Checks a live index against that manifest (read-only)
 │   ├── inject_category_path.py  # Adds category_path to an already-loaded index,
 │   │                            #   and fails when the updates miss their documents
-│   └── reindex_v7_to_v8.py  # Copies an index to a new generation without
-│                            #   re-embedding, and reports success only for a
-│                            #   copy it has polled to completion and counted
+│   ├── reindex_v7_to_v8.py  # Copies an index to a new generation without
+│   │                        #   re-embedding, and reports success only for a
+│   │                        #   copy it has polled to completion and counted
+│   └── tolerance.py       # The one --allow-… rule the three gating scripts
+│                          #   share: a fraction is floored, never rounded
 ├── builds/                # Per-build manifests, reports and verification notes
 ├── tests/
 │   ├── conftest.py        # Puts src/ on sys.path so tests import normally
