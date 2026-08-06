@@ -1,0 +1,208 @@
+{
+ "_source": "Open Food Facts (openfoodfacts.org), ODbL. Three records taken verbatim from data/sample-data/clean_products.ndjson as this repository shipped it at commit e81402b79ed2f3331adcef220308f292a29ed200 -- the last state of the tracked sample before it was regenerated in #57. Nothing is synthesised or edited: these are the bytes a reader of the README was given for seven months.",
+ "commit": "e81402b79ed2f3331adcef220308f292a29ed200",
+ "records": [
+  {
+   "id": "0000790200123",
+   "title": "Fine Chocolate Candy Bar, Dark Chocolate",
+   "brand": "Simply,  Simply Natural Foods  Llc.",
+   "description": "Fine Chocolate Candy Bar, Dark Chocolate. Maltitol, chocolate liquor, cocoa butter, inulin (natural vegetable fiber), soy lecithin, vanilla, cinnamon. Key specifications: Category: Snacks; Quantity: 3 oz; Serving size: 1 SQUARE (25 g); Nutri-Score: C; NOVA group: 4; Allergens: soybeans; Labels: no-gluten; Ingredients analysis: palm-oil-free, vegan-status-unknown, vegetarian-status-unknown; Energy (kcal/100g): 400 kcal; Fat (g/100g): 32 g; Saturated fat (g/100g): 20 g; Sugars (g/100g): 0 g; Salt (g/100g): 0 g; Protein (g/100g): 4 g; Fiber (g/100g): 12 g; Countries: United States",
+   "image_url": "https://images.openfoodfacts.org/images/products/000/079/020/0123/front_en.7.400.jpg",
+   "price": 4.29,
+   "currency": "USD",
+   "taxonomy_tags": [
+    "Snacks",
+    "Sweet snacks",
+    "Cocoa and its products"
+   ],
+   "attrs": {
+    "Quantity": "3 oz",
+    "Serving size": "1 SQUARE (25 g)",
+    "Nutri-Score": "C",
+    "NOVA group": "4",
+    "Allergens": [
+     "soybeans"
+    ],
+    "Labels": [
+     "no-gluten"
+    ],
+    "Ingredients analysis": [
+     "palm-oil-free",
+     "vegan-status-unknown",
+     "vegetarian-status-unknown"
+    ],
+    "Countries": "United States",
+    "Category": "Snacks",
+    "Energy (kcal/100g)": "400 kcal",
+    "Fat (g/100g)": "32 g",
+    "Saturated fat (g/100g)": "20 g",
+    "Sugars (g/100g)": "0 g",
+    "Salt (g/100g)": "0 g",
+    "Protein (g/100g)": "4 g",
+    "Fiber (g/100g)": "12 g",
+    "Price source": "estimated_unit_model",
+    "Pricing bucket": "snacks_sweets",
+    "Estimated unit price": "51.93 USD/kg (85g, source=quantity, bucket=snacks_sweets, scale=1.11, ratio=0.34)"
+   },
+   "attr_keys": [
+    "Allergens",
+    "Category",
+    "Countries",
+    "Energy (kcal/100g)",
+    "Estimated unit price",
+    "Fat (g/100g)",
+    "Fiber (g/100g)",
+    "Ingredients analysis",
+    "Labels",
+    "NOVA group",
+    "Nutri-Score",
+    "Price source",
+    "Pricing bucket",
+    "Protein (g/100g)",
+    "Quantity",
+    "Salt (g/100g)",
+    "Saturated fat (g/100g)",
+    "Serving size",
+    "Sugars (g/100g)"
+   ],
+   "dietary_restrictions": []
+  },
+  {
+   "id": "0008112100281",
+   "title": "Pure Sesame Oil",
+   "brand": "Taiwan Sunlife Corp., Foreway",
+   "description": "Pure Sesame Oil. Sesame oil Key specifications: Category: Plant based foods and beverages; Serving size: 1 Tbsp (15 ml); Nutri-Score: C; NOVA group: 2; Eco-Score: C; Dietary restrictions: vegan, vegetarian; Allergens: sesame-seeds; Labels: no-gmos, non-gmo-project; Ingredients analysis: palm-oil-free, vegan, vegetarian; Energy (kcal/100g): 800 kcal; Fat (g/100g): 93.3333 g; Saturated fat (g/100g): 13.3333 g; Sugars (g/100g): 0 g; Salt (g/100g): 0 g; Protein (g/100g): 0 g; Fiber (g/100g): 0 g; Countries: United States, World",
+   "image_url": "https://images.openfoodfacts.org/images/products/000/811/210/0281/front_en.14.400.jpg",
+   "price": 0.49,
+   "currency": "USD",
+   "taxonomy_tags": [
+    "Plant based foods and beverages",
+    "Plant based foods",
+    "Cereals and potatoes"
+   ],
+   "attrs": {
+    "Serving size": "1 Tbsp (15 ml)",
+    "Nutri-Score": "C",
+    "NOVA group": "2",
+    "Eco-Score": "C",
+    "Allergens": [
+     "sesame-seeds"
+    ],
+    "Labels": [
+     "no-gmos",
+     "non-gmo-project"
+    ],
+    "Ingredients analysis": [
+     "palm-oil-free",
+     "vegan",
+     "vegetarian"
+    ],
+    "Countries": "United States, World",
+    "Category": "Plant based foods and beverages",
+    "Energy (kcal/100g)": "800 kcal",
+    "Fat (g/100g)": "93.3333 g",
+    "Saturated fat (g/100g)": "13.3333 g",
+    "Sugars (g/100g)": "0 g",
+    "Salt (g/100g)": "0 g",
+    "Protein (g/100g)": "0 g",
+    "Fiber (g/100g)": "0 g",
+    "Dietary restrictions": [
+     "vegan",
+     "vegetarian"
+    ],
+    "Price source": "estimated_unit_model",
+    "Pricing bucket": "beverages_soft",
+    "Estimated unit price": "0.56 USD/l (default 500ml (no package qty), source=serving, bucket=beverages_soft)"
+   },
+   "attr_keys": [
+    "Allergens",
+    "Category",
+    "Countries",
+    "Dietary restrictions",
+    "Eco-Score",
+    "Energy (kcal/100g)",
+    "Estimated unit price",
+    "Fat (g/100g)",
+    "Fiber (g/100g)",
+    "Ingredients analysis",
+    "Labels",
+    "NOVA group",
+    "Nutri-Score",
+    "Price source",
+    "Pricing bucket",
+    "Protein (g/100g)",
+    "Salt (g/100g)",
+    "Saturated fat (g/100g)",
+    "Serving size",
+    "Sugars (g/100g)"
+   ],
+   "dietary_restrictions": [
+    "vegan",
+    "vegetarian"
+   ]
+  },
+  {
+   "id": "0008127000019",
+   "title": "Extra virgin olive oil",
+   "brand": "Athena Imports",
+   "description": "Extra virgin olive oil. Extra virgin olive oil Key specifications: Category: Plant based foods and beverages; Serving size: 15 ml; Nutri-Score: B; NOVA group: 2; Eco-Score: E; Dietary restrictions: vegan, vegetarian; Ingredients analysis: palm-oil-free, vegan, vegetarian; Energy (kcal/100g): 800 kcal; Fat (g/100g): 93.3 g; Saturated fat (g/100g): 13.3 g; Sugars (g/100g): 0 g; Salt (g/100g): 0 g; Protein (g/100g): 0 g; Countries: United States",
+   "image_url": "https://images.openfoodfacts.org/images/products/000/812/700/0019/front_en.5.400.jpg",
+   "price": 10.49,
+   "currency": "USD",
+   "taxonomy_tags": [
+    "Plant based foods and beverages",
+    "Plant based foods",
+    "Fats"
+   ],
+   "attrs": {
+    "Serving size": "15 ml",
+    "Nutri-Score": "B",
+    "NOVA group": "2",
+    "Eco-Score": "E",
+    "Ingredients analysis": [
+     "palm-oil-free",
+     "vegan",
+     "vegetarian"
+    ],
+    "Countries": "United States",
+    "Category": "Plant based foods and beverages",
+    "Energy (kcal/100g)": "800 kcal",
+    "Fat (g/100g)": "93.3 g",
+    "Saturated fat (g/100g)": "13.3 g",
+    "Sugars (g/100g)": "0 g",
+    "Salt (g/100g)": "0 g",
+    "Protein (g/100g)": "0 g",
+    "Dietary restrictions": [
+     "vegan",
+     "vegetarian"
+    ],
+    "Price source": "estimated_unit_model",
+    "Pricing bucket": "oils_fats",
+    "Estimated unit price": "43.03 USD/l (default 250ml (no package qty), source=serving, bucket=oils_fats)"
+   },
+   "attr_keys": [
+    "Category",
+    "Countries",
+    "Dietary restrictions",
+    "Eco-Score",
+    "Energy (kcal/100g)",
+    "Estimated unit price",
+    "Fat (g/100g)",
+    "Ingredients analysis",
+    "NOVA group",
+    "Nutri-Score",
+    "Price source",
+    "Pricing bucket",
+    "Protein (g/100g)",
+    "Salt (g/100g)",
+    "Saturated fat (g/100g)",
+    "Serving size",
+    "Sugars (g/100g)"
+   ],
+   "dietary_restrictions": [
+    "vegan",
+    "vegetarian"
+   ]
+  }
+ ]
+}
