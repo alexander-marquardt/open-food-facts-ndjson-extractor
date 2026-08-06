@@ -1,0 +1,1185 @@
+{
+ "_source": "Open Food Facts (openfoodfacts.org), ODbL. Real product category tags from the public JSONL export (first 200,000 records), and the ancestor closure of those tags from the public category taxonomy, with English/Spanish/French names retained. The three products that lost a category_path node to the 20-tag cap, two that were truncated without losing one, and three that were not truncated.",
+ "products": [
+  {
+   "code": "0036800388352",
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:plant-based-foods",
+    "en:fruits-and-vegetables-based-foods",
+    "en:legumes-and-their-products",
+    "en:vegetable-based-foods-and-beverages",
+    "en:cereals-and-potatoes",
+    "en:legumes",
+    "en:seeds",
+    "en:vegetables-based-foods",
+    "en:cereals-and-their-products",
+    "en:legume-seeds",
+    "en:vegetables",
+    "en:cereal-grains",
+    "en:pulses",
+    "en:lentils",
+    "en:rices",
+    "en:aromatic-rices",
+    "en:indica-rices",
+    "en:long-grain-rices",
+    "en:vegetables-from-spain",
+    "en:basmati-rices",
+    "en:oat",
+    "en:rice"
+   ]
+  },
+  {
+   "code": "0051933012707",
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:plant-based-foods",
+    "en:fruits-and-vegetables-based-foods",
+    "en:legumes-and-their-products",
+    "en:canned-foods",
+    "en:legumes",
+    "en:seeds",
+    "en:vegetables-based-foods",
+    "en:canned-plant-based-foods",
+    "en:legume-seeds",
+    "en:meals",
+    "en:vegetables",
+    "en:canned-vegetables",
+    "en:pulses",
+    "en:prepared-vegetables",
+    "en:canned-legumes",
+    "en:cooked-vegetables",
+    "en:green-peas",
+    "en:canned-peas",
+    "en:cooked-garden-peas",
+    "en:peas"
+   ]
+  },
+  {
+   "code": "0078742086774",
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:plant-based-foods",
+    "en:fruits-and-vegetables-based-foods",
+    "en:legumes-and-their-products",
+    "en:canned-foods",
+    "en:legumes",
+    "en:seeds",
+    "en:vegetables-based-foods",
+    "en:canned-plant-based-foods",
+    "en:legume-seeds",
+    "en:meals",
+    "en:vegetables",
+    "en:canned-vegetables",
+    "en:pulses",
+    "en:prepared-vegetables",
+    "en:canned-legumes",
+    "en:cooked-vegetables",
+    "en:green-peas",
+    "en:canned-peas",
+    "en:cooked-garden-peas",
+    "en:peas"
+   ]
+  },
+  {
+   "code": "0078742022512",
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:plant-based-foods",
+    "en:fruits-and-vegetables-based-foods",
+    "en:frozen-foods",
+    "en:fruits-based-foods",
+    "en:specific-products",
+    "en:frozen-plant-based-foods",
+    "en:fruits",
+    "en:products-for-specific-diets",
+    "en:products-without-gluten",
+    "en:tropical-fruits",
+    "en:frozen-fruits",
+    "en:fruit-salads",
+    "en:frozen-mixed-fruits",
+    "en:frozen-tropical-fruits",
+    "en:mangoes",
+    "en:papayas",
+    "en:pineapple",
+    "en:coconuts",
+    "en:frozen-mixed-tropical-fruits",
+    "en:frozen-pineapples",
+    "en:frozen-coconut",
+    "en:frozen-mangoes",
+    "en:frozen-papayas"
+   ]
+  },
+  {
+   "code": "2000000048051",
+   "categories_tags": [
+    "en:snacks",
+    "en:sweet-snacks",
+    "en:cocoa-and-its-products",
+    "en:festive-foods",
+    "en:chocolates",
+    "en:dark-chocolates",
+    "en:milk-chocolates",
+    "en:white-chocolates",
+    "en:easter-food",
+    "en:filled-chocolates",
+    "en:caramel-chocolates",
+    "en:chocolate-filled-with-praline",
+    "en:chocolates-with-almonds",
+    "en:chocolates-with-extra-fine-milk",
+    "en:chocolates-with-hazelnuts",
+    "en:dark-chocolate-with-caramel",
+    "en:dark-chocolates-with-almonds",
+    "en:dark-chocolates-with-hazelnuts",
+    "en:filled-dark-chocolates",
+    "en:filled-milk-chocolates",
+    "en:milk-chocolate-with-caramel",
+    "en:milk-chocolates-with-almonds",
+    "en:milk-chocolates-with-hazelnuts",
+    "fr:feuillantines"
+   ]
+  },
+  {
+   "code": "0041331029018",
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:plant-based-foods",
+    "en:legumes-and-their-products",
+    "en:canned-foods",
+    "en:legumes",
+    "en:seeds",
+    "en:canned-plant-based-foods",
+    "en:legume-seeds",
+    "en:meals",
+    "en:specific-products",
+    "en:products-for-specific-diets",
+    "en:pulses",
+    "en:common-beans",
+    "en:prepared-vegetables",
+    "en:products-without-gluten",
+    "en:canned-legumes",
+    "en:canned-meals",
+    "en:canned-common-beans",
+    "en:pinto-beans",
+    "en:refried-beans"
+   ]
+  },
+  {
+   "code": "0041449001104",
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:plant-based-foods",
+    "en:snacks",
+    "en:cereals-and-potatoes",
+    "en:sweet-snacks",
+    "en:biscuits-and-cakes",
+    "en:cereals-and-their-products",
+    "en:flours",
+    "en:cereal-flours",
+    "en:crepes-and-galettes",
+    "en:cakes",
+    "en:cooking-helpers",
+    "en:baking-mixes",
+    "en:dessert-mixes",
+    "en:pastry-helpers",
+    "en:cake-mixes",
+    "en:pancake-mixes",
+    "en:pancakes",
+    "en:soft-cake-filled-with-fruits"
+   ]
+  },
+  {
+   "code": "0000101209159",
+   "categories_tags": [
+    "en:breakfasts",
+    "en:spreads",
+    "en:sweet-spreads",
+    "fr:pates-a-tartiner",
+    "en:hazelnut-spreads",
+    "en:chocolate-spreads",
+    "en:cocoa-and-hazelnuts-spreads"
+   ]
+  }
+ ],
+ "taxonomy": {
+  "en:aromatic-rices": {
+   "name": {
+    "es": "Arroces aromáticos",
+    "fr": "Riz parfumés",
+    "en": "Aromatic rices"
+   },
+   "parents": [
+    "en:rices"
+   ]
+  },
+  "en:baking-mixes": {
+   "name": {
+    "en": "Baking Mixes"
+   },
+   "parents": [
+    "en:cooking-helpers"
+   ]
+  },
+  "en:basmati-rices": {
+   "name": {
+    "en": "Basmati rices",
+    "es": "Arroces Basmati",
+    "fr": "Riz Basmati"
+   },
+   "parents": [
+    "en:aromatic-rices",
+    "en:indica-rices",
+    "en:long-grain-rices"
+   ]
+  },
+  "en:biscuits-and-cakes": {
+   "name": {
+    "fr": "Biscuits et gâteaux",
+    "es": "Galletas y pasteles",
+    "en": "Biscuits and cakes"
+   },
+   "parents": [
+    "en:sweet-snacks"
+   ]
+  },
+  "en:breakfasts": {
+   "name": {
+    "en": "Breakfasts",
+    "fr": "Petit-déjeuners",
+    "es": "Desayunos"
+   }
+  },
+  "en:cake-mixes": {
+   "name": {
+    "fr": "Préparations pour gâteaux",
+    "es": "Mezcla para tartas",
+    "en": "Cake mixes"
+   },
+   "parents": [
+    "en:baking-mixes",
+    "en:dessert-mixes",
+    "en:pastry-helpers"
+   ]
+  },
+  "en:cakes": {
+   "name": {
+    "en": "Cakes",
+    "es": "Pasteles",
+    "fr": "gâteaux"
+   },
+   "parents": [
+    "en:biscuits-and-cakes"
+   ]
+  },
+  "en:canned-common-beans": {
+   "name": {
+    "en": "Canned common beans",
+    "fr": "Haricots en conserve",
+    "es": "Alubias cocidas en conserva"
+   },
+   "parents": [
+    "en:canned-legumes"
+   ]
+  },
+  "en:canned-foods": {
+   "name": {
+    "en": "Canned foods",
+    "fr": "Conserves",
+    "es": "Conservas"
+   }
+  },
+  "en:canned-legumes": {
+   "name": {
+    "en": "Canned legumes",
+    "fr": "Légumineuses en conserve",
+    "es": "Leguminosas en conserva"
+   },
+   "parents": [
+    "en:canned-plant-based-foods",
+    "en:legumes"
+   ]
+  },
+  "en:canned-meals": {
+   "name": {
+    "es": "Comidas preparadas en conserva",
+    "fr": "Plats préparés en conserve",
+    "en": "Canned meals"
+   },
+   "parents": [
+    "en:canned-foods",
+    "en:meals"
+   ]
+  },
+  "en:canned-peas": {
+   "name": {
+    "es": "Guisantes en conserva",
+    "fr": "Petits pois en conserve",
+    "en": "Canned peas"
+   },
+   "parents": [
+    "en:canned-legumes",
+    "en:canned-vegetables",
+    "en:green-peas"
+   ]
+  },
+  "en:canned-plant-based-foods": {
+   "name": {
+    "fr": "Aliments à base de plantes en conserve",
+    "es": "Alimentos de origen vegetal en conserva",
+    "en": "Canned plant-based foods"
+   },
+   "parents": [
+    "en:canned-foods",
+    "en:plant-based-foods"
+   ]
+  },
+  "en:canned-vegetables": {
+   "name": {
+    "en": "Canned vegetables",
+    "es": "Verduras y hortalizas en conserva",
+    "fr": "Légumes en conserve"
+   },
+   "parents": [
+    "en:canned-plant-based-foods",
+    "en:vegetables-based-foods"
+   ]
+  },
+  "en:caramel-chocolates": {
+   "name": {
+    "en": "Caramel chocolates",
+    "fr": "Chocolats au caramel"
+   },
+   "parents": [
+    "en:chocolates"
+   ]
+  },
+  "en:cereal-flours": {
+   "name": {
+    "en": "Cereal flours",
+    "es": "Harinas de cereales",
+    "fr": "Farines de céréales"
+   },
+   "parents": [
+    "en:cereals-and-their-products",
+    "en:flours"
+   ]
+  },
+  "en:cereal-grains": {
+   "name": {
+    "es": "Cereales en grano",
+    "fr": "Céréales en grains",
+    "en": "Cereal grains"
+   },
+   "parents": [
+    "en:cereals-and-their-products",
+    "en:seeds"
+   ]
+  },
+  "en:cereals-and-potatoes": {
+   "name": {
+    "es": "Cereales y patatas",
+    "fr": "Céréales et pommes de terre",
+    "en": "Cereals and potatoes"
+   },
+   "parents": [
+    "en:plant-based-foods"
+   ]
+  },
+  "en:cereals-and-their-products": {
+   "name": {
+    "en": "Cereals and their products",
+    "es": "Cereales y derivados",
+    "fr": "Céréales et dérivés"
+   },
+   "parents": [
+    "en:cereals-and-potatoes"
+   ]
+  },
+  "en:chocolate-filled-with-praline": {
+   "name": {
+    "fr": "Chocolats fourrés au praliné",
+    "en": "Chocolate filled with praline"
+   },
+   "parents": [
+    "en:filled-chocolates"
+   ]
+  },
+  "en:chocolate-spreads": {
+   "name": {
+    "es": "Cremas de chocolate",
+    "fr": "Pâtes à tartiner au chocolat",
+    "en": "Chocolate spreads"
+   },
+   "parents": [
+    "en:sweet-spreads",
+    "fr:pates-a-tartiner"
+   ]
+  },
+  "en:chocolates": {
+   "name": {
+    "en": "Chocolates",
+    "fr": "Chocolats",
+    "es": "Chocolates"
+   },
+   "parents": [
+    "en:cocoa-and-its-products",
+    "en:sweet-snacks"
+   ]
+  },
+  "en:chocolates-with-almonds": {
+   "name": {
+    "en": "Chocolates with almonds",
+    "es": "Chocolates con almendras",
+    "fr": "Chocolats aux amandes"
+   },
+   "parents": [
+    "en:chocolates"
+   ]
+  },
+  "en:chocolates-with-extra-fine-milk": {
+   "name": {
+    "fr": "Chocolats au lait extra fin",
+    "en": "Chocolates with extra fine milk"
+   },
+   "parents": [
+    "en:milk-chocolates"
+   ]
+  },
+  "en:chocolates-with-hazelnuts": {
+   "name": {
+    "fr": "Chocolats aux noisettes",
+    "es": "Chocolates con avellanas",
+    "en": "Chocolates with hazelnuts"
+   },
+   "parents": [
+    "en:chocolates"
+   ]
+  },
+  "en:cocoa-and-hazelnuts-spreads": {
+   "name": {
+    "es": "Cremas de cacao y avellanas",
+    "en": "Cocoa and hazelnuts spreads",
+    "fr": "Pâtes à tartiner aux noisettes et au cacao"
+   },
+   "parents": [
+    "en:chocolate-spreads",
+    "en:hazelnut-spreads"
+   ]
+  },
+  "en:cocoa-and-its-products": {
+   "name": {
+    "es": "Cacao y sus productos",
+    "fr": "Cacao et dérivés",
+    "en": "Cocoa and its products"
+   }
+  },
+  "en:coconuts": {
+   "name": {
+    "en": "Coconuts",
+    "es": "Cocos",
+    "fr": "Noix de coco"
+   },
+   "parents": [
+    "en:tropical-fruits"
+   ]
+  },
+  "en:common-beans": {
+   "name": {
+    "en": "Common beans",
+    "es": "Alubias"
+   },
+   "parents": [
+    "en:pulses"
+   ]
+  },
+  "en:cooked-garden-peas": {
+   "name": {
+    "fr": "Petits pois cuits",
+    "en": "Cooked garden peas"
+   },
+   "parents": [
+    "en:cooked-vegetables",
+    "en:green-peas"
+   ]
+  },
+  "en:cooked-vegetables": {
+   "name": {
+    "fr": "Légumes cuits",
+    "en": "Cooked vegetables"
+   },
+   "parents": [
+    "en:prepared-vegetables"
+   ]
+  },
+  "en:cooking-helpers": {
+   "name": {
+    "en": "Cooking helpers",
+    "fr": "Aides culinaires",
+    "es": "Ayudas culinarias"
+   }
+  },
+  "en:crepes-and-galettes": {
+   "name": {
+    "es": "Crêpes y galettes",
+    "en": "Crêpes and galettes",
+    "fr": "Crêpes et galettes"
+   }
+  },
+  "en:dark-chocolate-with-caramel": {
+   "name": {
+    "fr": "Chocolats noirs au caramel",
+    "en": "Dark chocolate with caramel"
+   },
+   "parents": [
+    "en:caramel-chocolates",
+    "en:dark-chocolates"
+   ]
+  },
+  "en:dark-chocolates": {
+   "name": {
+    "en": "Dark chocolates",
+    "es": "Chocolates negros",
+    "fr": "Chocolats noirs"
+   },
+   "parents": [
+    "en:chocolates"
+   ]
+  },
+  "en:dark-chocolates-with-almonds": {
+   "name": {
+    "en": "Dark chocolates with almonds",
+    "es": "Chocolates negros con almendras",
+    "fr": "Chocolats noirs aux amandes"
+   },
+   "parents": [
+    "en:chocolates-with-almonds",
+    "en:dark-chocolates"
+   ]
+  },
+  "en:dark-chocolates-with-hazelnuts": {
+   "name": {
+    "fr": "Chocolats noirs aux noisettes",
+    "en": "Dark chocolates with hazelnuts",
+    "es": "Chocolates negro con avellanas"
+   },
+   "parents": [
+    "en:chocolates-with-hazelnuts",
+    "en:dark-chocolates"
+   ]
+  },
+  "en:dessert-mixes": {
+   "name": {
+    "en": "Dessert mixes",
+    "fr": "Préparations pour desserts",
+    "es": "Mezclas para postres"
+   },
+   "parents": [
+    "en:cooking-helpers"
+   ]
+  },
+  "en:easter-foods-and-drinks": {
+   "name": {
+    "fr": "Aliments de Pâques",
+    "es": "Comida de Pascua",
+    "en": "Easter foods and drinks"
+   },
+   "parents": [
+    "en:festive-foods"
+   ]
+  },
+  "en:festive-foods": {
+   "name": {
+    "en": "Festive foods",
+    "fr": "Aliments festifs",
+    "es": "Alimentos festivos"
+   }
+  },
+  "en:filled-chocolates": {
+   "name": {
+    "es": "Chocolate relleno",
+    "fr": "Chocolats fourrés",
+    "en": "Filled chocolates"
+   },
+   "parents": [
+    "en:chocolates"
+   ]
+  },
+  "en:filled-dark-chocolates": {
+   "name": {
+    "en": "Filled dark chocolates",
+    "fr": "Chocolats noirs fourrés"
+   },
+   "parents": [
+    "en:dark-chocolates",
+    "en:filled-chocolates"
+   ]
+  },
+  "en:filled-milk-chocolates": {
+   "name": {
+    "fr": "Chocolats au lait fourrés",
+    "en": "Filled milk chocolates"
+   },
+   "parents": [
+    "en:filled-chocolates",
+    "en:milk-chocolates"
+   ]
+  },
+  "en:flours": {
+   "name": {
+    "es": "Harinas de origen vegetal",
+    "fr": "Farines",
+    "en": "Flours"
+   },
+   "parents": [
+    "en:plant-based-foods"
+   ]
+  },
+  "en:frozen-foods": {
+   "name": {
+    "en": "Frozen foods",
+    "es": "Congelados",
+    "fr": "Surgelés"
+   }
+  },
+  "en:frozen-fruits": {
+   "name": {
+    "es": "Frutas congeladas",
+    "fr": "Fruits surgelés",
+    "en": "Frozen fruits"
+   },
+   "parents": [
+    "en:frozen-plant-based-foods",
+    "en:fruits"
+   ]
+  },
+  "en:frozen-mixed-fruits": {
+   "name": {
+    "es": "Mezclas de frutas congeladas",
+    "en": "Frozen mixed fruits",
+    "fr": "Mélanges de fruits surgelés"
+   },
+   "parents": [
+    "en:frozen-fruits"
+   ]
+  },
+  "en:frozen-mixed-tropical-fruits": {
+   "name": {
+    "fr": "Mélanges de fruits tropicaux surgelés",
+    "es": "Mezclas de frutas tropicales congeladas",
+    "en": "Frozen mixed tropical fruits"
+   },
+   "parents": [
+    "en:frozen-mixed-fruits",
+    "en:frozen-tropical-fruits"
+   ]
+  },
+  "en:frozen-papayas": {
+   "name": {
+    "fr": "Papayes surgelées",
+    "en": "Frozen papayas"
+   },
+   "parents": [
+    "en:frozen-fruits",
+    "en:papayas"
+   ]
+  },
+  "en:frozen-pineapples": {
+   "name": {
+    "fr": "Ananas surgelés",
+    "en": "Frozen pineapples",
+    "es": "Piñas congeladas"
+   },
+   "parents": [
+    "en:frozen-tropical-fruits",
+    "en:pineapple"
+   ]
+  },
+  "en:frozen-plant-based-foods": {
+   "name": {
+    "en": "Frozen plant-based foods",
+    "fr": "Aliments à base de plantes surgelés",
+    "es": "Alimentos de origen vegetal congelados"
+   },
+   "parents": [
+    "en:frozen-foods",
+    "en:plant-based-foods"
+   ]
+  },
+  "en:frozen-tropical-fruits": {
+   "name": {
+    "en": "Frozen tropical fruits",
+    "es": "Frutas tropicales congeladas",
+    "fr": "Fruits tropicaux surgelés"
+   },
+   "parents": [
+    "en:frozen-fruits",
+    "en:tropical-fruits"
+   ]
+  },
+  "en:fruit-salads": {
+   "name": {
+    "es": "Ensaladas de frutas",
+    "en": "Fruit salads",
+    "fr": "Salades de fruits"
+   },
+   "parents": [
+    "en:fruits-based-foods"
+   ]
+  },
+  "en:fruits": {
+   "name": {
+    "en": "Fruits",
+    "es": "Frutas",
+    "fr": "Fruits"
+   },
+   "parents": [
+    "en:fruits-based-foods"
+   ]
+  },
+  "en:fruits-and-vegetables-based-foods": {
+   "name": {
+    "en": "Fruits and vegetables based foods",
+    "fr": "Aliments à base de fruits et de légumes",
+    "es": "Frutas y verduras y sus productos"
+   },
+   "parents": [
+    "en:plant-based-foods"
+   ]
+  },
+  "en:fruits-based-foods": {
+   "name": {
+    "en": "Fruits based foods",
+    "es": "Frutas y sus productos",
+    "fr": "Fruits et produits dérivés"
+   },
+   "parents": [
+    "en:fruits-and-vegetables-based-foods"
+   ]
+  },
+  "en:green-peas": {
+   "name": {
+    "es": "Guisantes verdes",
+    "fr": "Petits pois",
+    "en": "Green peas"
+   },
+   "parents": [
+    "en:legumes",
+    "en:vegetables"
+   ]
+  },
+  "en:hazelnut-spreads": {
+   "name": {
+    "fr": "Pâtes à tartiner aux noisettes",
+    "es": "Cremas a base de avellanas",
+    "en": "Hazelnut spreads"
+   },
+   "parents": [
+    "en:sweet-spreads",
+    "fr:pates-a-tartiner"
+   ]
+  },
+  "en:indica-rices": {
+   "name": {
+    "es": "Arroces de la variedad índica",
+    "en": "Indica rices",
+    "fr": "Riz de variété indica"
+   },
+   "parents": [
+    "en:rices"
+   ]
+  },
+  "en:legume-seeds": {
+   "name": {
+    "es": "Granos de leguminosas",
+    "fr": "Graines de légumineuses",
+    "en": "Legume seeds"
+   },
+   "parents": [
+    "en:legumes",
+    "en:seeds"
+   ]
+  },
+  "en:legumes": {
+   "name": {
+    "en": "Legumes",
+    "fr": "Légumineuses",
+    "es": "Leguminosas"
+   },
+   "parents": [
+    "en:legumes-and-their-products"
+   ]
+  },
+  "en:legumes-and-their-products": {
+   "name": {
+    "es": "Leguminosas y derivados",
+    "fr": "Légumineuses et dérivés",
+    "en": "Legumes and their products"
+   },
+   "parents": [
+    "en:plant-based-foods"
+   ]
+  },
+  "en:lentils": {
+   "name": {
+    "en": "Lentils",
+    "es": "Lentejas",
+    "fr": "Lentilles"
+   },
+   "parents": [
+    "en:pulses"
+   ]
+  },
+  "en:long-grain-rices": {
+   "name": {
+    "fr": "Riz long grain",
+    "es": "Arroces de grano largo",
+    "en": "Long grain rices"
+   },
+   "parents": [
+    "en:rices"
+   ]
+  },
+  "en:mangoes": {
+   "name": {
+    "en": "Mangoes",
+    "fr": "Mangues",
+    "es": "Mangos"
+   },
+   "parents": [
+    "en:tropical-fruits"
+   ]
+  },
+  "en:meals": {
+   "name": {
+    "es": "Comidas preparadas",
+    "fr": "Plats préparés",
+    "en": "Meals"
+   }
+  },
+  "en:milk-chocolate-with-caramel": {
+   "name": {
+    "en": "Milk chocolate with caramel",
+    "fr": "Chocolats au lait au caramel"
+   },
+   "parents": [
+    "en:caramel-chocolates",
+    "en:milk-chocolates"
+   ]
+  },
+  "en:milk-chocolates": {
+   "name": {
+    "en": "Milk chocolates",
+    "fr": "Chocolats au lait",
+    "es": "Chocolates con leche"
+   },
+   "parents": [
+    "en:chocolates"
+   ]
+  },
+  "en:milk-chocolates-with-almonds": {
+   "name": {
+    "es": "Chocalte con leche almendrado",
+    "fr": "Chocolats au lait aux amandes",
+    "en": "Milk chocolates with almonds"
+   },
+   "parents": [
+    "en:chocolates-with-almonds",
+    "en:milk-chocolates"
+   ]
+  },
+  "en:milk-chocolates-with-hazelnuts": {
+   "name": {
+    "fr": "Chocolats au lait aux noisettes",
+    "es": "Chocolate con leche y avellanas",
+    "en": "Milk chocolates with hazelnuts"
+   },
+   "parents": [
+    "en:chocolates-with-hazelnuts",
+    "en:milk-chocolates"
+   ]
+  },
+  "en:oat": {
+   "name": {
+    "en": "Oat",
+    "fr": "Avoines",
+    "es": "Avena sativa"
+   },
+   "parents": [
+    "en:cereal-grains"
+   ]
+  },
+  "en:pancake-mixes": {
+   "name": {
+    "es": "Mezcla para tortitas",
+    "en": "Pancake mixes"
+   },
+   "parents": [
+    "en:cereals-and-their-products",
+    "en:dessert-mixes"
+   ]
+  },
+  "en:pancakes": {
+   "name": {
+    "fr": "Pancakes",
+    "en": "Pancakes",
+    "es": "Tortitas"
+   },
+   "parents": [
+    "en:crepes-and-galettes"
+   ]
+  },
+  "en:papayas": {
+   "name": {
+    "en": "Papayas",
+    "es": "Papayas",
+    "fr": "Papayes"
+   },
+   "parents": [
+    "en:tropical-fruits"
+   ]
+  },
+  "en:pastry-helpers": {
+   "name": {
+    "en": "Pastry helpers",
+    "fr": "Aides à la pâtisserie"
+   },
+   "parents": [
+    "en:cooking-helpers"
+   ]
+  },
+  "en:peas": {
+   "name": {
+    "en": "Peas",
+    "es": "Guisantes",
+    "fr": "Pois"
+   },
+   "parents": [
+    "en:pulses"
+   ]
+  },
+  "en:pineapple": {
+   "name": {
+    "fr": "Ananas",
+    "es": "Piñas",
+    "en": "Pineapple"
+   },
+   "parents": [
+    "en:tropical-fruits"
+   ]
+  },
+  "en:pinto-beans": {
+   "name": {
+    "es": "Alubias pintas",
+    "en": "Pinto beans",
+    "fr": "Haricots pinto"
+   },
+   "parents": [
+    "en:common-beans"
+   ]
+  },
+  "en:plant-based-foods": {
+   "name": {
+    "en": "Plant-based foods",
+    "fr": "Aliments d'origine végétale",
+    "es": "Alimentos de origen vegetal"
+   },
+   "parents": [
+    "en:plant-based-foods-and-beverages"
+   ]
+  },
+  "en:plant-based-foods-and-beverages": {
+   "name": {
+    "fr": "Aliments et boissons à base de végétaux",
+    "es": "Alimentos y bebidas de origen vegetal",
+    "en": "Plant-based foods and beverages"
+   }
+  },
+  "en:prepared-vegetables": {
+   "name": {
+    "es": "Preparados vegetales",
+    "fr": "Légumes préparés",
+    "en": "Prepared vegetables"
+   },
+   "parents": [
+    "en:plant-based-foods"
+   ]
+  },
+  "en:products-for-specific-diets": {
+   "name": {
+    "fr": "Produits pour régimes spécifiques",
+    "en": "Products for specific diets"
+   },
+   "parents": [
+    "en:specific-products"
+   ]
+  },
+  "en:products-without-gluten": {
+   "name": {
+    "es": "Productos sin gluten",
+    "fr": "Produits sans gluten",
+    "en": "Products without gluten"
+   },
+   "parents": [
+    "en:products-for-specific-diets"
+   ]
+  },
+  "en:pulses": {
+   "name": {
+    "es": "Legumbres secas",
+    "fr": "Légumineuses sèches",
+    "en": "Pulses"
+   },
+   "parents": [
+    "en:legume-seeds"
+   ]
+  },
+  "en:refried-beans": {
+   "name": {
+    "fr": "Haricots refrits",
+    "es": "Frijoles refritos",
+    "en": "Refried beans"
+   },
+   "parents": [
+    "en:prepared-vegetables"
+   ]
+  },
+  "en:rices": {
+   "name": {
+    "en": "Rices",
+    "es": "Arroces",
+    "fr": "Riz"
+   },
+   "parents": [
+    "en:cereal-grains"
+   ]
+  },
+  "en:seeds": {
+   "name": {
+    "en": "Seeds",
+    "fr": "Graines",
+    "es": "Semillas"
+   },
+   "parents": [
+    "en:plant-based-foods"
+   ]
+  },
+  "en:snacks": {
+   "name": {
+    "en": "Snacks",
+    "es": "Botanas",
+    "fr": "Snacks"
+   }
+  },
+  "en:soft-cake-filled-with-fruits": {
+   "name": {
+    "en": "Soft cake filled with fruits",
+    "fr": "Gâteau moelleux fourré aux fruits"
+   },
+   "parents": [
+    "en:cakes"
+   ]
+  },
+  "en:specific-products": {
+   "name": {
+    "en": "Specific products",
+    "fr": "Produits spécifiques"
+   }
+  },
+  "en:spreads": {
+   "name": {
+    "en": "Spreads",
+    "fr": "Produits à tartiner",
+    "es": "Untables"
+   }
+  },
+  "en:sweet-snacks": {
+   "name": {
+    "en": "Sweet snacks",
+    "fr": "Snacks sucrés",
+    "es": "Snacks dulces"
+   },
+   "parents": [
+    "en:snacks"
+   ]
+  },
+  "en:sweet-spreads": {
+   "name": {
+    "es": "Untables dulces",
+    "fr": "Produits à tartiner sucrés",
+    "en": "Sweet spreads"
+   },
+   "parents": [
+    "en:breakfasts",
+    "en:spreads"
+   ]
+  },
+  "en:tropical-fruits": {
+   "name": {
+    "fr": "Fruits tropicaux",
+    "es": "Frutas tropicales",
+    "en": "Tropical fruits"
+   },
+   "parents": [
+    "en:fruits"
+   ]
+  },
+  "en:vegetable-based-foods-and-beverages": {
+   "name": {
+    "en": "Vegetable-based foods and beverages",
+    "es": "Comida y bebida vegetal",
+    "fr": "Aliments et boissons à base de légumes"
+   },
+   "parents": [
+    "en:plant-based-foods-and-beverages"
+   ]
+  },
+  "en:vegetables": {
+   "name": {
+    "es": "Hortalizas",
+    "fr": "Légumes",
+    "en": "Vegetables"
+   },
+   "parents": [
+    "en:vegetables-based-foods"
+   ]
+  },
+  "en:vegetables-based-foods": {
+   "name": {
+    "fr": "Légumes et dérivés",
+    "es": "Verduras y hortalizas y sus productos",
+    "en": "Vegetables based foods"
+   },
+   "parents": [
+    "en:fruits-and-vegetables-based-foods",
+    "en:vegetable-based-foods-and-beverages"
+   ]
+  },
+  "en:vegetables-from-spain": {
+   "name": {
+    "fr": "Légumes espagnols",
+    "en": "Vegetables from Spain"
+   },
+   "parents": [
+    "en:vegetables"
+   ]
+  },
+  "en:white-chocolates": {
+   "name": {
+    "es": "Chocolates blancos",
+    "fr": "Chocolats blancs",
+    "en": "White chocolates"
+   },
+   "parents": [
+    "en:chocolates"
+   ]
+  },
+  "fr:pates-a-tartiner": {
+   "name": {
+    "fr": "Pâtes à tartiner"
+   },
+   "parents": [
+    "en:sweet-spreads"
+   ]
+  }
+ }
+}
