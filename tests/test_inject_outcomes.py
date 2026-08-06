@@ -441,6 +441,153 @@ def test_every_document_is_sent_once_across_batches(
     assert payloads[0] == {"doc": {"category_path": ["Foods", "Foods/Snacks"]}}
 
 
+# --------------------------------------------------------------------------- #
+# the empty-path policy: which one ran, and can the operator choose it
+# --------------------------------------------------------------------------- #
+def _sent_ids(calls: Sequence[List[str]]) -> List[str]:
+    return [json.loads(line)["update"]["_id"] for call in calls for line in call[::2]]
+
+
+def _payloads(calls: Sequence[List[str]]) -> List[Dict[str, Any]]:
+    return [json.loads(line) for call in calls for line in call[1::2]]
+
+
+def test_an_empty_path_is_not_sent_by_default(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """A partial update writes what it is handed, so ``[]`` would erase the field.
+
+    The default is a backfill: a record the extract resolves no path for is
+    counted and reported, not turned into an instruction to empty the document.
+    """
+    calls: List[List[str]] = []
+    status = run_loader(
+        monkeypatch, tmp_path, catalog(6, empty_paths=4), responder_for(updated_item, calls)
+    )
+
+    assert status == 0
+    assert _sent_ids(calls) == [f"gtin-{i:03d}" for i in range(6)]
+    assert {"doc": {"category_path": []}} not in _payloads(calls)
+    out = capsys.readouterr().out
+    assert "sent=6" in out
+    assert "empty(skipped)=4" in out
+    assert "empty(overwritten)=0" in out
+
+
+def test_naming_the_default_explicitly_sends_exactly_what_omitting_it_sends(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """``--skip-empty`` stays accepted, and stays the default.
+
+    ``builds/2026-08-03/VERIFICATION.md`` records the load that produced the
+    current indices as ``inject_category_path.py --skip-empty``; that command
+    has to keep meaning what it meant, and keep parsing.
+    """
+    records = catalog(6, empty_paths=4)
+    implicit: List[List[str]] = []
+    explicit: List[List[str]] = []
+
+    assert run_loader(monkeypatch, tmp_path, records, responder_for(updated_item, implicit)) == 0
+    assert (
+        run_loader(
+            monkeypatch,
+            tmp_path,
+            records,
+            responder_for(updated_item, explicit),
+            extra_argv=["--skip-empty"],
+        )
+        == 0
+    )
+
+    assert implicit == explicit
+
+
+def test_no_skip_empty_sends_the_empty_path_as_an_explicit_overwrite(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """The other reading: make the index agree with the extract exactly.
+
+    A document holding a path an earlier extract generation resolved and the
+    current one does not is only repairable by writing the empty list over it.
+    """
+    calls: List[List[str]] = []
+    status = run_loader(
+        monkeypatch,
+        tmp_path,
+        catalog(6, empty_paths=4),
+        responder_for(updated_item, calls),
+        extra_argv=["--no-skip-empty"],
+    )
+
+    assert status == 0
+    assert _sent_ids(calls) == [f"gtin-{i:03d}" for i in range(6)] + [
+        f"empty-{i:03d}" for i in range(4)
+    ]
+    assert _payloads(calls)[6:] == [{"doc": {"category_path": []}}] * 4
+    out = capsys.readouterr().out
+    assert "sent=10" in out
+    assert "empty(skipped)=0" in out
+    assert "empty(overwritten)=4" in out
+
+
+def test_the_two_settings_differ_on_the_same_corpus(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """The lever moves something. Same records, two settings, two requests."""
+    records = catalog(6, empty_paths=4)
+    skipping: List[List[str]] = []
+    overwriting: List[List[str]] = []
+
+    run_loader(monkeypatch, tmp_path, records, responder_for(updated_item, skipping))
+    run_loader(
+        monkeypatch,
+        tmp_path,
+        records,
+        responder_for(updated_item, overwriting),
+        extra_argv=["--no-skip-empty"],
+    )
+
+    assert len(_sent_ids(skipping)) == 6
+    assert len(_sent_ids(overwriting)) == 10
+    assert set(_sent_ids(overwriting)) - set(_sent_ids(skipping)) == {
+        f"empty-{i:03d}" for i in range(4)
+    }
+
+
+def test_the_report_states_which_empty_path_policy_ran(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """Stated on every run, including one whose corpus has no empty path at all.
+
+    A record of a load says what was permitted, not only what happened to occur
+    — the same reason the missing tolerance is printed when nothing is missing.
+    """
+    run_loader(monkeypatch, tmp_path, catalog(3), responder_for(updated_item))
+    assert "empty paths: skipped" in capsys.readouterr().out
+
+    run_loader(
+        monkeypatch,
+        tmp_path,
+        catalog(3),
+        responder_for(updated_item),
+        extra_argv=["--no-skip-empty"],
+    )
+    assert "empty paths: overwritten with [] (--no-skip-empty)" in capsys.readouterr().out
+
+
+def test_inject_overwrites_an_empty_path_only_when_asked(tmp_path: Path) -> None:
+    """The function under the CLI, both ways, without the parser in between."""
+    records = catalog(2, empty_paths=3)
+
+    skipping = inject(iter(records), "catalog_en_v8", bulk=responder_for(updated_item))
+    overwriting = inject(
+        iter(records), "catalog_en_v8", bulk=responder_for(updated_item), skip_empty=False
+    )
+
+    assert (skipping.sent, skipping.empty, skipping.empty_overwritten) == (2, 3, 0)
+    assert (overwriting.sent, overwriting.empty, overwriting.empty_overwritten) == (5, 0, 3)
+
+
 def test_a_failed_bulk_request_is_an_operational_exit_not_a_gate_failure(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:

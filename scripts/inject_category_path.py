@@ -45,6 +45,24 @@ Exit status:
     1  the run completed and its outcomes fail the gate
     2  the run could not complete (the bulk request itself failed)
 
+Records whose ``category_path`` is empty
+----------------------------------------
+A partial update writes the value it is handed, so sending an empty path sets
+the field to ``[]`` — over whatever the document already holds. An extract can
+legitimately contain path-less records (``off-extract
+--no-require-category-path``, or any run without a taxonomy), so by default they
+are **skipped**: this is a backfill, and "this extract resolves no path for the
+product" is not a reason to erase the one the index has. They are still counted,
+as ``empty(skipped)``, rather than passed over silently.
+
+``--no-skip-empty`` asks for the other reading — make the index agree with the
+extract exactly, including for the products the extract resolves no path for.
+That is the repair for a document carrying a path an earlier extract generation
+produced and the current one does not; it destroys a value by construction, so
+it has to be named on the command line. Whichever policy is in force is printed
+in the report, and the overwrites it caused are counted separately as
+``empty(overwritten)``.
+
 Connection comes from the environment:
     PRISM_ELASTICSEARCH_URL, PRISM_ELASTICSEARCH_API_KEY
 
@@ -110,6 +128,7 @@ class Outcome:
     conflict: int = 0
     failed: int = 0
     empty: int = 0
+    empty_overwritten: int = 0
     missing_examples: List[str] = field(default_factory=list)
     failure_examples: List[str] = field(default_factory=list)
 
@@ -223,9 +242,13 @@ def inject(
         path = doc.get("category_path") or []
         if not gtin:
             continue
-        if skip_empty and not path:
-            outcome.empty += 1
-            continue
+        if not path:
+            if skip_empty:
+                outcome.empty += 1
+                continue
+            # Asked for: write [] over whatever the document holds, so that the
+            # index says exactly what this extract says.
+            outcome.empty_overwritten += 1
         batch.append(json.dumps({"update": {"_id": gtin, "_index": index}}))
         batch.append(json.dumps({"doc": {"category_path": path}}))
         outcome.sent += 1
@@ -281,15 +304,21 @@ def gate(outcome: Outcome, tolerance: Tolerance) -> List[str]:
     return reasons
 
 
-def report(outcome: Outcome, index: str, tolerance: Tolerance) -> str:
+def report(outcome: Outcome, index: str, tolerance: Tolerance, skip_empty: bool = True) -> str:
+    # Stated on every run, whether or not the input held an empty path, for the
+    # reason the tolerance is: the record of a load says what was permitted.
+    empty_policy = (
+        "skipped" if skip_empty else "overwritten with [] (--no-skip-empty)"
+    )
     lines = [
         f"Done. index={index} sent={outcome.sent:,} applied={outcome.applied:,} "
         f"(updated={outcome.updated:,} noop={outcome.noop:,}) "
         f"not_found={outcome.not_found:,} conflict={outcome.conflict:,} "
         f"failed={outcome.failed:,} unaccounted={outcome.unaccounted:,} "
-        f"empty(skipped)={outcome.empty:,}",
+        f"empty(skipped)={outcome.empty:,} empty(overwritten)={outcome.empty_overwritten:,}",
         f"  applied rate: {outcome.applied_fraction * 100:.2f}% "
-        f"| missing tolerance: {tolerance.describe(outcome.sent)}",
+        f"| missing tolerance: {tolerance.describe(outcome.sent)} "
+        f"| empty paths: {empty_policy}",
     ]
     if outcome.missing_examples:
         lines.append(
@@ -317,9 +346,11 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
     ap.add_argument("--batch", type=int, default=1000, help="docs per bulk request")
     ap.add_argument(
         "--skip-empty",
-        action="store_true",
+        action=argparse.BooleanOptionalAction,
         default=True,
-        help="do not send updates for records with an empty category_path",
+        help="do not send updates for records with an empty category_path "
+        "(default: on). --no-skip-empty sends them, which writes an empty list "
+        "over whatever category_path the document already holds",
     )
     allowance = ap.add_mutually_exclusive_group()
     allowance.add_argument(
@@ -359,7 +390,7 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
         print(str(exc), file=sys.stderr)
         return EXIT_OPERATIONAL
 
-    print(report(outcome, args.index, tolerance))
+    print(report(outcome, args.index, tolerance, skip_empty=args.skip_empty))
 
     reasons = gate(outcome, tolerance)
     for reason in reasons:

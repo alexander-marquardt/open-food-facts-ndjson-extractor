@@ -691,6 +691,17 @@ exception explicit, and the tolerance in force is printed in the report. What no
 tolerance can authorise is a run that applied **nothing** — that is what pointing
 at the wrong index looks like, and it always fails.
 
+**A record whose `category_path` is empty is skipped by default.** The extractor
+drops path-less products unless it is told not to (`--no-require-category-path`,
+or a run with no taxonomy), so most extracts contain none — but where they exist,
+sending one would write `[]` over whatever the document already holds, and this
+is a backfill. They are counted and reported as `empty(skipped)`.
+`--no-skip-empty` asks for the opposite reading: make the index agree with the
+extract exactly, including for the products it resolves no path for, which is
+the repair for a document still carrying a path an earlier extract generation
+produced. It destroys a value by construction, so it has to be named; the policy
+in force is printed in the report either way, alongside `empty(overwritten)`.
+
 ### Copying an index to a new generation
 
 `scripts/reindex_v7_to_v8.py` copies a catalog index server-side with **no
