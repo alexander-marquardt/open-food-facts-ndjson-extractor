@@ -48,6 +48,15 @@ from verify_index import (  # noqa: E402
     verify,
 )
 
+# The field names are written out here rather than imported from the module under
+# test. A test that reads the name off the code it is testing agrees with that
+# code by construction, which is the one thing this file must not do: #42 was a
+# field name that changed, and the whole point is that the assertion is pinned to
+# a name a human wrote down.
+TAGS_FIELD = "taxonomy_tags"
+PATH_FIELD = "category_path"
+ID_FIELD = "id"
+
 ENVELOPES = json.loads(
     (Path(__file__).parent / "fixtures" / "index_verification_envelopes.json").read_text(
         encoding="utf-8"
@@ -152,11 +161,16 @@ class ReplayClient:
         search: Dict[str, Any],
         *,
         meta: Optional[Dict[str, Any]] = None,
+        properties: Optional[Dict[str, Any]] = None,
         composite: Optional[Dict[str, List[Dict[str, Any]]]] = None,
     ) -> None:
         self.mapping = copy.deepcopy(ENVELOPES["mapping_response"])
         if meta is not None:
             next(iter(self.mapping.values()))["mappings"]["_meta"] = meta
+        if properties is not None:
+            next(iter(self.mapping.values()))["mappings"]["properties"] = copy.deepcopy(
+                properties
+            )
         self.search = search
         self.composite = {field: list(pages) for field, pages in (composite or {}).items()}
         self.requests: List[str] = []
@@ -350,10 +364,17 @@ def test_full_coverage_separates_a_missing_load_from_a_missed_update(tmp_path: P
 
 
 def test_identity_is_unverifiable_when_the_index_says_nothing(tmp_path: Path) -> None:
+    # A real index — documents, and both vocabularies non-empty — because the
+    # assertion at the end is that *nothing else* failed, and an empty index now
+    # fails three other checks for having verified nothing (#52). On an empty
+    # index this test would pass or fail for reasons that have nothing to do with
+    # manifest identity.
     taxonomy = write_taxonomy(tmp_path)
-    manifest = write_manifest(tmp_path, distinct_ids=0, taxonomy_sha=_sha(taxonomy))
+    manifest = write_manifest(tmp_path, distinct_ids=2, taxonomy_sha=_sha(taxonomy))
     client = ReplayClient(
-        search_response(total=0, with_path=0, taxonomy_tags={}, category_path={})
+        search_response(
+            total=2, with_path=2, taxonomy_tags={"Beverages": 2}, category_path={"Beverages": 2}
+        )
     )
     result = run(client, manifest, taxonomy_path=taxonomy)
     identity = check(result, "manifest_identity")
@@ -615,11 +636,432 @@ def test_vocabulary_flags_a_path_segment_absent_from_the_snapshot(tmp_path: Path
 def test_vocabulary_is_skipped_rather_than_faked_without_a_taxonomy(tmp_path: Path) -> None:
     manifest = write_manifest(tmp_path, distinct_ids=1)
     client = ReplayClient(
-        search_response(total=1, with_path=1, taxonomy_tags={"anything": 1}, category_path={})
+        search_response(
+            total=1, with_path=1, taxonomy_tags={"anything": 1}, category_path={"anything": 1}
+        )
     )
     result = run(client, manifest)
     assert check(result, "category_vocabulary")["status"] == "skipped"
     assert result["failed"] == []
+
+
+# --------------------------------------------------------------------------- #
+# a check that read nothing (#52)
+#
+# The rule ``verify_catalog.py`` settled in #35/#39 — a run that verified
+# nothing does not report clean — applied to the index side, where a
+# ``terms`` aggregation on a field the mapping does not have answers with an
+# empty bucket list and no error at all.
+# --------------------------------------------------------------------------- #
+
+
+BLIND_PROPERTIES = ENVELOPES["blind_read_mappings_properties"]
+BLIND_SEARCH = ENVELOPES["blind_read_search_response"]
+
+
+def blind_search(**overrides: Any) -> Dict[str, Any]:
+    """The captured blind read, with any scenario's buckets dropped in."""
+    response = copy.deepcopy(BLIND_SEARCH)
+    for name, counts in overrides.items():
+        response["aggregations"][name]["buckets"] = _buckets(counts)
+    return response
+
+
+def test_the_captured_blind_read_is_clean_at_the_wire_and_only_the_mapping_says_otherwise(
+) -> None:
+    """The premise of every test below, taken from the cluster rather than argued.
+
+    ``catalog_en_v13`` predates the ``taxonomy_tags`` rename, so today's request
+    against it is exactly the blind read #42 was about. Nothing in the *response*
+    distinguishes it from a field the index simply holds no values of — which is
+    why the verdict has to come from the mapping.
+    """
+    assert TAGS_FIELD not in BLIND_PROPERTIES
+    assert "categories" in BLIND_PROPERTIES and PATH_FIELD in BLIND_PROPERTIES
+
+    assert BLIND_SEARCH["_shards"]["failed"] == 0
+    assert BLIND_SEARCH["hits"]["total"] == {"value": 107451, "relation": "eq"}
+
+    agg = BLIND_SEARCH["aggregations"][TAGS_FIELD]
+    assert agg["buckets"] == []
+    assert agg["sum_other_doc_count"] == 0
+    assert agg["doc_count_error_upper_bound"] == 0
+    # And the verifier's own truncation logic calls that read complete — rightly,
+    # because zero buckets is not a prefix of anything. Completeness of the read
+    # was never the question; what the read proves about the index was.
+    assert terms_truncation(agg, 30000)["complete"] is True
+
+    # The other half of the same response is a real vocabulary, so "the cluster
+    # was unreachable" is not an available explanation for the empty half.
+    assert len(BLIND_SEARCH["aggregations"][PATH_FIELD]["buckets"]) > 0
+
+
+def test_a_field_the_mapping_does_not_declare_is_named_before_a_bucket_is_counted(
+    tmp_path: Path,
+) -> None:
+    manifest = write_manifest(tmp_path, distinct_ids=107451)
+    client = ReplayClient(blind_search(), properties=BLIND_PROPERTIES)
+    result = run(client, manifest, taxonomy_path=write_taxonomy(tmp_path))
+
+    fields = check(result, "mapped_fields")
+    assert fields["status"] == "fail"
+    assert fields["undeclared_fields"] == [TAGS_FIELD]
+    assert TAGS_FIELD in fields["reason"]
+    # The correction is in the output: the mapping's own field list, which is
+    # where the reader sees ``categories`` sitting in place of the name asked for.
+    assert "categories" in fields["sample_declared_fields"]
+    # The declared half is still reported, so the verdict is about one field and
+    # not a blanket "the mapping is wrong".
+    assert fields["declared_field_types"][PATH_FIELD] == "keyword"
+
+
+def test_a_blind_vocabulary_read_refuses_where_every_count_it_produced_is_zero(
+    tmp_path: Path,
+) -> None:
+    """The exact run the issue describes: half of nothing, reported green.
+
+    A clean ``category_path`` half over a blind ``taxonomy_tags`` half. Before
+    this gate the check's every number was a zero and its verdict was ``pass``;
+    the numbers are still zeros, and now they are not mistaken for a result.
+    """
+    taxonomy = write_taxonomy(tmp_path)
+    manifest = write_manifest(tmp_path, distinct_ids=2, taxonomy_sha=_sha(taxonomy))
+    client = ReplayClient(
+        search_response(total=2, with_path=2, taxonomy_tags={}, category_path={"Beverages": 2}),
+        properties=BLIND_PROPERTIES,
+    )
+    result = run(client, manifest, taxonomy_path=taxonomy)
+    vocabulary = check(result, "category_vocabulary")
+
+    assert vocabulary["values_outside_snapshot"] == 0
+    assert vocabulary["path_segments_outside_snapshot"] == 0
+    assert vocabulary["path_heads_outside_taxonomy_roots"] == 0
+    assert vocabulary["orphan_addresses"] == 0
+    assert vocabulary["status"] == "fail"
+
+    assert vocabulary["nothing_verified"] == [TAGS_FIELD]
+    assert vocabulary["fields_read_blind"] == [TAGS_FIELD]
+    assert "blind, not empty" in vocabulary["reasons"][0]
+    assert result["failed"] == ["mapped_fields", "category_vocabulary"]
+
+
+def test_the_verdict_is_a_failure_and_not_skipped_or_unverifiable(tmp_path: Path) -> None:
+    """The convention #39 settled, kept the same at both ends of the rule.
+
+    ``skipped`` is for a check the operator did not ask for and ``unverifiable``
+    for one the index cannot answer; neither describes a check that was asked
+    for, could be answered, and looked at nothing.
+    """
+    taxonomy = write_taxonomy(tmp_path)
+    manifest = write_manifest(tmp_path, distinct_ids=2, taxonomy_sha=_sha(taxonomy))
+    client = ReplayClient(
+        search_response(total=2, with_path=2, taxonomy_tags={}, category_path={"Beverages": 2}),
+        properties=BLIND_PROPERTIES,
+    )
+    result = run(client, manifest, taxonomy_path=taxonomy)
+    assert check(result, "category_vocabulary")["status"] == "fail"
+    assert "category_vocabulary" not in result["unverifiable"]
+
+
+def test_both_ends_of_the_rule_refuse_a_run_that_verified_nothing() -> None:
+    """The disagreement #52 is about, asserted closed rather than described.
+
+    ``verify_catalog.py`` calls it ``nothing_verified`` and makes it fatal at
+    zero. This is the same statement about the index side, so the two cannot
+    drift apart again without a test going red.
+    """
+    sys.path.insert(0, str(REPO_ROOT / "scripts"))
+    import verify_catalog
+
+    catalog_side = verify_catalog.gate(
+        {"records": 10, "values_checked_against_snapshot": 0},
+        verify_catalog.Tolerance(),
+    )
+    assert [name for name, _ in catalog_side] == ["nothing_verified"]
+
+    from verify_index import check_category_vocabulary
+
+    index_side = check_category_vocabulary({}, {"Beverages": 1}, {"Beverages"}, {"Beverages"})
+    assert index_side["status"] == "fail"
+    assert index_side["nothing_verified"] == [TAGS_FIELD]
+
+
+def test_a_declared_field_the_index_holds_no_value_of_is_empty_and_not_blind(
+    tmp_path: Path,
+) -> None:
+    """A legitimately empty read stays distinguishable from a blind one.
+
+    Both fail — an index holding no ``taxonomy_tags`` has had its vocabulary
+    verified exactly as much as one whose field name is wrong — but only one of
+    them is fixed by correcting the verifier, so the reason says which. Measured
+    live: ``rating`` is declared on ``catalog_en_v15`` and no document carries
+    it, and that read is named "declares it but holds no value", not "blind".
+    """
+    taxonomy = write_taxonomy(tmp_path)
+    manifest = write_manifest(tmp_path, distinct_ids=2, taxonomy_sha=_sha(taxonomy))
+    client = ReplayClient(
+        search_response(total=2, with_path=2, taxonomy_tags={}, category_path={"Beverages": 2})
+    )
+    result = run(client, manifest, taxonomy_path=taxonomy)
+
+    assert check(result, "mapped_fields")["status"] == "pass"
+    vocabulary = check(result, "category_vocabulary")
+    assert vocabulary["status"] == "fail"
+    assert vocabulary["nothing_verified"] == [TAGS_FIELD]
+    assert vocabulary["fields_read_blind"] == []
+    assert "holds no value of it" in vocabulary["reasons"][0]
+    assert "blind" not in vocabulary["reasons"][0]
+
+
+def test_an_empty_category_path_vocabulary_is_refused_on_the_same_terms(
+    tmp_path: Path,
+) -> None:
+    """The open question in #52, answered yes.
+
+    ``category_path_coverage`` covers part of it, but only for an index whose
+    documents do not carry the field at all. An index every one of whose
+    documents carries ``category_path`` while the aggregation reads none of them
+    passes coverage and used to pass the vocabulary check too.
+    """
+    taxonomy = write_taxonomy(tmp_path)
+    manifest = write_manifest(tmp_path, distinct_ids=2, taxonomy_sha=_sha(taxonomy))
+    client = ReplayClient(
+        search_response(total=2, with_path=2, taxonomy_tags={"Beverages": 2}, category_path={})
+    )
+    result = run(client, manifest, taxonomy_path=taxonomy)
+    assert check(result, "category_path_coverage")["status"] == "pass"
+    vocabulary = check(result, "category_vocabulary")
+    assert vocabulary["status"] == "fail"
+    assert vocabulary["nothing_verified"] == [PATH_FIELD]
+
+
+def test_a_real_read_of_a_real_index_still_passes(tmp_path: Path) -> None:
+    """The other direction: this is a gate, not a refusal to answer.
+
+    Matches the live control — ``catalog_en_v15`` reads 4,568 distinct
+    ``taxonomy_tags`` values and 3,979 addresses against the pinned snapshot and
+    passes with ``nothing_verified: []``.
+    """
+    taxonomy = write_taxonomy(tmp_path)
+    manifest = write_manifest(tmp_path, distinct_ids=2, taxonomy_sha=_sha(taxonomy))
+    client = ReplayClient(
+        search_response(
+            total=2,
+            with_path=2,
+            taxonomy_tags={"Beverages": 2, "Teas": 1},
+            category_path={"Beverages": 2, "Beverages/Hot beverages": 1},
+        )
+    )
+    result = run(client, manifest, taxonomy_path=taxonomy)
+    vocabulary = check(result, "category_vocabulary")
+    assert vocabulary["status"] == "pass"
+    assert vocabulary["nothing_verified"] == []
+    assert vocabulary["reasons"] == []
+    assert result["failed"] == []
+
+
+def test_a_real_vocabulary_defect_is_still_a_vocabulary_defect(tmp_path: Path) -> None:
+    """A non-empty read that is wrong fails for being wrong, not for being empty."""
+    taxonomy = write_taxonomy(tmp_path)
+    manifest = write_manifest(tmp_path, distinct_ids=2, taxonomy_sha=_sha(taxonomy))
+    client = ReplayClient(
+        search_response(
+            total=2,
+            with_path=2,
+            taxonomy_tags={"Beverages": 2, "Plant based foods": 5},
+            category_path={"Beverages": 2},
+        )
+    )
+    vocabulary = check(run(client, manifest, taxonomy_path=taxonomy), "category_vocabulary")
+    assert vocabulary["status"] == "fail"
+    assert vocabulary["nothing_verified"] == []
+    assert vocabulary["reasons"] == [
+        "1 of 2 distinct taxonomy_tags values are outside the pinned snapshot (5 instances)"
+    ]
+
+
+def test_an_index_using_none_of_the_snapshot_always_trips_a_fatal_gate(
+    tmp_path: Path,
+) -> None:
+    """Why ``snapshot_labels_unused_by_index == snapshot_labels`` stays informational.
+
+    It was the tell all along, and it is now subsumed: the only two ways to reach
+    it are an empty read and a read every value of which is outside the snapshot,
+    and both are already fatal. A third gate on the same two states would fail
+    nothing new.
+    """
+    taxonomy = write_taxonomy(tmp_path)
+    manifest = write_manifest(tmp_path, distinct_ids=2, taxonomy_sha=_sha(taxonomy))
+    for tags in ({}, {"Nothing the snapshot knows": 7}):
+        client = ReplayClient(
+            search_response(
+                total=2, with_path=2, taxonomy_tags=tags, category_path={"Beverages": 2}
+            )
+        )
+        vocabulary = check(run(client, manifest, taxonomy_path=taxonomy), "category_vocabulary")
+        assert vocabulary["snapshot_labels_unused_by_index"] == vocabulary["snapshot_labels"]
+        assert vocabulary["status"] == "fail", tags
+
+
+# --------------------------------------------------------------------------- #
+# the mapping read
+# --------------------------------------------------------------------------- #
+
+
+def test_mapped_fields_reads_objects_multi_fields_and_runtime_fields() -> None:
+    from verify_index import mapped_fields
+
+    declared = mapped_fields(
+        {
+            "properties": {
+                "attrs": {"properties": {"Labels": {"type": "keyword"}}},
+                "title": {"type": "text", "fields": {"raw": {"type": "keyword"}}},
+            },
+            "runtime": {"price_band": {"type": "keyword"}},
+        }
+    )
+    # An object's leaves are addressable and aggregatable; so are multi-fields
+    # and runtime fields, which live outside ``properties`` entirely. A check
+    # that only read top-level ``properties`` would call each of these undeclared
+    # and refuse a run that was perfectly able to see them.
+    assert declared["attrs.Labels"] == "keyword"
+    assert declared["title.raw"] == "keyword"
+    assert declared["price_band"] == "keyword"
+    assert declared["attrs"] == "object"
+
+
+def test_the_captured_live_mapping_declares_every_field_the_verifier_reads() -> None:
+    from verify_index import mapped_fields
+
+    declared = mapped_fields(next(iter(ENVELOPES["mapping_response"].values()))["mappings"])
+    assert {TAGS_FIELD, PATH_FIELD, ID_FIELD} <= set(declared)
+
+
+def test_the_mapping_check_names_the_same_fields_the_aggregations_request(
+    tmp_path: Path,
+) -> None:
+    """The drift that made #42 invisible for as long as it was, closed.
+
+    If the aggregation is moved to a new field and the mapping check is not, the
+    check goes on confirming a field nobody reads and the blind aggregation is
+    blind again — with a green ``mapped_fields`` beside it, which is worse than
+    no check at all.
+    """
+    manifest = write_manifest(tmp_path, distinct_ids=2)
+    client = ReplayClient(
+        search_response(
+            total=2, with_path=2, taxonomy_tags={"Beverages": 2}, category_path={"Beverages": 2}
+        )
+    )
+    result = run(client, manifest)
+
+    search = next(body for body in client.bodies if body and "track_total_hits" in body)
+    aggregated = {
+        agg["terms"]["field"] for agg in search["aggs"].values() if "terms" in agg
+    }
+    aggregated.add(search["aggs"]["with_category_path"]["filter"]["exists"]["field"])
+    assert aggregated == set(check(result, "mapped_fields")["fields_read"])
+
+
+def test_the_id_field_is_only_required_when_the_id_set_check_is_asked_for(
+    tmp_path: Path,
+) -> None:
+    manifest = write_manifest(tmp_path, distinct_ids=2)
+    search = search_response(
+        total=2, with_path=2, taxonomy_tags={"Beverages": 2}, category_path={"Beverages": 2}
+    )
+    assert ID_FIELD not in check(run(ReplayClient(search), manifest), "mapped_fields")[
+        "fields_read"
+    ]
+
+    catalog = write_catalog(tmp_path, ["1", "2"])
+    client = ReplayClient(search, composite={ID_FIELD: composite_pages({"1": 1, "2": 1})})
+    result = run(client, manifest, catalog_path=catalog)
+    assert ID_FIELD in check(result, "mapped_fields")["fields_read"]
+
+
+# --------------------------------------------------------------------------- #
+# the same shape, in the checks that are not about vocabulary (#52 sweep)
+# --------------------------------------------------------------------------- #
+
+
+def test_an_empty_index_does_not_reconcile_against_a_manifest_expecting_none(
+    tmp_path: Path,
+) -> None:
+    manifest = write_manifest(tmp_path, distinct_ids=0)
+    client = ReplayClient(
+        search_response(total=0, with_path=0, taxonomy_tags={}, category_path={})
+    )
+    count = check(run(client, manifest), "document_count")
+    assert count["delta"] == 0
+    assert count["status"] == "fail"
+    assert count["nothing_verified"] is True
+
+
+def test_full_coverage_of_an_empty_index_is_not_coverage(tmp_path: Path) -> None:
+    manifest = write_manifest(tmp_path, distinct_ids=0)
+    client = ReplayClient(
+        search_response(total=0, with_path=0, taxonomy_tags={}, category_path={})
+    )
+    coverage = check(run(client, manifest), "category_path_coverage")
+    assert coverage["without_category_path"] == 0
+    assert coverage["status"] == "fail"
+    assert coverage["nothing_verified"] is True
+
+
+def test_two_empty_id_sets_do_not_agree_about_anything(tmp_path: Path) -> None:
+    catalog = write_catalog(tmp_path, [], name="empty.ndjson")
+    client = ReplayClient(
+        search_response(total=0, with_path=0, taxonomy_tags={}, category_path={}),
+        composite={ID_FIELD: composite_pages({})},
+    )
+    identity = check_document_identity(client.request, "catalog_en_v13", catalog)
+    assert identity["catalog_ids_absent_from_index"] == 0
+    assert identity["index_ids_absent_from_catalog"] == 0
+    assert identity["status"] == "fail"
+    assert identity["nothing_verified"] is True
+
+
+def test_a_meta_block_that_names_nothing_comparable_is_not_confirmation(
+    tmp_path: Path,
+) -> None:
+    """``no disagreement`` over zero compared fields is not agreement.
+
+    ``unverifiable`` rather than ``fail`` because that is already this check's
+    verdict for an index that records nothing about its build, and a ``_meta``
+    block naming none of the four identifying fields records nothing that can be
+    checked. It stays out of the exit status unless ``--require-self-describing``
+    is passed, exactly as the empty-``_meta`` case does.
+    """
+    taxonomy = write_taxonomy(tmp_path)
+    manifest = write_manifest(tmp_path, distinct_ids=2, taxonomy_sha=_sha(taxonomy))
+    client = ReplayClient(
+        search_response(
+            total=2, with_path=2, taxonomy_tags={"Beverages": 2}, category_path={"Beverages": 2}
+        ),
+        meta={"off_catalog_build": {"manifest_schema": "off-catalog-build-manifest/1"}},
+    )
+    result = run(client, manifest, taxonomy_path=taxonomy)
+    identity = check(result, "manifest_identity")
+    assert identity["status"] == "unverifiable"
+    assert identity["fields_compared"] == []
+    assert result["failed"] == []
+    assert result["unverifiable"] == ["manifest_identity"]
+
+
+def test_a_meta_block_naming_one_field_is_compared_on_that_field(tmp_path: Path) -> None:
+    """The boundary of the rule above: one comparable field is a comparison."""
+    taxonomy = write_taxonomy(tmp_path)
+    manifest = write_manifest(tmp_path, distinct_ids=2, taxonomy_sha=_sha(taxonomy))
+    client = ReplayClient(
+        search_response(
+            total=2, with_path=2, taxonomy_tags={"Beverages": 2}, category_path={"Beverages": 2}
+        ),
+        meta={"off_catalog_build": {"dump_sha256": DUMP_SHA}},
+    )
+    identity = check(run(client, manifest, taxonomy_path=taxonomy), "manifest_identity")
+    assert identity["status"] == "pass"
+    assert identity["fields_compared"] == ["dump_sha256"]
 
 
 # --------------------------------------------------------------------------- #

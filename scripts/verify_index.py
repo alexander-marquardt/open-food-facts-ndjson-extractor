@@ -40,6 +40,14 @@ What it checks
     (``scripts/inject_category_path.py`` issues partial ``_update`` operations,
     which cannot create a document and count the rest as ``missing``).
 
+``mapped_fields``
+    Whether the mapping declares the fields this run is about to aggregate on.
+    Read off the ``_mapping`` response that is fetched anyway, and answered
+    before a single bucket is counted, because a ``terms`` aggregation on a field
+    the mapping does not have is not an error: Elasticsearch returns an empty
+    bucket list with ``_shards.failed: 0``, and no truncation signal
+    distinguishes it from a field that genuinely holds nothing.
+
 ``category_vocabulary`` (needs ``--taxonomy``)
     Every distinct ``taxonomy_tags`` value and every ``category_path`` segment in
     the index, checked against the display labels of the pinned snapshot — the
@@ -48,7 +56,8 @@ What it checks
     both directions: values the index uses that the snapshot does not explain
     (a failure — the index's vocabulary is not the snapshot's), and labels the
     snapshot has that the index never uses (informational — no catalog is
-    obliged to use every label).
+    obliged to use every label; see "Nothing verified" below for why that stays
+    informational rather than becoming the gate).
 
 ``document_identity`` (opt-in, ``--catalog``)
     The exact id-set difference between the index and an extract NDJSON, plus
@@ -102,6 +111,44 @@ exhaustive answer from a lucky one. ``cardinality`` is deliberately not used to
 cross-check the bucket count: it is a HyperLogLog estimate even below its
 precision threshold, and it already disagrees with the exhaustive enumeration on
 one of these indices (6,500 vs 6,499 for ``catalog_fr_v13``).
+
+Nothing verified
+----------------
+
+Truncation logic answers "is this read a prefix of the vocabulary?" faithfully,
+and a ``terms`` aggregation that returns zero buckets is not a prefix of
+anything — so ``complete`` is the honest verdict about the *read*. The dishonest
+part was the verdict about the *index*: every check here is a count of things
+that are wrong, and a count of an empty input is zero, so a check handed nothing
+reported clean. Measured, not argued — against ``catalog_en_v14`` before #42's
+rename, the flat half of ``category_vocabulary`` read 0 distinct values, found 0
+outside the snapshot, reported all 14,453 snapshot labels unused, and still said
+``pass``, hiding 46 real vocabulary defects that surfaced the moment the field
+name was corrected.
+
+``scripts/verify_catalog.py`` settled this rule for the NDJSON side in #35/#39: a
+run that verified nothing is a **failure**, named ``nothing_verified``, checked
+before the count-based gates whose zeros it explains. This script now applies the
+same rule to the same checks, with the same verdict — a failure, not
+``skipped`` and not ``unverifiable``, because "I did not look" is a defect in the
+run and ``skipped``/``unverifiable`` are reserved here for things the operator
+did not ask for or the index cannot answer.
+
+The index side can say *why* it read nothing, which the NDJSON side cannot: the
+mapping. A field the mapping does not declare is a **blind** read and is named as
+such; a declared field with no values is a **legitimately empty** read and is
+named as that. Both fail — an index holding no values of ``taxonomy_tags`` has
+had its vocabulary verified exactly as much as one whose field name is wrong,
+which is not at all — but the reason distinguishes them, so an operator is told
+whether to fix the verifier or the index.
+
+``snapshot_labels_unused_by_index == snapshot_labels`` — "the index uses none of
+the taxonomy" — stays **informational** rather than becoming a gate of its own.
+It was the tell all along, but it is now fully subsumed: it can only happen when
+the index yields no values at all (``nothing_verified``, fatal) or when every
+value it yields is outside the snapshot (``values_outside_snapshot``, fatal).
+A third gate on the same two states would fail nothing new and would make a
+legitimately sparse catalog look like a new class of defect.
 
 Making an index self-describing
 -------------------------------
@@ -187,6 +234,16 @@ READ_ONLY_ENDPOINTS = frozenset({"_search", "_count", "_mapping", "_settings"})
 # truncates, so this is a performance knob and not a correctness one.
 DEFAULT_TERMS_SIZE = 30000
 COMPOSITE_PAGE = 10000
+
+# The fields this script reads off an index, named once. The ``mapped_fields``
+# check confirms the mapping declares them and the aggregations request them from
+# the same constants, so the check cannot drift away from what is actually
+# aggregated — which is the drift that made a wrong field name invisible for as
+# long as it was (#42): the aggregation was renamed in one place and the thing
+# that would have noticed was reading a different literal.
+TAGS_FIELD = "taxonomy_tags"
+PATH_FIELD = "category_path"
+ID_FIELD = "id"
 
 
 class VerificationError(RuntimeError):
@@ -371,6 +428,39 @@ def expected_distinct_ids(entry: Dict[str, Any], lang: str) -> int:
     return int(value)
 
 
+def mapped_fields(mappings: Dict[str, Any]) -> Dict[str, str]:
+    """Every field the mapping declares, as ``dotted name -> type``.
+
+    Walks ``properties`` (objects nest), ``fields`` (multi-fields are separately
+    aggregatable) and ``runtime`` (declared outside ``properties`` and equally
+    aggregatable). A name absent from the result is a name no aggregation on this
+    index can ever return a bucket for.
+
+    Absence is a sound tell even under dynamic mapping: a field only stays out of
+    the mapping if no document ever carried it, so "not declared" and "no
+    document has it" are the same statement — and both mean the aggregation's
+    zero says nothing about the vocabulary.
+    """
+    declared: Dict[str, str] = {}
+
+    def walk(node: Dict[str, Any], prefix: str) -> None:
+        for name, definition in (node.get("properties") or {}).items():
+            if not isinstance(definition, dict):
+                continue
+            path = f"{prefix}{name}"
+            declared[path] = definition.get("type", "object")
+            for sub, sub_definition in (definition.get("fields") or {}).items():
+                if isinstance(sub_definition, dict):
+                    declared[f"{path}.{sub}"] = sub_definition.get("type", "object")
+            walk(definition, f"{path}.")
+
+    walk(mappings, "")
+    for name, definition in (mappings.get("runtime") or {}).items():
+        if isinstance(definition, dict):
+            declared.setdefault(name, definition.get("type", "keyword"))
+    return declared
+
+
 def _check(name: str, status: str, **detail: Any) -> Dict[str, Any]:
     return {"check": name, "status": status, **detail}
 
@@ -424,6 +514,47 @@ def read_catalog_ids(path: Path) -> List[str]:
 # --------------------------------------------------------------------------- #
 # checks
 # --------------------------------------------------------------------------- #
+
+
+def check_mapped_fields(mappings: Dict[str, Any], fields: Sequence[str]) -> Dict[str, Any]:
+    """Confirm the mapping declares every field this run will aggregate on.
+
+    The cheapest possible version of the whole point of this file: it costs
+    nothing (the ``_mapping`` is fetched anyway), it runs before the first
+    bucket is counted, and it converts the one failure mode Elasticsearch will
+    not report — a ``terms`` aggregation on a field that does not exist, which
+    answers with an empty bucket list, ``sum_other_doc_count: 0``,
+    ``doc_count_error_upper_bound: 0`` and ``_shards.failed: 0`` — into a named
+    failure that says which field and offers the mapping's own field list as the
+    correction.
+    """
+    declared = mapped_fields(mappings)
+    missing = [field for field in fields if field not in declared]
+    detail: Dict[str, Any] = {
+        "fields_read": list(fields),
+        "declared_field_types": {
+            field: declared[field] for field in fields if field in declared
+        },
+        "fields_declared_by_mapping": len(declared),
+    }
+    if not missing:
+        return _check("mapped_fields", "pass", **detail)
+    return _check(
+        "mapped_fields",
+        "fail",
+        undeclared_fields=missing,
+        reason=(
+            "the mapping does not declare "
+            + ", ".join(repr(field) for field in missing)
+            + ", so every aggregation on "
+            + ("them returns" if len(missing) > 1 else "it returns")
+            + " zero buckets with no error and _shards.failed: 0. At the wire that "
+            "is indistinguishable from a field the index holds no values of, so the "
+            "vocabulary checks below would report clean having read nothing"
+        ),
+        sample_declared_fields=sorted(declared)[:MAX_EXAMPLES],
+        **detail,
+    )
 
 
 def check_manifest_identity(
@@ -484,21 +615,48 @@ def check_manifest_identity(
         "taxonomy_sha256": taxonomy_pinned,
         "lang": lang,
     }
+    compared = sorted(key for key in expected if claimed.get(key) is not None)
     disagreements = {
         key: {"index_claims": claimed.get(key), "manifest_says": value}
         for key, value in expected.items()
         if claimed.get(key) is not None and claimed.get(key) != value
     }
-    status = "fail" if disagreements else "pass"
-    return _check(
-        "manifest_identity",
-        status,
-        index_claims=claimed,
-        manifest=str(manifest_path),
-        manifest_sha256=sha256(manifest_path),
-        disagreements=disagreements,
-        **snapshot,
-    )
+    detail: Dict[str, Any] = {
+        "index_claims": claimed,
+        "manifest": str(manifest_path),
+        "manifest_sha256": sha256(manifest_path),
+        "fields_compared": compared,
+        "disagreements": disagreements,
+    }
+    if disagreements:
+        return _check("manifest_identity", "fail", **detail, **snapshot)
+    if not compared:
+        # The same vacuity, one level in: a ``_meta.off_catalog_build`` block that
+        # carries none of the four fields this check compares agrees with the
+        # manifest about nothing, and "no disagreement" would report that as
+        # confirmation. ``unverifiable`` rather than ``fail`` because it is the
+        # verdict this check already gives an index that records nothing —
+        # a block naming none of them records nothing that can be checked.
+        return _check(
+            "manifest_identity",
+            "unverifiable",
+            reason=(
+                "the index carries a _meta.off_catalog_build block, but it names none of "
+                f"{sorted(expected)}, so nothing in it can be checked against the manifest"
+            ),
+            remedy=(
+                "have the loader write the identifying fields into "
+                "_meta.off_catalog_build (extractor_commit, dump_sha256, taxonomy_sha256, "
+                "lang), not only the descriptive ones"
+            ),
+            asserted={
+                key: expected[key]
+                for key in ("extractor_commit", "dump_sha256", "taxonomy_sha256")
+            },
+            **detail,
+            **snapshot,
+        )
+    return _check("manifest_identity", "pass", **detail, **snapshot)
 
 
 def check_document_count(
@@ -506,9 +664,25 @@ def check_document_count(
 ) -> Dict[str, Any]:
     records = (entry.get("counters") or {}).get("written")
     delta = indexed - expected
+    status = "pass" if delta == 0 else "fail"
+    reason: Dict[str, Any] = {}
+    if delta == 0 and indexed == 0:
+        # 0 == 0 is a true statement and an empty verification: an index holding
+        # no documents has not been reconciled against anything, and every check
+        # after this one is a count over an empty index. Same verdict
+        # ``verify_catalog.py`` gives an NDJSON with no records.
+        status = "fail"
+        reason = {
+            "nothing_verified": True,
+            "reason": (
+                "the index holds no documents and the manifest expects none, so the counts "
+                "agree without anything having been verified"
+            ),
+        }
     return _check(
         "document_count",
-        "pass" if delta == 0 else "fail",
+        status,
+        **reason,
         indexed_documents=indexed,
         manifest_distinct_ids=expected,
         delta=delta,
@@ -525,9 +699,22 @@ def check_document_count(
 
 def check_category_path_coverage(indexed: int, with_path: int) -> Dict[str, Any]:
     missing = indexed - with_path
+    status = "pass" if missing == 0 else "fail"
+    reason: Dict[str, Any] = {}
+    if indexed == 0:
+        # "0 of 0 documents are missing the field" is full coverage of nothing.
+        status = "fail"
+        reason = {
+            "nothing_verified": True,
+            "reason": (
+                "the index holds no documents, so no document's category_path coverage was "
+                "checked; full coverage of an empty index is not coverage"
+            ),
+        }
     return _check(
         "category_path_coverage",
-        "pass" if missing == 0 else "fail",
+        status,
+        **reason,
         indexed_documents=indexed,
         with_category_path=with_path,
         without_category_path=missing,
@@ -544,7 +731,17 @@ def check_category_vocabulary(
     addresses: Dict[str, int],
     labels: Set[str],
     root_labels: Set[str],
+    undeclared_fields: Sequence[str] = (),
 ) -> Dict[str, Any]:
+    """Judge the index's vocabulary against the snapshot, or say it read nothing.
+
+    ``undeclared_fields`` are the fields ``check_mapped_fields`` found the mapping
+    does not have. They are what separates a **blind** read from a
+    **legitimately empty** one: both produce zero buckets and both are fatal —
+    an index that yields no values has had its vocabulary checked exactly as much
+    as one whose field name is wrong — but only one of them is fixed by editing
+    this script, so the reason says which.
+    """
     outside = {value: count for value, count in taxonomy_tags.items() if value not in labels}
 
     segments: Set[str] = set()
@@ -566,10 +763,58 @@ def check_category_vocabulary(
     )
 
     unused = sorted(labels - set(taxonomy_tags))
-    failed = bool(outside or segments_outside or heads_outside or orphans)
+
+    # Checked and reported first, for the reason ``verify_catalog.py`` checks its
+    # own ``nothing_verified`` first: every number below is a count of things
+    # that are wrong, and a count over an empty read is zero. A zero produced
+    # that way is not a clean bill of health, it is the absence of a bill.
+    blind = set(undeclared_fields)
+    read_nothing: List[str] = []
+    if not taxonomy_tags:
+        read_nothing.append(TAGS_FIELD)
+    if not addresses:
+        read_nothing.append(PATH_FIELD)
+    reasons = [
+        (
+            f"no value of {field!r} was read, and the mapping does not declare it: the "
+            "aggregation was blind, not empty. Nothing was checked against the snapshot"
+            if field in blind
+            else f"the mapping declares {field!r} but the index holds no value of it, so "
+            "nothing was checked against the snapshot"
+        )
+        for field in read_nothing
+    ]
+
+    if outside:
+        reasons.append(
+            f"{len(outside):,} of {len(taxonomy_tags):,} distinct {TAGS_FIELD} values are "
+            f"outside the pinned snapshot ({sum(outside.values()):,} instances)"
+        )
+    if segments_outside:
+        reasons.append(
+            f"{len(segments_outside):,} of {len(segments):,} {PATH_FIELD} segments are "
+            "outside the pinned snapshot"
+        )
+    if heads_outside:
+        reasons.append(
+            f"{len(heads_outside):,} {PATH_FIELD} chains do not start at a global taxonomy root"
+        )
+    if orphans:
+        reasons.append(
+            f"{len(orphans):,} {PATH_FIELD} addresses reached the index without their own "
+            "one-segment-shorter prefix"
+        )
+
     return _check(
         "category_vocabulary",
-        "fail" if failed else "pass",
+        "fail" if reasons else "pass",
+        # The names of the two ends of this verdict, so a reader of the JSON can
+        # tell "0 outside the snapshot because everything matched" from "0
+        # outside the snapshot because nothing was read" without reconstructing
+        # it from the counts — which is the reconstruction nobody performed.
+        nothing_verified=read_nothing,
+        fields_read_blind=sorted(blind & set(read_nothing)),
+        reasons=reasons,
         snapshot_labels=len(labels),
         snapshot_root_labels=len(root_labels),
         distinct_categories_in_index=len(taxonomy_tags),
@@ -584,9 +829,13 @@ def check_category_vocabulary(
         top_path_heads_outside_taxonomy_roots=heads_outside[:MAX_EXAMPLES],
         orphan_addresses=len(orphans),
         top_orphan_addresses=orphans[:MAX_EXAMPLES],
-        # The reverse direction the issue asks for. Not a failure on its own: a
-        # catalog covering part of the taxonomy is normal, and a catalog using a
-        # label the snapshot does not have is not.
+        # The reverse direction, still informational. A catalog covering part of
+        # the taxonomy is normal, and a catalog using a label the snapshot does
+        # not have is not. Its degenerate case — every label unused, the tell
+        # that was there all along while this check said ``pass`` — is now
+        # subsumed rather than separately gated: it requires either an empty read
+        # (``nothing_verified`` above) or every value read being outside the
+        # snapshot (``values_outside_snapshot`` above), and both are fatal.
         snapshot_labels_unused_by_index=len(unused),
         sample_snapshot_labels_unused_by_index=unused[:MAX_EXAMPLES],
     )
@@ -597,7 +846,7 @@ def check_document_identity(
     index: str,
     catalog: Path,
 ) -> Dict[str, Any]:
-    indexed_ids = set(composite_terms(request, index, "id"))
+    indexed_ids = set(composite_terms(request, index, ID_FIELD))
     catalog_ids = read_catalog_ids(catalog)
     position = {identifier: order for order, identifier in enumerate(catalog_ids)}
 
@@ -606,9 +855,25 @@ def check_document_identity(
     runs = contiguous_runs([position[identifier] for identifier in missing])
     long_runs = [run for run in runs if run[1] - run[0] + 1 >= 100]
 
+    status = "pass" if not missing and not extra else "fail"
+    reason: Dict[str, Any] = {}
+    if not indexed_ids and not catalog_ids:
+        # Two empty sets differ by nothing, and an id-set diff of nothing against
+        # nothing is the same vacuity as an empty vocabulary read: an index whose
+        # ``id`` enumeration comes back empty and an extract with no records are
+        # each on their own a reason this check cannot answer.
+        status = "fail"
+        reason = {
+            "nothing_verified": True,
+            "reason": (
+                "neither the index nor the catalog yielded a single id, so the id sets agree "
+                "without any id having been compared"
+            ),
+        }
     return _check(
         "document_identity",
-        "pass" if not missing and not extra else "fail",
+        status,
+        **reason,
         catalog=str(catalog),
         catalog_distinct_ids=len(catalog_ids),
         indexed_ids=len(indexed_ids),
@@ -656,6 +921,12 @@ def verify(
 
     mappings = request(f"/{index}/_mapping")[index]["mappings"]
 
+    # Answered off the mapping, before the search below is even issued, so that
+    # a field this run cannot see is named rather than silently counted as zero.
+    fields_read = [TAGS_FIELD, PATH_FIELD] + ([ID_FIELD] if catalog_path is not None else [])
+    mapping_check = check_mapped_fields(mappings, fields_read)
+    undeclared = mapping_check.get("undeclared_fields", [])
+
     # One round trip: exact total, coverage, and both vocabularies.
     response = request(
         f"/{index}/_search",
@@ -663,9 +934,9 @@ def verify(
             "size": 0,
             "track_total_hits": True,
             "aggs": {
-                "with_category_path": {"filter": {"exists": {"field": "category_path"}}},
-                "taxonomy_tags": {"terms": {"field": "taxonomy_tags", "size": terms_size}},
-                "category_path": {"terms": {"field": "category_path", "size": terms_size}},
+                "with_category_path": {"filter": {"exists": {"field": PATH_FIELD}}},
+                TAGS_FIELD: {"terms": {"field": TAGS_FIELD, "size": terms_size}},
+                PATH_FIELD: {"terms": {"field": PATH_FIELD, "size": terms_size}},
             },
         },
     )
@@ -674,6 +945,7 @@ def verify(
     with_path = aggregations["with_category_path"]["doc_count"]
 
     checks: List[Dict[str, Any]] = [
+        mapping_check,
         check_manifest_identity(
             mappings.get("_meta") or {}, manifest, manifest_path, resolved_lang, taxonomy_path
         ),
@@ -683,18 +955,20 @@ def verify(
 
     truncation: Dict[str, Any] = {}
     if taxonomy_path is not None:
-        taxonomy_tags, truncation["taxonomy_tags"] = resolve_vocabulary(
-            request, index, "taxonomy_tags", aggregations["taxonomy_tags"], terms_size
+        taxonomy_tags, truncation[TAGS_FIELD] = resolve_vocabulary(
+            request, index, TAGS_FIELD, aggregations[TAGS_FIELD], terms_size
         )
-        addresses, truncation["category_path"] = resolve_vocabulary(
-            request, index, "category_path", aggregations["category_path"], terms_size
+        addresses, truncation[PATH_FIELD] = resolve_vocabulary(
+            request, index, PATH_FIELD, aggregations[PATH_FIELD], terms_size
         )
         taxonomy = load_taxonomy(taxonomy_path)
         labels = {display_label(taxonomy, node, resolved_lang) for node in taxonomy}
         root_labels = {
             display_label(taxonomy, node, resolved_lang) for node in global_roots(taxonomy)
         }
-        checks.append(check_category_vocabulary(taxonomy_tags, addresses, labels, root_labels))
+        checks.append(
+            check_category_vocabulary(taxonomy_tags, addresses, labels, root_labels, undeclared)
+        )
     else:
         checks.append(
             _check(
@@ -746,6 +1020,13 @@ def summarise(result: Dict[str, Any]) -> str:
             "unverifiable": "????",
         }[check["status"]]
         lines.append(f"  [{marker}] {check['check']}")
+        # Every reason a check gives, on the surface a human reads. A verdict
+        # whose explanation lives only in the JSON is one step from no
+        # explanation at all.
+        for reason in ([check["reason"]] if check.get("reason") else []) + list(
+            check.get("reasons") or []
+        ):
+            lines.append(f"          {reason}")
         if check["check"] == "document_count":
             lines.append(
                 f"          indexed {check['indexed_documents']:,} vs manifest "
