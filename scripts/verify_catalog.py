@@ -75,12 +75,12 @@ from __future__ import annotations
 
 import argparse
 import json
-import math
 import sys
 from collections import defaultdict
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
+
+from tolerance import Tolerance
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
@@ -107,36 +107,24 @@ class CatalogError(Exception):
     """
 
 
-@dataclass
-class Tolerance:
+def values_tolerance(
+    allow_values: Optional[int] = None,
+    allow_values_fraction: Optional[float] = None,
+) -> Tolerance:
     """How many off-snapshot values the operator has explicitly agreed to.
 
     Counted in **distinct values**, which is the number ``verify_index.py`` gates
     on for the same rule, and the number that says how much of the vocabulary is
-    unexplained rather than how often the unexplained part occurs.
+    unexplained rather than how often the unexplained part occurs. That choice of
+    denominator is this script's; what it does with it — floor a fraction, never
+    round it — is ``scripts/tolerance.py``'s, shared with the two loaders.
     """
-
-    allow_values: Optional[int] = None
-    allow_values_fraction: Optional[float] = None
-
-    def permitted(self, checked: int) -> int:
-        if self.allow_values is not None:
-            return self.allow_values
-        if self.allow_values_fraction is not None:
-            # Floored, never rounded: 0.5 of 5 values permits 2, not 3. Rounding
-            # up would let a fraction quietly buy a violation nobody named.
-            return math.floor(self.allow_values_fraction * checked)
-        return 0
-
-    def describe(self, checked: int) -> str:
-        if self.allow_values is not None:
-            return f"--allow-values-outside-snapshot {self.allow_values}"
-        if self.allow_values_fraction is not None:
-            return (
-                f"--allow-values-outside-snapshot-fraction {self.allow_values_fraction:g} "
-                f"({self.permitted(checked):,} of {checked:,})"
-            )
-        return "0 (default: zero tolerance)"
+    return Tolerance(
+        "--allow-values-outside-snapshot",
+        "--allow-values-outside-snapshot-fraction",
+        allow_values,
+        allow_values_fraction,
+    )
 
 
 def _chain_segments(path: List[str]) -> List[str]:
@@ -429,13 +417,13 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
     )
     args = parser.parse_args(list(argv) if argv is not None else None)
 
-    if args.allow_values_outside_snapshot is not None and args.allow_values_outside_snapshot < 0:
-        parser.error("--allow-values-outside-snapshot must not be negative")
-    fraction = args.allow_values_outside_snapshot_fraction
-    if fraction is not None and not 0.0 <= fraction <= 1.0:
-        parser.error("--allow-values-outside-snapshot-fraction must be between 0 and 1")
-
-    tolerance = Tolerance(args.allow_values_outside_snapshot, fraction)
+    tolerance = values_tolerance(
+        args.allow_values_outside_snapshot,
+        args.allow_values_outside_snapshot_fraction,
+    )
+    problem = tolerance.problem()
+    if problem is not None:
+        parser.error(problem)
 
     try:
         result = verify(args.ndjson, args.taxonomy, args.lang)

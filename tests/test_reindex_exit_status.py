@@ -585,7 +585,7 @@ def test_gate_passes_a_copy_that_matches_its_source() -> None:
     copy = reindex_v7_to_v8.Copy(source=SOURCE, dest=DEST, src_count=10, dst_count=10)
     copy.read_response(reindex_response(10))
 
-    assert reindex_v7_to_v8.gate(copy, reindex_v7_to_v8.Tolerance(), False) == []
+    assert reindex_v7_to_v8.gate(copy, reindex_v7_to_v8.missing_tolerance(), False) == []
 
 
 @pytest.mark.parametrize(

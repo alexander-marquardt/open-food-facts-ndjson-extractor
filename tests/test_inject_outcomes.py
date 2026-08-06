@@ -42,10 +42,10 @@ sys.path.insert(0, str(REPO_ROOT / "scripts"))
 import inject_category_path  # noqa: E402
 from inject_category_path import (  # noqa: E402
     Outcome,
-    Tolerance,
     gate,
     inject,
     main,
+    missing_tolerance,
 )
 
 
@@ -636,7 +636,7 @@ def test_missing_examples_are_capped_but_the_count_is_not() -> None:
 
 def test_gate_passes_only_a_run_that_applied_everything_it_sent() -> None:
     clean = Outcome(sent=10, updated=10)
-    assert gate(clean, Tolerance()) == []
+    assert gate(clean, missing_tolerance()) == []
 
 
 def test_inject_skips_records_without_an_id_without_counting_them_sent() -> None:

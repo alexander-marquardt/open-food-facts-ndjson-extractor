@@ -76,13 +76,14 @@ from __future__ import annotations
 
 import argparse
 import json
-import math
 import os
 import sys
 import urllib.error
 import urllib.request
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, Iterable, List, Optional, TextIO
+
+from tolerance import Tolerance
 
 MAX_EXAMPLES = 5
 
@@ -186,29 +187,24 @@ class Outcome:
             self.failure_examples.append(detail)
 
 
-@dataclass
-class Tolerance:
-    """How many misses the operator has explicitly agreed to."""
+def missing_tolerance(
+    allow_missing: Optional[int] = None,
+    allow_missing_fraction: Optional[float] = None,
+) -> Tolerance:
+    """How many misses the operator has explicitly agreed to.
 
-    allow_missing: Optional[int] = None
-    allow_missing_fraction: Optional[float] = None
-
-    def permitted(self, sent: int) -> int:
-        if self.allow_missing is not None:
-            return self.allow_missing
-        if self.allow_missing_fraction is not None:
-            return math.floor(self.allow_missing_fraction * sent)
-        return 0
-
-    def describe(self, sent: int) -> str:
-        if self.allow_missing is not None:
-            return f"--allow-missing {self.allow_missing}"
-        if self.allow_missing_fraction is not None:
-            return (
-                f"--allow-missing-fraction {self.allow_missing_fraction:g} "
-                f"({self.permitted(sent):,} of {sent:,})"
-            )
-        return "0 (default: zero tolerance)"
+    The rule itself — a whole number beats a fraction, a fraction is floored
+    and never rounded, nothing named means zero — is ``scripts/tolerance.py``'s
+    and is shared with ``verify_catalog.py`` and ``reindex_v7_to_v8.py``. All
+    this script contributes is the names of its own two flags, which is what
+    the report and any usage error quote back.
+    """
+    return Tolerance(
+        "--allow-missing",
+        "--allow-missing-fraction",
+        allow_missing,
+        allow_missing_fraction,
+    )
 
 
 def read_records(handle: Iterable[str]) -> Iterable[Dict[str, Any]]:
@@ -369,12 +365,10 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
     )
     args = ap.parse_args(list(argv) if argv is not None else None)
 
-    if args.allow_missing is not None and args.allow_missing < 0:
-        ap.error("--allow-missing must not be negative")
-    if args.allow_missing_fraction is not None and not 0.0 <= args.allow_missing_fraction <= 1.0:
-        ap.error("--allow-missing-fraction must be between 0 and 1")
-
-    tolerance = Tolerance(args.allow_missing, args.allow_missing_fraction)
+    tolerance = missing_tolerance(args.allow_missing, args.allow_missing_fraction)
+    problem = tolerance.problem()
+    if problem is not None:
+        ap.error(problem)
 
     try:
         with open(args.ndjson, encoding="utf-8") as handle:
