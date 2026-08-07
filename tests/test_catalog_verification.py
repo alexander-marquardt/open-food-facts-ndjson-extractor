@@ -56,23 +56,29 @@ TAXONOMY: Dict[str, Any] = {
     "en:cheeses": {"name": {"en": "Cheeses"}, "parents": ["en:dairy"]},
 }
 
-# Three records covering the seven labels above, each path a single anchored
-# root->leaf chain and each category at exactly one address.
+# Three records covering the seven labels above, each on a single anchored
+# root->leaf address and each category at exactly one address. Every record
+# carries ``category_path_primary`` as well: the verifier reads it for every gate
+# scoped to the breadcrumb a product page leads with, and refuses a record that
+# omits it rather than clearing those gates by having nothing to check.
 CLEAN_RECORDS: List[Dict[str, Any]] = [
     {
         "id": "1",
         "taxonomy_tags": ["Foods", "Snacks", "Biscuits"],
         "category_path": ["Foods", "Foods/Snacks", "Foods/Snacks/Biscuits"],
+        "category_path_primary": ["Foods", "Foods/Snacks", "Foods/Snacks/Biscuits"],
     },
     {
         "id": "2",
         "taxonomy_tags": ["Foods", "Beverages", "Waters"],
         "category_path": ["Foods", "Foods/Beverages", "Foods/Beverages/Waters"],
+        "category_path_primary": ["Foods", "Foods/Beverages", "Foods/Beverages/Waters"],
     },
     {
         "id": "3",
         "taxonomy_tags": ["Foods", "Dairy", "Cheeses"],
         "category_path": ["Foods", "Foods/Dairy", "Foods/Dairy/Cheeses"],
+        "category_path_primary": ["Foods", "Foods/Dairy", "Foods/Dairy/Cheeses"],
     },
 ]
 
@@ -83,6 +89,7 @@ OFF_SNAPSHOT_RECORD: Dict[str, Any] = {
     "id": "4",
     "taxonomy_tags": ["Foods", "Rocket fuel", "Gravel", "Neon"],
     "category_path": ["Foods"],
+    "category_path_primary": ["Foods"],
 }
 
 
@@ -157,6 +164,7 @@ def test_off_snapshot_path_segment_also_fails(tmp_path, monkeypatch, capsys):
         "id": "9",
         "taxonomy_tags": ["Foods"],
         "category_path": ["Foods", "Foods/Sawdust"],
+        "category_path_primary": ["Foods", "Foods/Sawdust"],
     }
     catalog = write_catalog(tmp_path, CLEAN_RECORDS + [record])
 
@@ -393,6 +401,7 @@ def test_broken_chain_still_fails(tmp_path, monkeypatch, capsys):
         "taxonomy_tags": ["Foods"],
         # Skips a level: the second element does not extend the first.
         "category_path": ["Foods", "Foods/Snacks/Biscuits"],
+        "category_path_primary": ["Foods", "Foods/Snacks/Biscuits"],
     }
     catalog = write_catalog(tmp_path, [record])
 
@@ -400,8 +409,99 @@ def test_broken_chain_still_fails(tmp_path, monkeypatch, capsys):
 
     result = json.loads(out)
     assert result["property_3_single_chain_violations"] == 1
+    # The union check bites on the same record for its own reason: the ancestor
+    # of "Foods/Snacks/Biscuits" is "Foods/Snacks", which is not a value.
+    assert result["property_3_union_violations"] == 1
     assert status == 1
-    assert result["failed"] == ["property_3_single_chain"]
+    assert set(result["failed"]) == {
+        "property_3_single_primary_chain",
+        "property_3_prefix_closed_union",
+    }
+
+
+def test_a_union_that_is_not_prefix_closed_fails(tmp_path, monkeypatch, capsys):
+    """A second address whose ancestor levels were not emitted.
+
+    The shape a naive "just append the alternates" change produces: the deeper
+    value arrives, the breadcrumb level above it never does, and the drill-down
+    facet has a level with no bucket to render.
+    """
+    taxonomy = write_taxonomy(tmp_path)
+    record = {
+        "id": "9",
+        "taxonomy_tags": ["Foods", "Waters"],
+        "category_path": [
+            "Foods",
+            "Foods/Beverages",
+            "Foods/Beverages/Waters",
+            "Foods/Snacks/Waters",
+        ],
+        "category_path_primary": ["Foods", "Foods/Beverages", "Foods/Beverages/Waters"],
+    }
+    catalog = write_catalog(tmp_path, [record])
+
+    status, out, _ = run(monkeypatch, capsys, "--ndjson", catalog, "--taxonomy", taxonomy)
+
+    result = json.loads(out)
+    assert result["property_3_union_violations"] == 1
+    assert result["property_3_single_chain_violations"] == 0
+    assert status == 1
+    assert result["failed"] == ["property_3_prefix_closed_union"]
+
+
+def test_a_record_without_a_primary_address_fails(tmp_path, monkeypatch, capsys):
+    """A catalog built before the primary existed must not pass vacuously.
+
+    Every gate below the union check reads ``category_path_primary``. Without the
+    field there is nothing to check, and "nothing was checked" would otherwise
+    render as a clean verdict.
+    """
+    taxonomy = write_taxonomy(tmp_path)
+    record = {
+        "id": "10",
+        "taxonomy_tags": ["Foods"],
+        "category_path": ["Foods", "Foods/Beverages"],
+    }
+    catalog = write_catalog(tmp_path, [record])
+
+    status, out, _ = run(monkeypatch, capsys, "--ndjson", catalog, "--taxonomy", taxonomy)
+
+    result = json.loads(out)
+    assert result["property_3_union_violations"] == 1
+    assert status == 1
+    assert "property_3_prefix_closed_union" in result["failed"]
+
+
+def test_several_addresses_per_product_is_not_a_failure(tmp_path, monkeypatch, capsys):
+    """The restored DAG itself: two addresses, both prefix-closed, primary first.
+
+    The catalog this project now builds. It must pass — and the numbers a
+    downstream aggregation has to be sized against must be reported from it.
+    """
+    taxonomy = write_taxonomy(tmp_path)
+    record = {
+        "id": "11",
+        "taxonomy_tags": ["Foods", "Waters"],
+        "category_path": [
+            "Foods",
+            "Foods/Beverages",
+            "Foods/Beverages/Waters",
+            "Foods/Snacks",
+            "Foods/Snacks/Waters",
+        ],
+        "category_path_primary": ["Foods", "Foods/Beverages", "Foods/Beverages/Waters"],
+    }
+    catalog = write_catalog(tmp_path, [record])
+
+    status, out, _ = run(monkeypatch, capsys, "--ndjson", catalog, "--taxonomy", taxonomy)
+
+    result = json.loads(out)
+    assert status == 0, result["failure_reasons"]
+    assert result["records_at_multiple_addresses"] == 1
+    assert result["categories_at_multiple_addresses"] == 1
+    assert result["property_2_categories_at_multiple_primary_addresses"] == 0
+    assert result["distinct_category_paths"] == 5
+    assert result["max_category_path_values"] == 5
 
 
 def test_category_at_two_addresses_still_fails(tmp_path, monkeypatch, capsys):
@@ -411,11 +511,17 @@ def test_category_at_two_addresses_still_fails(tmp_path, monkeypatch, capsys):
             "id": "6",
             "taxonomy_tags": ["Foods", "Waters"],
             "category_path": ["Foods", "Foods/Beverages", "Foods/Beverages/Waters"],
+            "category_path_primary": [
+                "Foods",
+                "Foods/Beverages",
+                "Foods/Beverages/Waters",
+            ],
         },
         {
             "id": "7",
             "taxonomy_tags": ["Foods", "Waters"],
             "category_path": ["Foods", "Foods/Snacks", "Foods/Snacks/Waters"],
+            "category_path_primary": ["Foods", "Foods/Snacks", "Foods/Snacks/Waters"],
         },
     ]
     catalog = write_catalog(tmp_path, records)
@@ -423,9 +529,9 @@ def test_category_at_two_addresses_still_fails(tmp_path, monkeypatch, capsys):
     status, out, _ = run(monkeypatch, capsys, "--ndjson", catalog, "--taxonomy", taxonomy)
 
     result = json.loads(out)
-    assert result["property_2_categories_at_multiple_addresses"] == 1
+    assert result["property_2_categories_at_multiple_primary_addresses"] == 1
     assert status == 1
-    assert result["failed"] == ["property_2_one_address_per_category"]
+    assert result["failed"] == ["property_2_one_primary_address_per_category"]
 
 
 def test_unanchored_chain_still_fails(tmp_path, monkeypatch, capsys):
@@ -435,6 +541,7 @@ def test_unanchored_chain_still_fails(tmp_path, monkeypatch, capsys):
         "taxonomy_tags": ["Snacks"],
         # Starts mid-taxonomy: "Snacks" is not the label of a global root.
         "category_path": ["Snacks", "Snacks/Biscuits"],
+        "category_path_primary": ["Snacks", "Snacks/Biscuits"],
     }
     catalog = write_catalog(tmp_path, [record])
 
@@ -454,12 +561,27 @@ def test_every_failing_gate_is_named_at_once(tmp_path, monkeypatch, capsys):
     """
     taxonomy = write_taxonomy(tmp_path)
     records = [
-        {"id": "a", "taxonomy_tags": ["Sawdust"], "category_path": ["Snacks", "Snacks/Biscuits"]},
-        {"id": "b", "taxonomy_tags": ["Foods"], "category_path": ["Foods", "Foods/Waters"]},
+        {
+            "id": "a",
+            "taxonomy_tags": ["Sawdust"],
+            "category_path": ["Snacks", "Snacks/Biscuits"],
+            "category_path_primary": ["Snacks", "Snacks/Biscuits"],
+        },
+        {
+            "id": "b",
+            "taxonomy_tags": ["Foods"],
+            "category_path": ["Foods", "Foods/Waters"],
+            "category_path_primary": ["Foods", "Foods/Waters"],
+        },
         {
             "id": "c",
             "taxonomy_tags": ["Foods"],
             "category_path": ["Foods", "Foods/Beverages", "Foods/Beverages/Waters"],
+            "category_path_primary": [
+                "Foods",
+                "Foods/Beverages",
+                "Foods/Beverages/Waters",
+            ],
         },
     ]
     catalog = write_catalog(tmp_path, records)
@@ -470,7 +592,7 @@ def test_every_failing_gate_is_named_at_once(tmp_path, monkeypatch, capsys):
     assert status == 1
     assert set(result["failed"]) == {
         "anchoring",
-        "property_2_one_address_per_category",
+        "property_2_one_primary_address_per_category",
         "values_outside_pinned_snapshot",
     }
     assert len(result["failure_reasons"]) == 3

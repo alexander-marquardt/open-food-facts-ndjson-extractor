@@ -340,7 +340,7 @@ def test_the_gate_refuses_nothing_because_the_chains_are_now_right() -> None:
     # than as a top-level Pâté of its own.
     by_id = {r["id"]: r for r in records}
     assert by_id["0055652001899"]["category_path"][0] == "Meats and their products"
-    assert by_id["0017400140328"]["category_path"] == [
+    assert by_id["0017400140328"]["category_path_primary"] == [
         "Meals",
         "Meals/Cereales preparees",
         "Meals/Cereales preparees/Prepared rices",

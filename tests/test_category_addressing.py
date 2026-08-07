@@ -32,7 +32,11 @@ from typing import Dict, List
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
-from off_demo_extract.taxonomy import build_category_path, category_chain  # noqa: E402
+from off_demo_extract.taxonomy import (  # noqa: E402
+    build_category_path,
+    build_primary_category_path,
+    category_chain,
+)
 
 _FIXTURE = json.loads(
     (Path(__file__).resolve().parent / "fixtures" / "off_real_categories.json").read_text(
@@ -65,7 +69,7 @@ def _addresses_by_category(lang: str) -> Dict[str, Dict[str, List[str]]]:
         chain = category_chain(
             tags, TAXONOMY, EXCLUDE, keep_prefixes={"en", lang} if lang else {"en"}
         )
-        paths = build_category_path(tags, TAXONOMY, EXCLUDE, lang)
+        paths = build_primary_category_path(tags, TAXONOMY, EXCLUDE, lang)
         assert len(chain) == len(paths), (
             f"{product['code']}: chain and path lengths disagree ({chain} vs {paths})"
         )
@@ -74,14 +78,16 @@ def _addresses_by_category(lang: str) -> Dict[str, Dict[str, List[str]]]:
     return seen
 
 
-def test_property_2_one_address_per_category() -> None:
-    """A category occupies exactly ONE position in the tree.
+def test_property_2_one_primary_address_per_category() -> None:
+    """A category has exactly ONE primary position, on every product carrying it.
 
-    Every product carrying a category must file it at the same path, or the
-    category's facet count splits across two buckets and drill-down lands on a
-    subset of the matching products. This is the defect: on the pre-fix walk,
-    407 categories in the English catalog (246 es, 581 fr) sat at two or more
-    addresses.
+    The category may also sit at alternate addresses — the source taxonomy is a
+    DAG and 2,545 of its nodes have several parents — but which address is
+    *primary* is decided once per run over the whole graph, so it cannot differ
+    between two products that both carry the node. A primary that moved would
+    split the breadcrumb a product page leads with across two positions, which is
+    the defect this was written for: on the pre-fix walk, 407 categories in the
+    English catalog (246 es, 581 fr) sat at two or more addresses.
     """
     for lang in ("en", "es"):
         offenders = {
@@ -115,30 +121,63 @@ def test_property_2_covers_the_categories_that_were_broken() -> None:
         )
 
 
-def test_property_3_one_path_per_product() -> None:
-    """Each product carries exactly ONE root→leaf chain, never a union of branches.
+def test_the_primary_address_is_one_root_to_leaf_chain() -> None:
+    """The address a product page leads with is still exactly one chain.
 
-    This holds today, and this test is the guard rather than the fix: if a later
-    change emitted every matching chain per product, the paths would stop being
-    a single cumulative sequence, disjointness reasoning downstream would break,
-    and facet counts would split — with nothing else failing.
+    ``category_path`` is a union now, but the breadcrumb is not: it is one
+    cumulative sequence, entry *i* carrying *i* separators and extending its
+    predecessor by one segment. Nothing downstream can render "one address plus
+    also categorized as …" if the "one address" is itself a union.
     """
     for lang in ("en", "es", "fr"):
         for product in PRODUCTS:
-            paths = build_category_path(product["categories_tags"], TAXONOMY, EXCLUDE, lang)
+            paths = build_primary_category_path(
+                product["categories_tags"], TAXONOMY, EXCLUDE, lang
+            )
             assert paths, f"[{lang}] {product['code']}: expected a resolved path"
-            # A single chain is exactly a cumulative sequence: entry i has i
-            # separators, and each entry extends the previous one by one segment.
             for i, entry in enumerate(paths):
                 assert entry.count("/") == i, (
-                    f"[{lang}] {product['code']}: path[{i}] is not a single "
+                    f"[{lang}] {product['code']}: primary[{i}] is not a single "
                     f"cumulative chain: {paths}"
                 )
             for shorter, longer in zip(paths, paths[1:]):
                 assert longer.startswith(shorter + "/"), (
                     f"[{lang}] {product['code']}: {longer!r} does not extend "
-                    f"{shorter!r} — more than one branch was emitted: {paths}"
+                    f"{shorter!r} — the primary is not a single branch: {paths}"
                 )
+
+
+def test_property_3_the_emitted_field_is_a_prefix_closed_union() -> None:
+    """``category_path`` carries every ancestor prefix of every address it holds.
+
+    This is what the single-chain assertion became. It is not a weaker check: the
+    cumulative-path contract is what every hierarchy facet downstream is entitled
+    to under either shape, and a union that dropped a prefix would leave a
+    breadcrumb level with no bucket to render. The primary leads the list, so a
+    consumer reading the head gets the address the product page shows.
+    """
+    for lang in ("en", "es", "fr"):
+        for product in PRODUCTS:
+            tags = product["categories_tags"]
+            paths = build_category_path(tags, TAXONOMY, EXCLUDE, lang)
+            primary = build_primary_category_path(tags, TAXONOMY, EXCLUDE, lang)
+            assert paths, f"[{lang}] {product['code']}: expected a resolved path"
+            assert paths[: len(primary)] == primary, (
+                f"[{lang}] {product['code']}: the union does not lead with the "
+                f"primary address ({paths} vs {primary})"
+            )
+            values = set(paths)
+            for entry in paths:
+                if "/" not in entry:
+                    continue
+                parent = entry.rsplit("/", 1)[0]
+                assert parent in values, (
+                    f"[{lang}] {product['code']}: {entry!r} is emitted but its "
+                    f"ancestor {parent!r} is not — the union is not prefix-closed"
+                )
+            assert len(paths) == len(set(paths)), (
+                f"[{lang}] {product['code']}: a path is emitted twice: {paths}"
+            )
 
 
 def test_sodas_is_anchored_to_a_global_root() -> None:

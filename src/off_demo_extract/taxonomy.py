@@ -1,20 +1,22 @@
 """
-Open Food Facts category *taxonomy* → a single clean hierarchical path.
+Open Food Facts category *taxonomy* → clean hierarchical addresses, one primary.
 
 Background
 ----------
 Open Food Facts ships ``categories_tags`` / ``categories_hierarchy`` on every
-product, but those are **not** a single root→leaf path. They are the flattened
-*union of every ancestor category* drawn from the OFF category taxonomy, which
-is a directed acyclic graph (a category can have several parents). Naively
-joining them with ``/`` produces a nonsense path that mixes parallel roots and
-sibling branches.
+product, but those are **not** a root→leaf path. They are the flattened *union of
+every ancestor category* drawn from the OFF category taxonomy, which is a
+directed acyclic graph (a category can have several parents). Naively joining
+them with ``/`` produces a nonsense path that mixes parallel roots and sibling
+branches.
 
 To get a clean hierarchy in the shape retail catalogs typically expose (an array
 of cumulative path strings like ``["Beverages", "Beverages/Hot beverages",
 "Beverages/Hot beverages/Teas"]``) we need the taxonomy *graph* — the
-parent→child edges — and then walk a single canonical chain from the product's
-most specific category up to a root.
+parent→child edges — and then walk it from the product's most specific
+categories up to the roots. A node with several parents has several such
+addresses, and a product is legitimately reachable by each of them; one of them
+is named the **primary**, which is the breadcrumb a product page leads with.
 
 The taxonomy is the public OFF file:
     https://static.openfoodfacts.org/data/taxonomies/categories.json
@@ -25,24 +27,50 @@ Its shape is ``{canonical_id: {"name": {lang: label, ...},
 Strategy
 --------
 The address of a category must not depend on which product you are looking at.
-So the parent of every node is decided **once per run, globally**, over the whole
-taxonomy — never per product:
+So the graph is walked **once per run, globally**, over the whole taxonomy —
+never per product:
 
 1. :func:`build_canonical_parent_map` runs one BFS from the taxonomy's roots over
    the reversed ``parents`` edges. That gives every node its exact *fewest-hops*
-   distance to a root, and picks each node's single canonical parent. The result
-   is a spanning forest of the DAG: every non-root keeps exactly one parent, no
-   node is orphaned, only redundant parent edges are dropped. It is built over
-   the **whole** taxonomy, in every language, for every catalog.
-2. :func:`category_chain` then takes the product's own tags only to choose the
+   distance to a root, and picks each node's single canonical parent. It is built
+   over the **whole** taxonomy, in every language, for every catalog.
+2. :class:`AddressIndex` enumerates **every** root→node path over the full
+   ``parents`` DAG. The path that follows the canonical parent at every hop is the
+   node's **primary** address; the others are its **alternates**. Also built once
+   per run, from the same global graph, so a node's whole address *set* is
+   product-independent exactly as its single address used to be.
+3. :func:`category_chain` takes the product's own tags only to choose the
    **leaf**, and walks the canonical parent map from that leaf all the way to a
-   **global** root — materialising ancestors the product never tagged.
-3. :func:`display_label` maps each canonical id to a display label (taxonomy
+   **global** root — materialising ancestors the product never tagged. That is the
+   product's *primary* leaf; :func:`category_leaves` returns it followed by the
+   alternates.
+4. :func:`display_label` maps each canonical id to a display label (taxonomy
    ``name`` in the requested language, falling back to English, then ``xx``, then
-   a prettified slug) and the chain is emitted as cumulative ``/``-joined paths.
-   That function is the single place a category's label is decided — the flat
-   ``categories`` field calls it too, so the two fields can never disagree about
-   what one node is called.
+   a prettified slug) and each address is emitted as cumulative ``/``-joined
+   paths. That function is the single place a category's label is decided — the
+   flat ``categories`` field calls it too, so the two fields can never disagree
+   about what one node is called.
+
+Several addresses per node, one of them primary
+-----------------------------------------------
+2,545 of the taxonomy's 14,457 nodes have more than one parent, so a node
+genuinely sits at several addresses. Collapsing that to one made every product
+reachable by exactly one breadcrumb, which is not what the source data says.
+:func:`category_path_entries` therefore emits the **union** of the cumulative
+entries across every address a product holds, and
+:func:`primary_category_path_entries` emits the primary alone.
+
+The canonical parent map is **not** deleted for this. It is retained and re-cast
+as the *primary-address selector*, for three reasons:
+
+* a product page shows one address plus "also categorized as …", so a primary has
+  to exist regardless;
+* the leaf-selection rules below keep their exact present meaning instead of
+  needing redefinition — "longest canonical chain" and "drop canonical ancestors"
+  are only ill-defined if the canonical map is gone;
+* every path a run emitted before still exists, and every product's primary is
+  byte-identical to what the collapsed build produced, so the rebuild diff is
+  auditable: **a primary that moves is a defect, not noise.**
 
 Why global anchoring, and not just a DAG-to-tree projection
 -----------------------------------------------------------
@@ -56,13 +84,18 @@ root does.
 
 The two properties this module guarantees
 -----------------------------------------
-**Property 2 — one address per category.** A node's ancestry comes from the
-run-wide canonical parent map, so every occurrence of a node resolves to the
-identical path, on every product.
+**Property 2 — one address *set* per category, and one primary address.** A
+node's addresses come from the run-wide graph, so every occurrence of a node
+resolves to the identical set of paths with the identical primary, on every
+product. This is the restatement of the older "one address per category": what
+was load-bearing about it was that the address does not depend on the product,
+not that there is only one.
 
-**Property 3 — one path per product.** :func:`category_chain` returns a single
-root→leaf chain, so a product's ``category_path`` is one cumulative path and
-never a union of branches.
+**Property 3 — a prefix-closed union of root→leaf chains per product.** A
+product's ``category_path`` carries every cumulative prefix of every address it
+holds, so a value's ancestor prefixes are always present as values of their own.
+The older reading — exactly one chain — was the forest's shadow, not a property
+of the source data.
 
 Where the language filter applies — naming, not traversal
 ----------------------------------------------------------
@@ -133,7 +166,18 @@ import sys
 import urllib.request
 from collections import Counter, deque
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Sequence, Set, TextIO, Tuple
+from typing import (
+    Any,
+    Dict,
+    Iterable,
+    List,
+    NamedTuple,
+    Optional,
+    Sequence,
+    Set,
+    TextIO,
+    Tuple,
+)
 
 TAXONOMY_URL = "https://static.openfoodfacts.org/data/taxonomies/categories.json"
 
@@ -460,12 +504,20 @@ def build_canonical_parent_map(
     taxonomy: Dict[str, Any],
     exclude: Optional[Set[str]] = None,
 ) -> Dict[str, Optional[str]]:
-    """Pick one canonical parent for every taxonomy node, once, for the whole run.
+    """Pick each node's **primary** parent, once, for the whole run.
 
     The OFF category taxonomy is a DAG: 2,545 of its 14,457 nodes have more than
-    one parent. This collapses it to a spanning **forest** — every non-root keeps
-    exactly one parent, the roots stay roots, and no node is orphaned; only
-    redundant parent edges are dropped.
+    one parent. This picks one of them per node, which is a spanning **forest** of
+    that DAG — every non-root keeps exactly one primary parent, the roots stay
+    roots, and no node is orphaned.
+
+    **The other parent edges are no longer dropped.** They are enumerated by
+    :class:`AddressIndex`, which treats the path following the choice made here at
+    every hop as a node's *primary* address and every other root→node path as an
+    *alternate*. This function is therefore the primary-address selector, not a
+    flattening: keeping it is what lets every downstream rule below (leaf choice,
+    ancestor coverage, the emitted breadcrumb) keep its exact present meaning
+    while the alternates are added alongside.
 
     **Language-blind, and takes no ``keep_prefixes``.** The graph is the same for
     every catalog: all 14,457 nodes, so the map's roots are the taxonomy's 92 and
@@ -569,6 +621,145 @@ def canonical_ancestry(
     return chain
 
 
+class AddressExplosionError(RuntimeError):
+    """A node has more root→node paths than any catalog could sensibly carry.
+
+    Enumerating every path through a DAG is exponential in the worst case. The
+    pinned snapshot's worst node has 28, so the cap this is raised at cannot fire
+    on it — it exists so that a future taxonomy refresh which *is* pathological
+    stops the build with a name instead of exhausting memory, or silently
+    truncating a product's addresses, which would be a facet that lies.
+    """
+
+
+# Refuses at ~35x the pinned snapshot's worst node (28). Deliberately far above
+# anything real, because the number is a circuit breaker and not a policy about
+# how many addresses a category may have.
+MAX_ADDRESSES_PER_NODE = 1000
+
+
+class AddressIndex:
+    """Every root→node address in the taxonomy DAG, primary first.
+
+    Built **once per run** from the whole taxonomy, exactly like
+    :func:`build_canonical_parent_map`, and for the same reason: a category's
+    addresses must not depend on which product you are looking at. Nothing here
+    consults a product, a language or a label — an address is a tuple of canonical
+    ids, and :func:`display_label` renders it later.
+
+    ``addresses(node)[0]`` is the **primary**: the path that follows
+    ``canonical_parents`` at every hop, i.e. exactly what
+    :func:`canonical_ancestry` returns and exactly what a run emitted before the
+    alternates existed. The rest are the alternates, ordered shortest-first and
+    then lexicographically — a total order over the *set* of paths, so it cannot
+    move when the upstream file re-orders a ``parents`` list, which is the same
+    stability argument the tie-break in the module docstring makes.
+
+    A node's paths are its parents' paths with the node appended, so the whole
+    index is one pass in parent-before-child order. That pass is written
+    iteratively rather than recursively: the recursion depth would be the
+    taxonomy's, which a future refresh could deepen without warning, and the
+    explicit stack is also what gives the cycle guard somewhere to stand.
+    """
+
+    def __init__(
+        self,
+        taxonomy: Dict[str, Any],
+        canonical_parents: Dict[str, Optional[str]],
+        exclude: Optional[Set[str]] = None,
+        max_addresses_per_node: int = MAX_ADDRESSES_PER_NODE,
+    ) -> None:
+        nodes = eligible_nodes(taxonomy, keep_prefixes=None, exclude=exclude)
+        self._parents: Dict[str, List[str]] = {
+            n: sorted(set(parents_of(taxonomy, n, within=nodes))) for n in nodes
+        }
+        self._canonical = canonical_parents
+        self._max = max_addresses_per_node
+        self._addresses: Dict[str, Tuple[Tuple[str, ...], ...]] = {}
+        self._build()
+
+    def _build(self) -> None:
+        # Iterative post-order: a node is resolved only once every parent is.
+        # ``in_progress`` is the cycle guard — the pinned snapshot has none, but
+        # ``build_canonical_parent_map`` already carries the same defence, and an
+        # unguarded walk here would not terminate rather than merely be wrong.
+        in_progress: Set[str] = set()
+        for start in sorted(self._parents):
+            if start in self._addresses:
+                continue
+            stack: List[str] = [start]
+            while stack:
+                node = stack[-1]
+                if node in self._addresses:
+                    stack.pop()
+                    in_progress.discard(node)
+                    continue
+                pending = [
+                    p
+                    for p in self._parents[node]
+                    if p not in self._addresses and p not in in_progress
+                ]
+                if pending:
+                    in_progress.add(node)
+                    stack.extend(pending)
+                    continue
+                stack.pop()
+                in_progress.discard(node)
+                self._addresses[node] = self._resolve(node)
+
+    def _resolve(self, node: str) -> Tuple[Tuple[str, ...], ...]:
+        paths: List[Tuple[str, ...]] = []
+        for parent in self._parents[node]:
+            # A parent still unresolved at this point is one the cycle guard cut;
+            # its edge contributes nothing rather than looping forever.
+            for prefix in self._addresses.get(parent, ()):
+                if node in prefix:
+                    continue  # a cycle edge would make the path revisit ``node``
+                paths.append(prefix + (node,))
+                if len(paths) > self._max:
+                    raise AddressExplosionError(
+                        f"category {node!r} has more than {self._max:,} root-to-node "
+                        "addresses in this taxonomy. Every address becomes a "
+                        "category_path value on every product filed beneath it, so "
+                        "this would be a document, an index and a facet the catalog "
+                        "cannot honestly serve. Refusing rather than truncating."
+                    )
+        if not paths:
+            return ((node,),)
+        distinct = set(paths)
+        primary = tuple(canonical_ancestry(self._canonical, node))
+        # ``primary`` is a path of this DAG by construction — every canonical
+        # parent is a real parent — whenever the map was built over the same node
+        # set. It is checked rather than assumed so that a caller who passes a
+        # differently-scoped map gets a deterministic order instead of a leading
+        # path the graph does not contain.
+        if primary in distinct:
+            rest = sorted(distinct - {primary}, key=lambda p: (len(p), p))
+            return (primary,) + tuple(rest)
+        return tuple(sorted(distinct, key=lambda p: (len(p), p)))
+
+    def addresses(self, node: str) -> Tuple[Tuple[str, ...], ...]:
+        """Every root→``node`` path, primary first. ``()`` for an unknown node."""
+        return self._addresses.get(node, ())
+
+    def primary(self, node: str) -> Tuple[str, ...]:
+        """The primary root→``node`` path. ``()`` for an unknown node."""
+        found = self._addresses.get(node)
+        return found[0] if found else ()
+
+    @property
+    def multi_address_nodes(self) -> int:
+        """Nodes sitting at more than one address — the DAG's forks, materialised."""
+        return sum(1 for paths in self._addresses.values() if len(paths) > 1)
+
+    @property
+    def max_addresses(self) -> int:
+        return max((len(paths) for paths in self._addresses.values()), default=0)
+
+    def __len__(self) -> int:
+        return len(self._addresses)
+
+
 def category_chain(
     product_tags: List[str],
     taxonomy: Dict[str, Any],
@@ -576,21 +767,63 @@ def category_chain(
     keep_prefixes: Optional[Set[str]] = None,
     canonical_parents: Optional[Dict[str, Optional[str]]] = None,
 ) -> List[str]:
-    """Return one canonical root→leaf chain of category ids for this product.
+    """Return this product's **primary** root→leaf chain of category ids.
 
     The product's own tags choose only the **leaf**; the rest of the chain comes
     from the run-wide canonical parent map and runs all the way to a **global**
     taxonomy root, materialising ancestors this product never tagged. That is
-    what makes a node's address identical on every product carrying it
-    (property 2). Exactly one chain is returned (property 3). Returns ``[]``
-    when the product has no taxonomy-known category.
+    what makes a node's primary address identical on every product carrying it.
+    Returns ``[]`` when the product has no taxonomy-known category.
 
-    Leaf selection:
+    **This function's result is frozen behaviour.** It is the primary breadcrumb,
+    and the acceptance gate for restoring the DAG is that it did not move for a
+    single product. The alternates live in :func:`category_leaves` and
+    :class:`AddressIndex` alongside it, never inside it.
+
+    Note where it sits, though: the extraction run does **not** call this. It
+    calls :func:`category_addresses`, which takes its primary from
+    ``AddressIndex.primary``. So this is not the production code path — it is the
+    *independent* statement of what the primary must be, and the tests in
+    ``tests/test_primary_stability.py`` assert the two agree (over the pinned
+    snapshot they do, for all 14,457 nodes). Keeping it separate is the point: an
+    equality asserted between two implementations is evidence, and folding this
+    one into the other would delete the evidence rather than simplify it. The
+    same holds for :func:`category_path_entries`,
+    :func:`primary_category_path_entries`, :func:`build_category_path` and
+    :func:`build_primary_category_path`.
+
+    Leaf selection — see :func:`category_leaves`, which is where the rule lives
+    and which returns the alternates this discards.
+    """
+    if canonical_parents is None:
+        canonical_parents = build_canonical_parent_map(taxonomy, exclude=exclude)
+    leaves = category_leaves(
+        product_tags,
+        taxonomy,
+        exclude,
+        keep_prefixes=keep_prefixes,
+        canonical_parents=canonical_parents,
+    )
+    return canonical_ancestry(canonical_parents, leaves[0]) if leaves else []
+
+
+def category_leaves(
+    product_tags: List[str],
+    taxonomy: Dict[str, Any],
+    exclude: Set[str],
+    keep_prefixes: Optional[Set[str]] = None,
+    canonical_parents: Optional[Dict[str, Optional[str]]] = None,
+) -> List[str]:
+    """The nodes this product is filed under: **primary first**, then alternates.
+
+    A product's tags can sit on several disjoint branches, and only one of them
+    can head the breadcrumb the product page leads with. The rule that picks that
+    one is unchanged, and picks the same node it always did:
 
     0. Keep only tags whose language prefix is in ``keep_prefixes``. This is the
        **one** place the catalog's language narrows the hierarchy: an English
        product is not filed under a French-only category. It is applied to the
-       product's tags, not to the graph, so a chain chosen here still walks
+       product's tags, not to the graph, so a leaf chosen here still walks
        through whatever ancestors the taxonomy gives it. ``None`` accepts any
        language.
     1. Drop any tag that is a canonical ancestor of another of this product's
@@ -599,12 +832,23 @@ def category_chain(
        filing), and **on a tie the lexicographically smallest canonical id
        wins** — the same tie-break the parent map uses.
 
+    What changed is only that step 2's losers are **returned rather than
+    discarded**. They were a real second filing of the product all along; dropping
+    them is the second of the two collapses that made every product reachable by
+    exactly one breadcrumb, and relaxing the graph alone would not have removed it.
+    The order is the same total order step 2 minimises over, so the alternates are
+    as stable as the primary.
+
+    Coverage in step 1 is still computed over **canonical** chains, deliberately.
+    Widening it to the whole DAG would change which node is primary, and the
+    primary is the thing this restoration must not move. An alternate leaf that
+    does turn out to be a DAG-ancestor of another costs nothing: its addresses are
+    prefixes of that other leaf's, so the union de-duplicates them away.
+
     ``canonical_parents`` should be the map built once per run by
     :func:`build_canonical_parent_map`. It is optional only so ad-hoc callers and
     tests can pass tags alone; omitting it rebuilds the map on every call, which
-    is far too slow for an extraction run. Supplying it does not change the
-    outcome: the map is language-blind either way, and ``keep_prefixes`` is
-    consulted here regardless of which branch produced it.
+    is far too slow for an extraction run.
     """
     if canonical_parents is None:
         canonical_parents = build_canonical_parent_map(taxonomy, exclude=exclude)
@@ -630,8 +874,100 @@ def category_chain(
         covered.update(chain[:-1])
     candidates = [n for n in present if n not in covered] or sorted(present)
 
-    leaf = min(candidates, key=lambda n: (-len(chains[n]), n))
-    return chains[leaf]
+    return sorted(candidates, key=lambda n: (-len(chains[n]), n))
+
+
+class CategoryAddresses(NamedTuple):
+    """One product's category addressing, primary and union in one pass.
+
+    ``primary`` and ``entries`` are produced together because they share the leaf
+    selection and the graph walk, and because a caller that takes one without the
+    other is almost always the beginning of a bug: the emitted field is the union
+    and the breadcrumb is the primary, and the two must describe the same product.
+    """
+
+    #: ``(canonical_id, cumulative_path)`` along the **primary** address only.
+    #: Byte-identical to what a run emitted before alternates existed.
+    primary: List[Tuple[str, str]]
+    #: ``(canonical_id, cumulative_path)`` over **every** address, primary first.
+    #: De-duplicated on the *pair*: one id may legitimately appear at several
+    #: paths, and — see :func:`category_path_entries` — one path may legitimately
+    #: be claimed by several ids.
+    entries: List[Tuple[str, str]]
+
+
+def category_addresses(
+    product_tags: List[str],
+    taxonomy: Dict[str, Any],
+    exclude: Set[str],
+    lang: str = "en",
+    canonical_parents: Optional[Dict[str, Optional[str]]] = None,
+    address_index: Optional[AddressIndex] = None,
+) -> CategoryAddresses:
+    """Every address this product sits at, with its primary named separately.
+
+    The addresses are, in order: every address of the primary leaf (its own
+    primary first), then every address of each alternate leaf. So
+    ``entries[:len(primary)] == primary`` and the breadcrumb a product page leads
+    with is the head of the same list the facet counts over.
+
+    ``address_index`` should be the :class:`AddressIndex` built once per run.
+    Omitting it rebuilds the whole DAG enumeration on every call, which is far too
+    slow for an extraction run and is offered only so ad-hoc callers and tests can
+    pass tags alone.
+    """
+    if canonical_parents is None:
+        canonical_parents = build_canonical_parent_map(taxonomy, exclude=exclude)
+    if address_index is None:
+        address_index = AddressIndex(taxonomy, canonical_parents, exclude=exclude)
+
+    leaves = category_leaves(
+        product_tags,
+        taxonomy,
+        exclude,
+        keep_prefixes=default_keep_prefixes(lang),
+        canonical_parents=canonical_parents,
+    )
+
+    primary: List[Tuple[str, str]] = []
+    entries: List[Tuple[str, str]] = []
+    seen: Set[Tuple[str, str]] = set()
+    for index, leaf in enumerate(leaves):
+        addresses = address_index.addresses(leaf)
+        if index == 0 and not addresses:
+            # The leaf rule accepted a node the address index does not cover, so
+            # the two were built over different node sets — which can only happen
+            # if a caller passed a ``canonical_parents`` map and an
+            # ``address_index`` built with different ``exclude`` sets. Silently
+            # emitting the alternates of the *other* leaves would leave the
+            # product with no primary and a breadcrumb it never chose.
+            raise ValueError(
+                f"category {leaf!r} is the product's primary leaf but the address "
+                "index holds no address for it: the canonical parent map and the "
+                "address index were built over different node sets"
+            )
+        for address in addresses:
+            rendered = _render_address(taxonomy, address, lang)
+            if index == 0 and not primary:
+                primary = rendered
+            for pair in rendered:
+                if pair not in seen:
+                    seen.add(pair)
+                    entries.append(pair)
+    return CategoryAddresses(primary=primary, entries=entries)
+
+
+def _render_address(
+    taxonomy: Dict[str, Any], address: Sequence[str], lang: str
+) -> List[Tuple[str, str]]:
+    """``(canonical_id, cumulative_path)`` for each step of one root→leaf address."""
+    rendered: List[Tuple[str, str]] = []
+    prefix = ""
+    for node in address:
+        label = display_label(taxonomy, node, lang)
+        prefix = label if not prefix else f"{prefix}{PATH_SEPARATOR}{label}"
+        rendered.append((node, prefix))
+    return rendered
 
 
 def category_path_entries(
@@ -640,29 +976,56 @@ def category_path_entries(
     exclude: Set[str],
     lang: str = "en",
     canonical_parents: Optional[Dict[str, Optional[str]]] = None,
+    address_index: Optional[AddressIndex] = None,
 ) -> List[Tuple[str, str]]:
-    """``(canonical_id, cumulative_path)`` for each step of the product's chain.
+    """``(canonical_id, cumulative_path)`` over **every** address of this product.
 
-    Callers that only need the paths want :func:`build_category_path`; the ids
-    are here so an extraction run can verify property 2 — that a node resolved to
-    the same address everywhere — instead of hand-auditing the built index.
+    Callers that only need the paths want :func:`build_category_path`. **The id is
+    not decoration and must not be re-derived from the path string**: the two are
+    not in bijection, and were not even before the alternates existed. On the
+    pinned snapshot four nodes render to a full path string another node also
+    claims — one of them live, where a French catalog's
+    ``…/Vins italiens/Chianti`` is claimed by both ``en:chianti`` and
+    ``it:chianti``. Any consumer going breadcrumb → category id has to read the
+    pair.
+
+    A node may now appear more than once, once per address it holds; the list is
+    de-duplicated on the pair, not on either half of it. For the single address a
+    product leads with, see :func:`primary_category_path_entries`.
     """
-    keep_prefixes = default_keep_prefixes(lang)
-    chain = category_chain(
+    return category_addresses(
         product_tags,
         taxonomy,
         exclude,
-        keep_prefixes=keep_prefixes,
+        lang,
         canonical_parents=canonical_parents,
-    )
+        address_index=address_index,
+    ).entries
 
-    entries: List[Tuple[str, str]] = []
-    prefix = ""
-    for node in chain:
-        label = display_label(taxonomy, node, lang)
-        prefix = label if not prefix else f"{prefix}{PATH_SEPARATOR}{label}"
-        entries.append((node, prefix))
-    return entries
+
+def primary_category_path_entries(
+    product_tags: List[str],
+    taxonomy: Dict[str, Any],
+    exclude: Set[str],
+    lang: str = "en",
+    canonical_parents: Optional[Dict[str, Optional[str]]] = None,
+    address_index: Optional[AddressIndex] = None,
+) -> List[Tuple[str, str]]:
+    """``(canonical_id, cumulative_path)`` along the product's **primary** address.
+
+    The breadcrumb a product page leads with, and a prefix of
+    :func:`category_path_entries`. Frozen behaviour: this is the list the
+    DAG-restoration acceptance gate compares against the pre-restoration build,
+    product by product.
+    """
+    return category_addresses(
+        product_tags,
+        taxonomy,
+        exclude,
+        lang,
+        canonical_parents=canonical_parents,
+        address_index=address_index,
+    ).primary
 
 
 def default_keep_prefixes(lang: str) -> Set[str]:
@@ -692,39 +1055,98 @@ def default_keep_prefixes(lang: str) -> Set[str]:
     return {"en", "xx", lang} if lang else {"en", "xx"}
 
 
+def path_strings(entries: Iterable[Tuple[str, str]]) -> List[str]:
+    """The distinct cumulative paths of ``entries``, in first-seen order.
+
+    De-duplicated on the **path**, not on the pair: two different nodes can render
+    to one string (see :func:`category_path_entries`), and the emitted field is a
+    set of addresses, so it must carry that string once. The ids are what
+    distinguish them, and they stay in ``entries``.
+    """
+    seen: Set[str] = set()
+    out: List[str] = []
+    for _node, path in entries:
+        if path not in seen:
+            seen.add(path)
+            out.append(path)
+    return out
+
+
 def build_category_path(
     product_tags: List[str],
     taxonomy: Dict[str, Any],
     exclude: Set[str],
     lang: str = "en",
     canonical_parents: Optional[Dict[str, Optional[str]]] = None,
+    address_index: Optional[AddressIndex] = None,
 ) -> List[str]:
-    """Cumulative root→leaf path strings, the shape retail catalogs typically expose.
+    """Cumulative path strings over **every** address this product sits at.
 
-    Example: ``["Beverages", "Beverages/Hot beverages",
-    "Beverages/Hot beverages/Teas", "Beverages/Hot beverages/Teas/Tea bags"]``.
+    Example, for a product on one address: ``["Beverages",
+    "Beverages/Hot beverages", "Beverages/Hot beverages/Teas",
+    "Beverages/Hot beverages/Teas/Tea bags"]``. A product on several addresses
+    carries the union of their cumulative entries, the primary address first — the
+    shape that makes it reachable by more than one breadcrumb and that a facet
+    aggregation counts over.
+
+    For the single address the product page leads with, see
+    :func:`build_primary_category_path`.
     """
-    return [
-        path
-        for _node, path in category_path_entries(
-            product_tags, taxonomy, exclude, lang, canonical_parents=canonical_parents
+    return path_strings(
+        category_path_entries(
+            product_tags,
+            taxonomy,
+            exclude,
+            lang,
+            canonical_parents=canonical_parents,
+            address_index=address_index,
         )
-    ]
+    )
+
+
+def build_primary_category_path(
+    product_tags: List[str],
+    taxonomy: Dict[str, Any],
+    exclude: Set[str],
+    lang: str = "en",
+    canonical_parents: Optional[Dict[str, Optional[str]]] = None,
+    address_index: Optional[AddressIndex] = None,
+) -> List[str]:
+    """Cumulative path strings along the product's **primary** address alone."""
+    return path_strings(
+        primary_category_path_entries(
+            product_tags,
+            taxonomy,
+            exclude,
+            lang,
+            canonical_parents=canonical_parents,
+            address_index=address_index,
+        )
+    )
 
 
 class AddressAudit:
     """Records where each category node landed and what it was called.
 
-    Property 2 — one address per category — holds by construction once the chain
-    walks a run-wide canonical parent map, but "by construction" is exactly the
-    kind of claim that quietly stops being true. Feeding every emitted chain
-    through here turns a regression into a line in the extraction report rather
-    than a hand audit of the built index.
+    Property 2 — one *primary* address per category — holds by construction once
+    the primary walks a run-wide canonical parent map, but "by construction" is
+    exactly the kind of claim that quietly stops being true. Feeding every emitted
+    address through here turns a regression into a line in the extraction report
+    rather than a hand audit of the built index.
+
+    **What the restored DAG changed here, and what it did not.** A node now sits at
+    several addresses on purpose, so "a node's path is the same everywhere" is no
+    longer the invariant — but the thing that was load-bearing about it survives
+    verbatim: a node's addressing must not depend on which product you are looking
+    at. So the conflict counter watches the **primary** address, where a
+    disagreement is still a defect and the expected value is still zero, and the
+    alternates are counted separately as the shape they are.
 
     The same argument applies to the node's *label*, in both directions, so this
     audits three things over every record written:
 
-    * **one address per node** — a node's cumulative path is the same everywhere;
+    * **one primary address per node** — a node's primary cumulative path is the
+      same everywhere;
     * **one label per node** — the node reads identically in ``category_path``
       and in the flat ``categories`` list. Holds by construction now that both
       come from :func:`display_label`, and this is what proves it stayed true;
@@ -749,25 +1171,57 @@ class AddressAudit:
         self.label: Dict[str, str] = {}
         self.label_conflicts: Dict[str, Set[str]] = {}
         self.label_owners: Dict[str, Set[str]] = {}
+        self.addresses: Dict[str, Set[str]] = {}
+        self.products = 0
+        self.multi_address_products = 0
+        self.path_values = 0
+        self.max_path_values = 0
+        self.distinct_paths: Set[str] = set()
 
     def record(
         self,
         path_entries: Iterable[Tuple[str, str]],
         flat_entries: Iterable[Tuple[str, str]] = (),
+        all_entries: Optional[Iterable[Tuple[str, str]]] = None,
     ) -> None:
-        """Take one product's ``(id, path)`` chain and its ``(id, label)`` tags.
+        """Take one product's primary ``(id, path)`` chain and its ``(id, label)`` tags.
+
+        ``all_entries`` is the same product's entries over **every** address it
+        holds — what actually reaches the ``category_path`` field. It defaults to
+        ``path_entries``, so a caller that emits only a primary is audited exactly
+        as before rather than reporting a vacuous zero for the alternates.
 
         The chain's label for a node is the last segment of its cumulative path —
         :func:`display_label` neutralises the separator inside a label, so that
         split is exact and does not need the label passed in a second time.
         """
-        for node, path in path_entries:
+        primary = list(path_entries)
+        emitted = primary if all_entries is None else list(all_entries)
+
+        for node, path in primary:
             seen = self.address.setdefault(node, path)
             if seen != path:
                 self.conflicts.setdefault(node, {seen}).add(path)
+        for node, path in emitted:
+            self.addresses.setdefault(node, set()).add(path)
             self._record_label(node, path.rsplit(PATH_SEPARATOR, 1)[-1])
         for node, label in flat_entries:
             self._record_label(node, label)
+
+        self.products += 1
+        values = path_strings(emitted)
+        self.path_values += len(values)
+        self.max_path_values = max(self.max_path_values, len(values))
+        self.distinct_paths.update(values)
+        # A product is multi-address when the union carries strictly more than its
+        # primary — counted from the emitted values rather than from the leaf
+        # count, because most of these products have a single-parent leaf and
+        # fork *above* it. On the ``en`` catalog over the whole export that is
+        # 49,915 of 65,743, and a leaf-based count finds only 15,828: a 4.2x
+        # undercount. See the README's "Several addresses per product" for the
+        # population those numbers belong to; they are not constants.
+        if len(values) > len(path_strings(primary)):
+            self.multi_address_products += 1
 
     def _record_label(self, node: str, label: str) -> None:
         seen = self.label.setdefault(node, label)
@@ -778,6 +1232,27 @@ class AddressAudit:
     @property
     def conflict_count(self) -> int:
         return len(self.conflicts)
+
+    @property
+    def multi_address_category_count(self) -> int:
+        """Categories emitted at more than one address. A shape, not a defect."""
+        return sum(1 for paths in self.addresses.values() if len(paths) > 1)
+
+    @property
+    def max_addresses_for_a_category(self) -> int:
+        return max((len(paths) for paths in self.addresses.values()), default=0)
+
+    @property
+    def mean_path_values(self) -> float:
+        """Mean ``category_path`` values per record written.
+
+        Reported because it is the number that sizes the index: it is the postings
+        per document on the field, and ``distinct_category_paths`` beside it is
+        the bucket count every ``category_path`` terms aggregation downstream has
+        to be sized against. An aggregation still sized for the pre-restoration
+        cardinality truncates silently, and a truncated facet panel lies.
+        """
+        return self.path_values / self.products if self.products else 0.0
 
     @property
     def label_conflict_count(self) -> int:
@@ -803,10 +1278,25 @@ class AddressAudit:
             for label, owners in self.label_owners.items()
             if len(owners) > 1
         )[:max_examples]
+        multi = sorted(
+            (node, paths)
+            for node, paths in self.addresses.items()
+            if len(paths) > 1
+        )[:max_examples]
         return {
             "categories_seen": len(self.address),
-            "categories_at_multiple_addresses": self.conflict_count,
+            "categories_at_multiple_primary_addresses": self.conflict_count,
             "examples": examples,
+            "products": self.products,
+            "products_at_multiple_addresses": self.multi_address_products,
+            "categories_with_alternate_addresses": self.multi_address_category_count,
+            "max_addresses_for_a_category": self.max_addresses_for_a_category,
+            "multi_address_examples": [
+                {"category": node, "addresses": sorted(paths)} for node, paths in multi
+            ],
+            "distinct_category_paths": len(self.distinct_paths),
+            "mean_category_path_values": round(self.mean_path_values, 3),
+            "max_category_path_values": self.max_path_values,
             "labels_seen": len(self.label_owners),
             "categories_under_multiple_labels": self.label_conflict_count,
             "label_examples": label_examples,

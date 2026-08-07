@@ -358,7 +358,7 @@ def test_the_run_reports_no_addressing_or_labelling_conflict() -> None:
     for lang in LANGS:
         _records, report = runs[lang]
         counters = report["counters"]
-        assert counters["categories_at_multiple_addresses"] == 0, lang
+        assert counters["categories_at_multiple_primary_addresses"] == 0, lang
         assert counters["categories_under_multiple_labels"] == 0, lang
         assert counters["labels_shared_by_multiple_categories"] == 0, lang
         assert counters["written"] == len(PRODUCTS), (lang, counters["written"])

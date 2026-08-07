@@ -163,10 +163,17 @@ def _chain_ids(tags: List[str], lang: str) -> List[str]:
 def _self_tagged_labels(record: dict, tags: List[str], lang: str) -> List[str]:
     """The chain's labels for the nodes this product actually carried as tags."""
     ids = _chain_ids(tags, lang)
-    paths = record["category_path"]
+    # The PRIMARY address, which is the one ``category_chain`` returns ids for.
+    # Read off the emitted record rather than recomputed, so this also pins that
+    # the extractor really writes the field and writes the primary into it.
+    paths = record["category_path_primary"]
     assert len(ids) == len(paths), (
-        f"chain length {len(ids)} != emitted category_path length {len(paths)} "
-        f"for {record['id']}; the test's id walk and the extractor's disagree"
+        f"chain length {len(ids)} != emitted category_path_primary length "
+        f"{len(paths)} for {record['id']}; the test's id walk and the "
+        "extractor's disagree"
+    )
+    assert paths == record["category_path"][: len(paths)], (
+        f"{record['id']}: category_path does not lead with the primary address"
     )
     tagset = set(tags)
     return [

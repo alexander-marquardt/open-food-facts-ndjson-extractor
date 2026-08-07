@@ -237,7 +237,7 @@ def test_override_keeps_the_truncated_record_but_still_reports_it() -> None:
 
     by_id = {r["id"]: r for r in records}
     assert set(by_id) == {TRUNCATED_CODE, ROOT_ONLY_CODE}, sorted(by_id)
-    assert by_id[TRUNCATED_CODE]["category_path"] == ["Pate", "Pate/Pork pates"]
+    assert by_id[TRUNCATED_CODE]["category_path_primary"] == ["Pate", "Pate/Pork pates"]
 
     assert report["counters"]["unanchored_category_path"] == 0, report["counters"]
     assert report["category_path_anchoring"]["products_with_unanchored_path"] == 1, (
@@ -337,8 +337,8 @@ def test_real_records_would_have_passed_the_old_emptiness_test() -> None:
         path = by_id[code]["category_path"]
         assert path, f"{code} has no path at all; it is the wrong fixture for this test"
         assert head not in roots, f"{head} is a taxonomy root; fixture no longer bites"
-    assert by_id["0087703021877"]["category_path"] == ["Chinese dumplings"]
-    assert by_id["0017400140328"]["category_path"] == [
+    assert by_id["0087703021877"]["category_path_primary"] == ["Chinese dumplings"]
+    assert by_id["0017400140328"]["category_path_primary"] == [
         "Prepared rices",
         "Prepared rices/Fried rice",
     ]

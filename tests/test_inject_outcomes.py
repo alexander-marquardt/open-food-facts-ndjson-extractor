@@ -122,11 +122,19 @@ def write_ndjson(tmp_path: Path, records: Sequence[Dict[str, Any]]) -> Path:
 
 
 def catalog(count: int, empty_paths: int = 0) -> List[Dict[str, Any]]:
+    """Records shaped like an extract: every address, plus the primary among them."""
     records = [
-        {"id": f"gtin-{i:03d}", "category_path": ["Foods", "Foods/Snacks"]}
+        {
+            "id": f"gtin-{i:03d}",
+            "category_path": ["Foods", "Foods/Snacks", "Meals", "Meals/Snacks"],
+            "category_path_primary": ["Foods", "Foods/Snacks"],
+        }
         for i in range(count)
     ]
-    records += [{"id": f"empty-{i:03d}", "category_path": []} for i in range(empty_paths)]
+    records += [
+        {"id": f"empty-{i:03d}", "category_path": [], "category_path_primary": []}
+        for i in range(empty_paths)
+    ]
     return records
 
 
@@ -438,7 +446,14 @@ def test_every_document_is_sent_once_across_batches(
         f"gtin-{i:03d}" for i in range(7)
     ]
     assert {action["update"]["_index"] for action in actions} == {"catalog_en_v8"}
-    assert payloads[0] == {"doc": {"category_path": ["Foods", "Foods/Snacks"]}}
+    # Both fields travel in one partial update: a document holding the addresses
+    # without the primary cannot render the breadcrumb it leads with.
+    assert payloads[0] == {
+        "doc": {
+            "category_path": ["Foods", "Foods/Snacks", "Meals", "Meals/Snacks"],
+            "category_path_primary": ["Foods", "Foods/Snacks"],
+        }
+    }
 
 
 # --------------------------------------------------------------------------- #
@@ -523,7 +538,10 @@ def test_no_skip_empty_sends_the_empty_path_as_an_explicit_overwrite(
     assert _sent_ids(calls) == [f"gtin-{i:03d}" for i in range(6)] + [
         f"empty-{i:03d}" for i in range(4)
     ]
-    assert _payloads(calls)[6:] == [{"doc": {"category_path": []}}] * 4
+    assert (
+        _payloads(calls)[6:]
+        == [{"doc": {"category_path": [], "category_path_primary": []}}] * 4
+    )
     out = capsys.readouterr().out
     assert "sent=10" in out
     assert "empty(skipped)=0" in out
