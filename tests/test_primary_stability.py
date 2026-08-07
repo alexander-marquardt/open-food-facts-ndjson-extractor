@@ -15,13 +15,32 @@ the same curated tag sets — and **zero** primaries moved, across 108,380 Engli
 measurement: the census cannot run in CI, so a sample of the same corpus travels
 with the repository and is checked on every commit.
 
+What the shipped sample is, and what it is not
+----------------------------------------------
+``fixtures/off_primary_addresses.json`` carries 120 products taken at an even
+stride over the first 500,000 lines of the products export — every line carrying
+a ``code`` and a ``categories_tags`` list whose every tag is a taxonomy node —
+together with the ancestor closure of their tags over the pinned snapshot's full
+``parents`` DAG (308 nodes). The stride is applied before any outcome is
+computed, so the sample is not selected on whether a product moved.
+
+It is a **sample**, and it is a sample of the *head* of the dump: it is the gate
+a commit is held to, not the census. The census above is the claim about the
+whole corpus; this file is what keeps that claim from silently rotting.
+
 Why this is not the implementation restating itself
 ---------------------------------------------------
 The expected values in ``fixtures/off_primary_addresses.json`` were produced by
 ``taxonomy.py`` as it stood at the last commit before a product could hold more
-than one address. That code is no longer in the tree, so nothing here can drift
-into agreement with it: the fixture is an oracle, and the only way to satisfy it
-is to place every product where the collapsed build placed it.
+than one address (``a19d04b``). That code is no longer in the tree, so nothing
+here can drift into agreement with it: the fixture is an oracle, and the only way
+to satisfy it is to place every product where the collapsed build placed it.
+
+The oracle was also run twice — once over the fixture's taxonomy slice and once
+over the whole pinned snapshot — and made to agree, because a slice that moved a
+node's shortest distance to a root would be an oracle for a different graph than
+the catalog is built on. :func:`test_the_fixture_taxonomy_is_a_faithful_slice`
+pins the property that makes those two agree.
 
 The fixture also has to keep *biting*. A gate over products that happen to sit at
 one address each would pass on a build that had quietly dropped the restoration
@@ -41,8 +60,11 @@ from typing import Any, Dict, List
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
 from off_demo_extract.taxonomy import (  # noqa: E402
+    AddressIndex,
+    build_canonical_parent_map,
     build_category_path,
     build_primary_category_path,
+    canonical_ancestry,
 )
 
 _FIXTURE = json.loads(
@@ -118,6 +140,39 @@ def test_the_fixture_still_exercises_multi_address_products() -> None:
             "an address; the stability gate above would pass on a build that had "
             "dropped the restoration"
         )
+
+
+def test_every_node_keeps_the_address_the_forest_gave_it() -> None:
+    """The same gate one altitude down: **every** node, not only the sampled ones.
+
+    The tests above compare products, so they only ever reach the nodes 120
+    products happen to sit on. This asks the graph directly, of all 308 nodes in
+    the slice: the address the ``AddressIndex`` calls primary must be the chain
+    ``build_canonical_parent_map`` already produced, hop for hop. That is the
+    ruling — the map is *retained* and re-cast as the primary-address selector,
+    not replaced — expressed as an equality rather than as a sampling.
+
+    It is also the only thing watching :meth:`AddressIndex._resolve`'s fallback
+    branch, which orders the addresses by length when the canonical chain is not
+    among them. That branch exists for a caller who passes a differently-scoped
+    map, and its cost is a moved primary; nothing else here would notice a node
+    quietly taking it, because a node no fixture product sits on contributes to
+    no product's path.
+
+    Run over the whole pinned snapshot rather than the slice, the same equality
+    holds for all 14,457 nodes; the slice is what can travel in the repository.
+    """
+    canonical = build_canonical_parent_map(TAXONOMY, exclude=EXCLUDE)
+    index = AddressIndex(TAXONOMY, canonical, exclude=EXCLUDE)
+    moved = {
+        node: {"forest": canonical_ancestry(canonical, node), "index": index.primary(node)}
+        for node in TAXONOMY
+        if index.primary(node) != tuple(canonical_ancestry(canonical, node))
+    }
+    assert not moved, (
+        f"{len(moved)} of {len(TAXONOMY)} nodes no longer lead with the forest's "
+        f"chain:\n{json.dumps(dict(list(moved.items())[:5]), ensure_ascii=False, indent=2)}"
+    )
 
 
 def test_the_fixture_taxonomy_is_a_faithful_slice() -> None:
