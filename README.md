@@ -574,12 +574,37 @@ name. The rate is meant to be read per run — this defect was originally found 
 reverse-mapping a built index against the taxonomy, which nobody should have to
 do twice.
 
-The taxonomy file is fetched once from
-[`https://static.openfoodfacts.org/data/taxonomies/categories.json`](https://static.openfoodfacts.org/data/taxonomies/categories.json)
-and cached at `data/taxonomy/categories.json`. Override its location with
-`--taxonomy <path>`. Display names follow `--lang`, so the French and Spanish
-personas get localized category labels — in `taxonomy_tags` as well as in
-`category_path`.
+The taxonomy file is a **pinned snapshot** of
+[`https://static.openfoodfacts.org/data/taxonomies/categories.json`](https://static.openfoodfacts.org/data/taxonomies/categories.json),
+read from `data/json_source/categories.json` alongside the dump. Override its
+location with `--taxonomy <path>`. Display names follow `--lang`, so the French
+and Spanish personas get localized category labels — in `taxonomy_tags` as well
+as in `category_path`.
+
+### The snapshot is pinned, and a run that cannot get it stops
+
+Every category address is a function of this one file, so a run that quietly
+built against a different copy of it would move `category_path` values for
+reasons nothing in the output records. Two guards make that impossible to do by
+accident, and both refuse rather than fall back:
+
+- **A missing snapshot is an error.** It used to be a cache miss that downloaded
+  today's upstream taxonomy and carried on, which is the pin failing open at the
+  one moment it was needed. Pass **`--fetch-taxonomy`** to download it on
+  purpose; that puts the refresh on the command line, and so into the build
+  record. (The default location now sits inside `data/json_source/`, the
+  read-only source dump directory, which is a second reason a build should not
+  be writing there on its own.)
+- **A snapshot that is not the pinned one is an error.** The expected digest is
+  `PINNED_TAXONOMY_SHA256` in `src/off_demo_extract/taxonomy.py` — the same
+  `sha256` the build records under `builds/` carry as `pinned_taxonomy_sha256`.
+  A mismatch names both digests and stops. Moving the pin means editing that
+  constant in a commit, where it can be reviewed against the catalog churn it
+  causes; building against some other file for a one-off needs
+  **`--allow-unpinned-taxonomy`**, said out loud.
+
+Both refusals exit `2` — "the run could not be carried out" — rather than
+producing a catalog.
 
 ### Category-hierarchy flags
 
@@ -594,8 +619,9 @@ exactly what each does:
   hyphenation or parentheticals. With no taxonomy there is also no vocabulary to
   validate tags against, so only the curated drop list applies and the rest are
   emitted unchecked; refusing everything would blank the field for the whole run.
-  Use this to skip the download when you don't need the hierarchy and are not
-  relying on category labels.
+  Use this when you don't need the hierarchy and are not relying on category
+  labels — it is also the only way to run with no snapshot on disk at all, since
+  a taxonomy the run *is* using has to be the pinned one.
 - **`--require-category-path`** *(default: on)* — **drops products whose
   `category_path` can't be reconstructed**, so the catalog is uniformly
   drill-down-faceted. This is a small tail — roughly 2–6% of otherwise-clean
@@ -656,7 +682,7 @@ generations because no check ever put the two numbers side by side.
 ```bash
 python scripts/verify_catalog.py \
     --ndjson data/products/off_en_v14.ndjson \
-    --taxonomy data/taxonomy/categories.json \
+    --taxonomy data/json_source/categories.json \
     --lang en --json builds/2026-08-03/verify_en_v14.json
 ```
 
@@ -704,7 +730,7 @@ export PRISM_ELASTICSEARCH_URL=...  PRISM_ELASTICSEARCH_API_KEY=...
 python scripts/verify_index.py \
     --index catalog_fr_v13 \
     --manifest builds/2026-08-03/build_manifest.json \
-    --taxonomy data/taxonomy/categories.json
+    --taxonomy data/json_source/categories.json
 ```
 
 It compares the index's document count against the manifest's **distinct ids**
@@ -863,7 +889,7 @@ Run from the repository root:
 uv run -m off_demo_extract.extract \
   --lang en \
   --require-category \
-  --taxonomy data/taxonomy/categories.json \
+  --taxonomy data/json_source/categories.json \
   --output data/sample-data/clean_products.ndjson \
   --report data/products/clean_products_sample_report.json \
   --max-output-records 10 \
@@ -873,9 +899,10 @@ uv run -m off_demo_extract.extract \
 Neither input is in this repository: the run needs the Open Food Facts JSONL
 export at `data/json_source/openfoodfacts-products.jsonl.gz` (see [Data is not
 included in this repo](#data-is-not-included-in-this-repo)) and the category
-taxonomy snapshot at `data/taxonomy/categories.json`, which the extractor
-downloads if it is absent. `builds/2026-08-03-tags/build_manifest.json` pins by
-sha256 the two the current sample was made from. The run is deterministic: the
+taxonomy snapshot at `data/json_source/categories.json`, which the run refuses to
+start without (pass `--fetch-taxonomy` to download it deliberately).
+`builds/2026-08-03-tags/build_manifest.json` pins by sha256 the two the current
+sample was made from. The run is deterministic: the
 same commit against the same inputs writes byte-identical output, so a
 regeneration diff is a real change and not run-to-run noise.
 
@@ -910,6 +937,20 @@ Then place it in the data directory:
 
 The script reads `.jsonl` or `.jsonl.gz` and streams it; it does not require full decompression.
 
+The second input, the category taxonomy snapshot, goes in the same directory as
+`data/json_source/categories.json` — one place for everything a build reads. It
+is **not** in the repository either, and unlike the dump it is pinned by sha256
+(see [The snapshot is pinned](#the-snapshot-is-pinned-and-a-run-that-cannot-get-it-stops)),
+so the copy upstream serves today may no longer be the pinned one. A first run
+with an empty directory:
+
+```bash
+uv run -m off_demo_extract.extract --fetch-taxonomy ...
+```
+
+downloads it there and then checks it against the pin, telling you both digests
+if upstream has moved on.
+
 ## Price Estimation
 
 The pricing information is synthetically generated by the `extract.py` script and is not a separate tool. The price estimation logic is based on a product's category, quantity, and other attributes, using the configuration from `config/pricing_buckets.json`. This process is integrated into the main extraction pipeline.
@@ -919,9 +960,9 @@ The pricing information is synthetically generated by the `extract.py` script an
 ```text
 ecommerce-open-food-facts/
 ├── data/                  # All data lives here (ignored by git)
-│   ├── json_source/       # Raw OFF data dump
-│   │   └── openfoodfacts-products.jsonl.gz
-│   ├── taxonomy/          # Cached OFF category taxonomy (auto-downloaded)
+│   ├── json_source/       # Every extraction input: the raw OFF dump, and the
+│   │   │                  #   pinned category taxonomy snapshot beside it
+│   │   ├── openfoodfacts-products.jsonl.gz
 │   │   └── categories.json
 │   └── products/          # Processed NDJSON files (The "Output")
 ├── src/
@@ -959,7 +1000,8 @@ ecommerce-open-food-facts/
 ### Running the tests
 
 The tests need no network and no data dump — they build a synthetic taxonomy and
-a two-record input on the fly:
+a two-record input on the fly, and pass `--allow-unpinned-taxonomy` because a
+fixture taxonomy is by construction not the pinned snapshot:
 
 ```bash
 uv run --with pytest python -m pytest tests/ -v
@@ -969,6 +1011,12 @@ Each test file is also runnable on its own (`python tests/test_taxonomy.py`).
 CI runs the same suite on every push and pull request.
 
 ## Quickstart (uv)
+
+Both commands below take the default taxonomy path, so they need the pinned
+snapshot at `data/json_source/categories.json` and stop with a named error if it
+is not there — add `--fetch-taxonomy` on a first run to download it (see [The
+snapshot is
+pinned](#the-snapshot-is-pinned-and-a-run-that-cannot-get-it-stops)).
 
 Create and run a small sample (recommended first step):
 

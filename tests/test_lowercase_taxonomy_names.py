@@ -138,6 +138,8 @@ def _run_extract(tmp: Path, lang: str) -> Dict[str, dict]:
             "--output", str(output_path),
             "--report", str(tmp / "report.json"),
             "--taxonomy", str(taxonomy_path),
+            # A hand-built fixture is deliberately not the pinned snapshot.
+            "--allow-unpinned-taxonomy",
             "--pricing-config", str(PRICING_CONFIG),
             "--lang", lang,
             "--progress-every", "0",

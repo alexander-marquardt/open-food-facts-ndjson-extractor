@@ -16,7 +16,7 @@ It never contacts a cluster.
 Usage:
     python scripts/build_manifest.py \\
         --dump data/json_source/openfoodfacts-products.jsonl.gz \\
-        --taxonomy data/taxonomy/categories.json \\
+        --taxonomy data/json_source/categories.json \\
         --locale en:report_en.json:verify_en.json:off_en.ndjson \\
         --locale fr:report_fr.json:verify_fr.json:off_fr.ndjson \\
         --out builds/2026-08-03/build_manifest.json

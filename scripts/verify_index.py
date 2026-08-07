@@ -185,7 +185,7 @@ Usage
     python scripts/verify_index.py \\
         --index catalog_fr_v13 \\
         --manifest builds/2026-08-03/build_manifest.json \\
-        --taxonomy data/taxonomy/categories.json
+        --taxonomy data/json_source/categories.json
 
     # exact id-set diff, when a count shortfall needs a mechanism
     python scripts/verify_index.py --index catalog_fr_v13 \\

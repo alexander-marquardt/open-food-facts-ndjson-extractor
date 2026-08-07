@@ -63,7 +63,7 @@ Exit status:
 Usage:
     python scripts/verify_catalog.py \\
         --ndjson data/products/off_en_v14.ndjson \\
-        --taxonomy data/taxonomy/categories.json \\
+        --taxonomy data/json_source/categories.json \\
         --lang en [--json out.json]
 
 stdout is the JSON result and nothing else — the build workflow captures it to a

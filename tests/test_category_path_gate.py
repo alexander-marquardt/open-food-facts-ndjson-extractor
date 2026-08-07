@@ -84,6 +84,8 @@ def _run_extract(tmp: Path, *extra_args: str) -> tuple[list[dict], dict]:
             "--output", str(output_path),
             "--report", str(report_path),
             "--taxonomy", str(taxonomy_path),
+            # A hand-built fixture is deliberately not the pinned snapshot.
+            "--allow-unpinned-taxonomy",
             "--pricing-config", str(PRICING_CONFIG),
             "--progress-every", "0",
             "--progress-seconds", "0",
