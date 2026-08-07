@@ -1338,6 +1338,12 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
                 lang,
                 max_n=MAX_NUM_TAXONOMY_TAGS,
                 vocabulary=vocabulary,
+                # The PRIMARY chain's nodes, deliberately, not the union's. The
+                # cap reserves a slot for every node here, so widening it to the
+                # alternates would change which incidental tags survive and move
+                # ``taxonomy_tags`` on products whose addressing is the only thing
+                # that changed — the one field this restoration is supposed to
+                # leave byte-identical alongside the primary.
                 chain_tags={node for node, _path in path_entries},
             )
             flat_entries = flat_selection.entries
@@ -1463,7 +1469,7 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
 
             if category_path:
                 c.with_category_path += 1
-            # Property 2 (one address per category) and the label invariants
+            # Property 2 (one PRIMARY address per category) and the label invariants
             # (one label per category, one category per label), on the records
             # actually written. The flat entries go in even when no path
             # resolved, so a tag that never reaches a chain is still audited.

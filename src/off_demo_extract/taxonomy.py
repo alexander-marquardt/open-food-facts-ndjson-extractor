@@ -1,20 +1,22 @@
 """
-Open Food Facts category *taxonomy* → a single clean hierarchical path.
+Open Food Facts category *taxonomy* → clean hierarchical addresses, one primary.
 
 Background
 ----------
 Open Food Facts ships ``categories_tags`` / ``categories_hierarchy`` on every
-product, but those are **not** a single root→leaf path. They are the flattened
-*union of every ancestor category* drawn from the OFF category taxonomy, which
-is a directed acyclic graph (a category can have several parents). Naively
-joining them with ``/`` produces a nonsense path that mixes parallel roots and
-sibling branches.
+product, but those are **not** a root→leaf path. They are the flattened *union of
+every ancestor category* drawn from the OFF category taxonomy, which is a
+directed acyclic graph (a category can have several parents). Naively joining
+them with ``/`` produces a nonsense path that mixes parallel roots and sibling
+branches.
 
 To get a clean hierarchy in the shape retail catalogs typically expose (an array
 of cumulative path strings like ``["Beverages", "Beverages/Hot beverages",
 "Beverages/Hot beverages/Teas"]``) we need the taxonomy *graph* — the
-parent→child edges — and then walk a single canonical chain from the product's
-most specific category up to a root.
+parent→child edges — and then walk it from the product's most specific
+categories up to the roots. A node with several parents has several such
+addresses, and a product is legitimately reachable by each of them; one of them
+is named the **primary**, which is the breadcrumb a product page leads with.
 
 The taxonomy is the public OFF file:
     https://static.openfoodfacts.org/data/taxonomies/categories.json
@@ -653,10 +655,11 @@ class AddressIndex:
     move when the upstream file re-orders a ``parents`` list, which is the same
     stability argument the tie-break in the module docstring makes.
 
-    Paths are built bottom-up in one pass over a topological order rather than by
-    recursion: the taxonomy is 14,457 nodes deep enough to make a recursive walk a
-    stack-depth question, and the iterative form also gives the cycle guard
-    somewhere to stand.
+    A node's paths are its parents' paths with the node appended, so the whole
+    index is one pass in parent-before-child order. That pass is written
+    iteratively rather than recursively: the recursion depth would be the
+    taxonomy's, which a future refresh could deepen without warning, and the
+    explicit stack is also what gives the cycle guard somewhere to stand.
     """
 
     def __init__(
@@ -918,7 +921,20 @@ def category_addresses(
     entries: List[Tuple[str, str]] = []
     seen: Set[Tuple[str, str]] = set()
     for index, leaf in enumerate(leaves):
-        for address in address_index.addresses(leaf):
+        addresses = address_index.addresses(leaf)
+        if index == 0 and not addresses:
+            # The leaf rule accepted a node the address index does not cover, so
+            # the two were built over different node sets — which can only happen
+            # if a caller passed a ``canonical_parents`` map and an
+            # ``address_index`` built with different ``exclude`` sets. Silently
+            # emitting the alternates of the *other* leaves would leave the
+            # product with no primary and a breadcrumb it never chose.
+            raise ValueError(
+                f"category {leaf!r} is the product's primary leaf but the address "
+                "index holds no address for it: the canonical parent map and the "
+                "address index were built over different node sets"
+            )
+        for address in addresses:
             rendered = _render_address(taxonomy, address, lang)
             if index == 0 and not primary:
                 primary = rendered

@@ -1050,9 +1050,13 @@ ecommerce-open-food-facts/
 │   ├── conftest.py        # Puts src/ on sys.path so tests import normally
 │   ├── test_business_signal_values.py  # margin / popularity derivation
 │   ├── test_canonical_parents.py       # Canonical parent map and its tie-break
-│   ├── test_category_addressing.py     # One address per category, one path per product
+│   ├── test_category_addressing.py     # One primary address per category, prefix-closed union
 │   ├── test_category_path_gate.py      # End-to-end tests for the category_path gate
 │   ├── test_index_verification.py      # Index-vs-manifest checks, on captured ES envelopes
+│   ├── test_multi_address.py           # The DAG shapes: divergence, diamond, nested
+│   │                                   #   diamond, and the second leaf a product holds
+│   ├── test_primary_stability.py       # No product's primary breadcrumb moved when the
+│   │                                   #   alternate addresses were restored
 │   ├── test_taxonomy.py   # Regression tests for the hierarchy builder
 │   └── fixtures/          # Real OFF products + pruned taxonomy, checked in
 ├── pyproject.toml         # Dependencies
