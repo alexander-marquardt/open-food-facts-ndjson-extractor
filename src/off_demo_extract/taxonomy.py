@@ -127,6 +127,7 @@ every one of the 1,070 ties today, while being immune to that order changing.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import sys
 import urllib.request
@@ -136,23 +137,109 @@ from typing import Any, Dict, Iterable, List, Optional, Sequence, Set, TextIO, T
 
 TAXONOMY_URL = "https://static.openfoodfacts.org/data/taxonomies/categories.json"
 
+# The snapshot every catalog in ``builds/`` was made against, recorded there as
+# ``pinned_taxonomy_sha256``. It is the *only* thing tying a build to a specific
+# taxonomy: the 4.5MB file itself lives under ``data/``, which git ignores, so
+# the digest travels in the repository and the bytes do not. A run that resolves
+# some other file is not comparable to those builds, and this is the constant
+# that lets the extractor say so instead of silently building anyway.
+#
+# Refreshing the taxonomy therefore means editing this line in a commit, which
+# is the point: the address of every category is a function of this file, so a
+# refresh moves `category_path` values and must be a reviewable act.
+PINNED_TAXONOMY_SHA256 = "74717ecc001cf8661f6ec0bb3fc8c7a0cf317a6355a245004e892348fe575ec5"
+
 # Path separator used *inside* each emitted cumulative path string. Matches the
 # ``path_separator`` configured in the PRISM field map.
 PATH_SEPARATOR = "/"
 
+_HASH_CHUNK = 1 << 22
 
-def ensure_taxonomy(path: Path, log: Optional[Any] = None) -> Path:
-    """Return ``path``, downloading the OFF taxonomy there first if it's missing."""
-    if path.exists():
-        return path
-    path.parent.mkdir(parents=True, exist_ok=True)
-    if log:
-        log(f"Category taxonomy not found at {path}; downloading from {TAXONOMY_URL} ...")
-    with urllib.request.urlopen(TAXONOMY_URL) as resp:  # noqa: S310 (trusted OFF host)
-        data = resp.read()
-    path.write_bytes(data)
-    if log:
-        log(f"Saved category taxonomy ({len(data):,} bytes) to {path}")
+
+class TaxonomySnapshotError(RuntimeError):
+    """The taxonomy snapshot on disk is not the one the run asked for.
+
+    Raised instead of falling back to *some* taxonomy. A catalog built against
+    an unintended snapshot is not detectably wrong afterwards — every product
+    still gets a plausible ``category_path`` — so the only place to catch it is
+    before the build starts.
+    """
+
+
+def taxonomy_sha256(path: Path) -> str:
+    """Return the sha256 of ``path``, read in chunks (the snapshot is ~4.5MB)."""
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for block in iter(lambda: handle.read(_HASH_CHUNK), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def resolve_taxonomy(
+    path: Path,
+    *,
+    fetch: bool = False,
+    expected_sha256: Optional[str] = PINNED_TAXONOMY_SHA256,
+    log: Optional[Any] = None,
+) -> Path:
+    """Return ``path`` once it is known to hold the snapshot the run asked for.
+
+    Two refusals, both loud, replacing what used to be a silent download:
+
+    * **The file is missing and ``fetch`` is false.** Downloading a fresh
+      upstream taxonomy on a cache miss makes "the pin" mean "whatever upstream
+      published today" exactly when a build needed it held fixed. Refreshing is
+      now opt-in (``--fetch-taxonomy``), so it appears on the command line and
+      therefore in the build record. The default path also sits inside
+      ``data/json_source/``, a read-only source dump; a build has no business
+      writing into it unasked.
+    * **The file is not the expected snapshot.** ``path.exists()`` waves through
+      a stale, truncated or hand-edited file. Pass ``expected_sha256=None`` to
+      state deliberately that this run is not pinned.
+    """
+    if not path.exists():
+        if not fetch:
+            expected = expected_sha256 or "unpinned"
+            raise TaxonomySnapshotError(
+                f"category taxonomy snapshot not found at {path} "
+                f"(expected sha256 {expected}). It is not downloaded automatically: "
+                f"a build must not silently substitute today's upstream taxonomy for the "
+                f"pinned one. Put the snapshot at that path, name another with --taxonomy, "
+                f"or pass --fetch-taxonomy to download {TAXONOMY_URL} there on purpose."
+            )
+        path.parent.mkdir(parents=True, exist_ok=True)
+        if log:
+            log(f"--fetch-taxonomy: downloading {TAXONOMY_URL} to {path} ...")
+        try:
+            with urllib.request.urlopen(TAXONOMY_URL) as resp:  # noqa: S310 (trusted OFF host)
+                data = resp.read()
+        except OSError as exc:  # URLError and friends are all OSError subclasses
+            # An opt-in fetch that could not complete is still a run without its
+            # taxonomy, and it exits through the same named error rather than a
+            # traceback — the caller has one thing to catch, not two.
+            raise TaxonomySnapshotError(
+                f"could not download the category taxonomy from {TAXONOMY_URL} to {path}: {exc}"
+            ) from exc
+        path.write_bytes(data)
+        if log:
+            log(f"Saved category taxonomy ({len(data):,} bytes) to {path}")
+
+    if expected_sha256:
+        actual = taxonomy_sha256(path)
+        if actual != expected_sha256:
+            raise TaxonomySnapshotError(
+                f"category taxonomy snapshot {path} is not the pinned one: "
+                f"expected sha256 {expected_sha256}, found {actual}. "
+                f"Every category address is a function of this file, so a build against it "
+                f"would not be comparable to the pinned ones. Restore the pinned snapshot, "
+                f"update PINNED_TAXONOMY_SHA256 in a commit if the pin is meant to move, "
+                f"or pass --allow-unpinned-taxonomy to build against this file knowingly."
+            )
+        if log:
+            log(f"Category taxonomy {path} matches the pinned sha256 {expected_sha256}.")
+    elif log:
+        log(f"Category taxonomy {path} used WITHOUT a sha256 pin (--allow-unpinned-taxonomy).")
+
     return path
 
 

@@ -19,7 +19,9 @@ from off_demo_extract.category_tags import (
 )
 from off_demo_extract.pricing import load_pricing_config, estimate_price
 from off_demo_extract.taxonomy import (
-    ensure_taxonomy,
+    PINNED_TAXONOMY_SHA256,
+    TaxonomySnapshotError,
+    resolve_taxonomy,
     load_taxonomy,
     build_canonical_parent_map,
     category_path_entries,
@@ -1039,14 +1041,29 @@ def build_parser(
 
     p.add_argument("--pricing-config", type=Path, default=default_pricing, help="Path to pricing_buckets.json")
 
-    # Category taxonomy: drives the hierarchical ``category_path`` field. When the
-    # file is missing it is downloaded from the public Open Food Facts taxonomy.
+    # Category taxonomy: drives the hierarchical ``category_path`` field. A
+    # missing snapshot is an error; it is never downloaded unless asked for.
     p.add_argument(
         "--taxonomy",
         type=Path,
         default=None,
         help="Path to the Open Food Facts categories taxonomy JSON "
-        "(default: data/taxonomy/categories.json; downloaded if absent).",
+        "(default: data/json_source/categories.json). A missing file is an error, "
+        "not a download; see --fetch-taxonomy.",
+    )
+    p.add_argument(
+        "--fetch-taxonomy",
+        action="store_true",
+        help="Download the taxonomy to --taxonomy when it is missing, instead of failing. "
+        "Refreshing the snapshot is deliberate, so it is named here and lands in the "
+        "build record rather than happening on a cache miss.",
+    )
+    p.add_argument(
+        "--allow-unpinned-taxonomy",
+        action="store_true",
+        help="Build against the --taxonomy file whatever its sha256, instead of requiring "
+        "the pinned snapshot. The run is then not comparable to a pinned build, which is "
+        "why it has to be said on the command line.",
     )
     p.add_argument(
         "--no-taxonomy",
@@ -1089,7 +1106,7 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
     default_output = root / "data" / "products" / "off_common.ndjson"
     default_report = root / "data" / "products" / "report.json"
     default_pricing = root / "config" / "pricing_buckets.json"
-    default_taxonomy = root / "data" / "taxonomy" / "categories.json"
+    default_taxonomy = root / "data" / "json_source" / "categories.json"
 
     args = build_parser(default_input, default_output, default_report, default_pricing).parse_args(
         list(argv) if argv is not None else None
@@ -1117,8 +1134,21 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
     taxonomy: Optional[Dict[str, Any]] = None
     if not args.no_taxonomy:
         taxonomy_path = args.taxonomy or default_taxonomy
+        # Resolving the snapshot is a gate, not a best-effort step: a run that
+        # cannot get the taxonomy it was asked for must stop rather than write a
+        # catalog whose category addresses came from somewhere else. Only the
+        # *parsing* below keeps the old degrade-to-empty behaviour.
         try:
-            ensure_taxonomy(taxonomy_path, log=log)
+            resolve_taxonomy(
+                taxonomy_path,
+                fetch=args.fetch_taxonomy,
+                expected_sha256=None if args.allow_unpinned_taxonomy else PINNED_TAXONOMY_SHA256,
+                log=log,
+            )
+        except TaxonomySnapshotError as exc:
+            log(f"ERROR: {exc}")
+            return 2
+        try:
             taxonomy = load_taxonomy(taxonomy_path)
             log(f"Category taxonomy: {len(taxonomy):,} nodes from {taxonomy_path}")
         except Exception as exc:  # noqa: BLE001 — degrade gracefully, never abort the run
