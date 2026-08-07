@@ -20,6 +20,7 @@ from off_demo_extract.category_tags import (
 from off_demo_extract.pricing import load_pricing_config, estimate_price
 from off_demo_extract.taxonomy import (
     PINNED_TAXONOMY_SHA256,
+    AddressExplosionError,
     TaxonomySnapshotError,
     resolve_taxonomy,
     load_taxonomy,
@@ -1200,7 +1201,17 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
         # the same reason as the map above: a category's addresses must not depend
         # on which product you are looking at, and the alternates are enumerated
         # from the same global, language-blind graph as the primary.
-        address_index = AddressIndex(taxonomy, canonical_parents, exclude=cat_exclude)
+        #
+        # The explosion circuit breaker is caught here and reported the same way
+        # the snapshot pin is, rather than surfacing as a traceback. Both are the
+        # same kind of event — a taxonomy this run refuses to build a catalog
+        # from — and a refusal a caller has to read a stack trace to understand
+        # reads as a crash.
+        try:
+            address_index = AddressIndex(taxonomy, canonical_parents, exclude=cat_exclude)
+        except AddressExplosionError as exc:
+            log(f"ERROR: {exc}")
+            return 2
         log(
             f"Category addresses: {len(address_index):,} nodes, "
             f"{address_index.multi_address_nodes:,} at more than one address "
@@ -1298,12 +1309,14 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
                 c.missing_category += 1
                 continue
 
-            # Hierarchical category path derived from the OFF taxonomy graph, in
-            # the shape retail catalogs typically expose (a single clean root→leaf
-            # chain as cumulative path strings). The flat ``taxonomy_tags`` list
-            # below is still used for pricing-bucket matching and attrs;
-            # ``category_path`` is the field PRISM's hierarchical category facet
-            # renders.
+            # Hierarchical category addressing derived from the OFF taxonomy
+            # graph, in the shape retail catalogs expose: cumulative path
+            # strings. Two of them, because the source is a DAG — the single
+            # clean root→leaf chain the product leads with (``primary``), and the
+            # union over every address it sits at (``entries``). The flat
+            # ``taxonomy_tags`` list below is still used for pricing-bucket
+            # matching and attrs; ``category_path`` is the field PRISM's
+            # hierarchical category facet renders.
             #
             # It is derived *before* the flat list because the flat list's cap
             # needs to know which tags are on this chain, so that truncating the
@@ -1599,10 +1612,17 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
                 if taxonomy is not None
                 else "no taxonomy loaded: tags aliased and curated-dropped only, not validated"
             ),
+            # These two describe DIFFERENT shapes and both are named, because the
+            # report is the run's own self-description and is the artifact a
+            # downstream consumer reads to learn what it is being handed. Since
+            # the source DAG's alternate addresses are emitted, ``category_path``
+            # is no longer one root->leaf chain: it is the prefix-closed union
+            # over every address. The single chain is ``category_path_primary``.
             "category_path": (
                 "disabled"
                 if args.no_taxonomy
-                else f"hierarchical root->leaf path from OFF taxonomy "
+                else f"prefix-closed union of the cumulative OFF-taxonomy paths of "
+                f"every address the product sits at, primary address first "
                 f"(written for {c.with_category_path:,}/{c.written:,} records"
                 + (
                     f"; {c.missing_category_path:,} unresolved products dropped"
@@ -1612,6 +1632,15 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
                     else ""
                 )
                 + ")"
+            ),
+            "category_path_primary": (
+                "disabled"
+                if args.no_taxonomy
+                else f"the primary address alone: one hierarchical root->leaf chain "
+                f"of cumulative paths from the OFF taxonomy, and the head of "
+                f"category_path (written for the same "
+                f"{c.with_category_path:,}/{c.written:,} records — a record carries "
+                f"both fields or neither)"
             ),
             "price": "category baseline unit model + deterministic noise + label premiums + retail rounding",
             "dietary_restrictions": "keyword list derived from labels_tags and ingredients_analysis_tags (positive-only)",

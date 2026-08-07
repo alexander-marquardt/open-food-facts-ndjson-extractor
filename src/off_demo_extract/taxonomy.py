@@ -780,6 +780,18 @@ def category_chain(
     single product. The alternates live in :func:`category_leaves` and
     :class:`AddressIndex` alongside it, never inside it.
 
+    Note where it sits, though: the extraction run does **not** call this. It
+    calls :func:`category_addresses`, which takes its primary from
+    ``AddressIndex.primary``. So this is not the production code path — it is the
+    *independent* statement of what the primary must be, and the tests in
+    ``tests/test_primary_stability.py`` assert the two agree (over the pinned
+    snapshot they do, for all 14,457 nodes). Keeping it separate is the point: an
+    equality asserted between two implementations is evidence, and folding this
+    one into the other would delete the evidence rather than simplify it. The
+    same holds for :func:`category_path_entries`,
+    :func:`primary_category_path_entries`, :func:`build_category_path` and
+    :func:`build_primary_category_path`.
+
     Leaf selection — see :func:`category_leaves`, which is where the rule lives
     and which returns the alternates this discards.
     """
@@ -1203,8 +1215,11 @@ class AddressAudit:
         self.distinct_paths.update(values)
         # A product is multi-address when the union carries strictly more than its
         # primary — counted from the emitted values rather than from the leaf
-        # count, because two thirds of these products have a single leaf and fork
-        # *above* it, and a leaf-based count undercounts them by about 2.5x.
+        # count, because most of these products have a single-parent leaf and
+        # fork *above* it. On the ``en`` catalog over the whole export that is
+        # 49,915 of 65,743, and a leaf-based count finds only 15,828: a 4.2x
+        # undercount. See the README's "Several addresses per product" for the
+        # population those numbers belong to; they are not constants.
         if len(values) > len(path_strings(primary)):
             self.multi_address_products += 1
 

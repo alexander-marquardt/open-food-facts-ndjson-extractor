@@ -494,3 +494,37 @@ def test_the_run_does_not_report_the_alternates_as_a_property_2_violation() -> N
     assert addresses["max_addresses_for_a_category"] == 3
     assert report["counters"]["categories_at_multiple_primary_addresses"] == 0
     assert report["counters"]["products_at_multiple_addresses"] == 2
+
+
+def test_the_report_describes_both_category_fields_and_their_two_shapes() -> None:
+    """The report is the run's own self-description; it must describe this run.
+
+    ``category_path`` stopped being one root→leaf chain the moment the alternates
+    were restored, and ``category_path_primary`` did not exist before. A report
+    that still calls the first a single path — or never names the second at all —
+    hands a downstream consumer the wrong shape for the field it is reading, and
+    nothing else in this suite reads the ``filters`` block, so nothing else would
+    notice. The description drifted exactly this way once already.
+    """
+    with tempfile.TemporaryDirectory(prefix="off-multi-address-") as d:
+        records, report = _run_extract(
+            Path(d), DIAMOND, [_product("0050428476284", ["en:peanut-butters"])]
+        )
+
+    # The run being described really does emit the two different shapes, so what
+    # follows is about a distinction this report had to make, not a hypothetical.
+    record = records[0]
+    assert len(record["category_path"]) > len(record["category_path_primary"])
+
+    filters = report["filters"]
+    assert "category_path_primary" in filters, sorted(filters)
+
+    union_desc = filters["category_path"]
+    primary_desc = filters["category_path_primary"]
+    # The union is not a chain, and the chain is not the union. Asserted on the
+    # wording because the wording is the whole artifact: this block is prose a
+    # consumer reads, and a description that names the wrong shape is the defect.
+    assert "union" in union_desc, union_desc
+    assert "root->leaf" not in union_desc, union_desc
+    assert "root->leaf" in primary_desc, primary_desc
+    assert union_desc != primary_desc

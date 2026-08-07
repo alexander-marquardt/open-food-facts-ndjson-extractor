@@ -52,7 +52,7 @@ This script transforms the raw data into a clean, consistent, and search-ready f
 *   **Keeps the description to the product's own prose:** `description` is the title plus the source text, and nothing else. The facts worth reaching exactly are fields of their own instead (see [Per-fact fields](#per-fact-fields)).
 *   **Generates a synthetic price:** It creates a deterministic, plausible price to enable e-commerce simulations.
 *   **Flattens the structure:** It extracts key attributes into a simple key-value `attrs` object, keeping list-valued attributes as lists so each value stays exactly matchable (see [Multi-valued attributes](#multi-valued-attributes)).
-*   **Reconstructs a category hierarchy:** It resolves the product's categories against the Open Food Facts category taxonomy graph to emit a single clean root→leaf `category_path` (see [Category hierarchy](#category-hierarchy)).
+*   **Reconstructs a category hierarchy:** It resolves the product's categories against the Open Food Facts category taxonomy graph to emit clean cumulative breadcrumbs — `category_path_primary`, the one address the product leads with, and `category_path`, the union over every address the source DAG puts it at (see [Category hierarchy](#category-hierarchy)).
 
 ### Before: Raw Open Food Facts Data Example
 
@@ -366,29 +366,62 @@ contain, 26 are foreign and 20 of those have no English or `xx` name, so they
 render de-slugged from their own language. It applies to 0.9% of the categories
 an English catalog can file under, and it buys back their true lineage.
 
+The values below are the real output of `category_addresses` for those tags
+against the pinned snapshot, not a sketch — reproduce them with:
+
+```bash
+uv run python -c "
+from pathlib import Path
+from off_demo_extract.taxonomy import (load_taxonomy, build_canonical_parent_map,
+    AddressIndex, category_addresses, path_strings)
+tax = load_taxonomy(Path('data/json_source/categories.json'))
+ex = {'en:null', 'en:unknown', 'en:undefined'}
+cp = build_canonical_parent_map(tax, exclude=ex)
+a = category_addresses(['en:plant-based-foods-and-beverages', 'en:beverages',
+    'en:hot-beverages', 'en:plant-based-beverages', 'en:teas', 'en:tea-bags'],
+    tax, ex, 'en', canonical_parents=cp,
+    address_index=AddressIndex(tax, cp, exclude=ex))
+print(*path_strings(a.primary), sep='\n'); print(); print(*path_strings(a.entries), sep='\n')"
+```
+
 ```text
 raw tags:   en:plant-based-foods-and-beverages, en:beverages, en:hot-beverages,
             en:plant-based-beverages, en:teas, en:tea-bags        (a flat DAG union)
 
-category_path_primary:
-  [ "Beverages",
-    "Beverages/Hot beverages",
-    "Beverages/Hot beverages/Teas" ]                    (the address it leads with)
+category_path_primary:                                  (the address it leads with)
+  [ "Beverages and beverages preparations",
+    "Beverages and beverages preparations/Beverage preparations",
+    "Beverages and beverages preparations/Beverage preparations/Tea leaves",
+    "Beverages and beverages preparations/Beverage preparations/Tea leaves/Tea bags" ]
 
-category_path:
-  [ "Beverages",
-    "Beverages/Hot beverages",
-    "Beverages/Hot beverages/Teas",                             (primary, in full)
+category_path:                              (12 values; a prefix already present is
+  [ "Beverages and beverages preparations",              not repeated)
+    "Beverages and beverages preparations/Beverage preparations",
+    "Beverages and beverages preparations/Beverage preparations/Tea leaves",
+    "Beverages and beverages preparations/Beverage preparations/Tea leaves/Tea bags",
+                                                       ^ the primary above, in full
+    "Beverages and beverages preparations/Beverages",
+    "Beverages and beverages preparations/Beverages/Hot beverages",
+                                                       ^ en:hot-beverages' address
     "Plant-based foods and beverages",
     "Plant-based foods and beverages/Plant-based beverages",
-    "Beverages/Plant-based beverages",
     "Plant-based foods and beverages/Plant-based beverages/Teas",
-    "Beverages/Plant-based beverages/Teas" ]           (en:teas' other addresses)
+    "Beverages and beverages preparations/Beverages/Hot beverages/Teas",
+    "Beverages and beverages preparations/Beverages/Plant-based beverages",
+    "Beverages and beverages preparations/Beverages/Plant-based beverages/Teas" ]
+                                                       ^ en:teas' three addresses
 ```
 
-`en:teas` has two parents, and each of those has its own parents, so the node sits
-at several addresses and the product is reachable by each of them. The primary
-leads the list and is repeated in a field of its own.
+Three things in that block are worth reading twice. The primary leaf is
+`en:tea-bags` — the most specific tag — so the address the product leads with is
+its `Tea leaves/Tea bags` lineage, *not* the `Teas` one. `en:hot-beverages` and
+`en:teas` are kept as **alternate leaves** because neither sits on that primary
+chain, and each contributes its own addresses. And `en:teas` alone accounts for
+three of them: it has two parents (`en:hot-beverages`, `en:plant-based-beverages`)
+and `en:plant-based-beverages` itself has two (`en:beverages`,
+`en:plant-based-foods-and-beverages`), so the fork one hop up multiplies through.
+Four entries of primary become **twelve** values in the field, and the product is
+reachable by every one of them.
 
 ### Canonical parents and the tie-break
 
@@ -439,14 +472,79 @@ distinct `category_path` values, and the mean and maximum values per product.
 sized for the collapsed cardinality truncates silently, and a truncated facet
 panel lies.
 
+Take them from **the report of the run that built the catalog you are sizing
+against**, never from a figure quoted in prose. Every such figure — here, in the
+pull request, or in a build report — is a property of *one population*: one
+locale's membership rules over one input bound. A run that keeps more products
+reaches more distinct paths, so a quoted count is a measurement of that build and
+never a ceiling.
+
+There is a real ceiling, and it comes from the taxonomy rather than from any
+build. A product can only be filed under a node this catalog's language filter
+makes eligible, so every path it can emit is a prefix of some eligible node's
+address. Counting those over the pinned snapshot, with the default
+`--category-exclude`, gives **21,655** distinct path strings for `en`, **22,296**
+for `es` and **27,696** for `fr`. No catalog built that way can exceed its
+locale's number however loose its *product* filters are, which is what makes
+`verify_index.py`'s 30,000-term request safe rather than lucky. Reproduce with:
+
+```bash
+uv run python -c "
+from pathlib import Path
+from off_demo_extract.taxonomy import (load_taxonomy, build_canonical_parent_map,
+    AddressIndex, default_keep_prefixes, category_addresses, path_strings)
+from off_demo_extract.category_tags import CategoryVocabulary
+tax = load_taxonomy(Path('data/json_source/categories.json'))
+ex = {'en:null', 'en:unknown', 'en:undefined'}
+cp = build_canonical_parent_map(tax, exclude=ex)
+idx = AddressIndex(tax, cp, exclude=ex)
+for lang in ('en', 'es', 'fr'):
+    paths = set()
+    for node in CategoryVocabulary.for_catalog(tax, default_keep_prefixes(lang), ex).eligible:
+        paths.update(path_strings(category_addresses([node], tax, ex, lang,
+            canonical_parents=cp, address_index=idx).entries))
+    print(lang, len(paths))"
+```
+
 ### Several addresses per product
 
 The source taxonomy is a DAG: 2,545 of its 14,457 nodes have more than one
 parent, and a node one hop below such a fork inherits the fork whether or not it
-has several parents itself. Roughly two thirds of the products that end up at
-several addresses have a **single-parent leaf** and are multi-addressed only
-because something further up their lineage forks — so counting multi-parent leaves
-undercounts the affected set by about 2.5x.
+has several parents itself. **The inherited forks are most of the effect, so
+counting multi-parent nodes badly undercounts it.** Over the pinned snapshot,
+**7,717** nodes sit at more than one address — 3.0x the 2,545 that have more than
+one parent, and that figure needs nothing but the snapshot:
+
+```bash
+uv run python -c "
+from pathlib import Path
+from off_demo_extract.taxonomy import (load_taxonomy, build_canonical_parent_map,
+    AddressIndex, parents_of)
+tax = load_taxonomy(Path('data/json_source/categories.json'))
+ex = {'en:null', 'en:unknown', 'en:undefined'}
+idx = AddressIndex(tax, build_canonical_parent_map(tax, exclude=ex), exclude=ex)
+print(sum(1 for n in tax if len(parents_of(tax, n)) > 1),
+      sum(1 for n in tax if len(idx.addresses(n)) > 1))"
+```
+
+The same gap shows up per product, and there the number depends on the catalog,
+so here is the one that was measured and the population it was measured over.
+**Population:** the 108,380 records an `en --require-category
+--require-category-path` run keeps from the whole 4,241,020-line export — a
+`product_name_en` (or `lang=en` with a `product_name`), a description, a front-`en`
+image, at least one category tag surviving curation, and a root-anchored primary.
+That count reproduces this catalog's build manifest exactly, which is what says
+the measurement is of the real catalog. **Method:** a product is multi-addressed
+when its `category_path` is longer than its `category_path_primary`; its leaf is
+`category_leaves(...)[0]`; a leaf is multi-parent when `parents_of` returns more
+than one. **Result:** 65,743 products (60.7%) sit at more than one address, and
+**49,915 of those — 75.9% — have a single-parent leaf**, multi-addressed only
+because something further up their lineage forks. Counting by multi-parent leaf
+instead finds 15,828 products and so **undercounts the affected set by 4.2x**.
+
+Both the 60.7% and the 4.2x are properties of that population. A build that keeps
+more products, or a different locale, gets different ones — the ratio is stable
+in shape, not in value.
 
 Two shapes occur, they read very differently, and both are emitted:
 
