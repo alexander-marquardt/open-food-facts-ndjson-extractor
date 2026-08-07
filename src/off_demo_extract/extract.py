@@ -20,16 +20,20 @@ from off_demo_extract.category_tags import (
 from off_demo_extract.pricing import load_pricing_config, estimate_price
 from off_demo_extract.taxonomy import (
     PINNED_TAXONOMY_SHA256,
+    AddressExplosionError,
     TaxonomySnapshotError,
     resolve_taxonomy,
     load_taxonomy,
     build_canonical_parent_map,
-    category_path_entries,
+    category_addresses,
     default_keep_prefixes,
     display_label,
     global_roots,
     unanchored_head,
+    path_strings,
     AddressAudit,
+    CategoryAddresses,
+    AddressIndex,
     RootAnchorAudit,
 )
 
@@ -977,7 +981,8 @@ class Counters:
     with_category_path: int = 0
     missing_category_path: int = 0
     unanchored_category_path: int = 0
-    categories_at_multiple_addresses: int = 0
+    categories_at_multiple_primary_addresses: int = 0
+    products_at_multiple_addresses: int = 0
     categories_under_multiple_labels: int = 0
     labels_shared_by_multiple_categories: int = 0
     products_with_refused_category_tags: int = 0
@@ -1184,12 +1189,33 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
     # through every filtered node too, which promoted 90 nodes to roots of an
     # English run's forest and truncated the chains beneath them.
     canonical_parents: Optional[Dict[str, Optional[str]]] = None
+    address_index: Optional[AddressIndex] = None
     if taxonomy is not None:
         canonical_parents = build_canonical_parent_map(taxonomy, exclude=cat_exclude)
         roots = sum(1 for parent in canonical_parents.values() if parent is None)
         log(
             f"Canonical category parents: {len(canonical_parents):,} nodes, "
             f"{roots:,} roots (fewest hops to a root; ties by canonical id)"
+        )
+        # Every root→node path in the DAG, primary first. Built once per run for
+        # the same reason as the map above: a category's addresses must not depend
+        # on which product you are looking at, and the alternates are enumerated
+        # from the same global, language-blind graph as the primary.
+        #
+        # The explosion circuit breaker is caught here and reported the same way
+        # the snapshot pin is, rather than surfacing as a traceback. Both are the
+        # same kind of event — a taxonomy this run refuses to build a catalog
+        # from — and a refusal a caller has to read a stack trace to understand
+        # reads as a crash.
+        try:
+            address_index = AddressIndex(taxonomy, canonical_parents, exclude=cat_exclude)
+        except AddressExplosionError as exc:
+            log(f"ERROR: {exc}")
+            return 2
+        log(
+            f"Category addresses: {len(address_index):,} nodes, "
+            f"{address_index.multi_address_nodes:,} at more than one address "
+            f"(most for one node: {address_index.max_addresses:,})"
         )
     # The taxonomy's real roots. These two counts should now agree — the graph is
     # unfiltered, so its roots *are* the taxonomy's — and any gap is what
@@ -1283,29 +1309,40 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
                 c.missing_category += 1
                 continue
 
-            # Hierarchical category path derived from the OFF taxonomy graph, in
-            # the shape retail catalogs typically expose (a single clean root→leaf
-            # chain as cumulative path strings). The flat ``taxonomy_tags`` list
-            # below is still used for pricing-bucket matching and attrs;
-            # ``category_path`` is the field PRISM's hierarchical category facet
-            # renders.
+            # Hierarchical category addressing derived from the OFF taxonomy
+            # graph, in the shape retail catalogs expose: cumulative path
+            # strings. Two of them, because the source is a DAG — the single
+            # clean root→leaf chain the product leads with (``primary``), and the
+            # union over every address it sits at (``entries``). The flat
+            # ``taxonomy_tags`` list below is still used for pricing-bucket
+            # matching and attrs; ``category_path`` is the field PRISM's
+            # hierarchical category facet renders.
             #
             # It is derived *before* the flat list because the flat list's cap
             # needs to know which tags are on this chain, so that truncating the
             # incidental ones cannot take a segment's flat counterpart with them
             # (#14).
-            path_entries = (
-                category_path_entries(
+            addressing = (
+                category_addresses(
                     tags_curated,
                     taxonomy,
                     cat_exclude,
                     lang,
                     canonical_parents=canonical_parents,
+                    address_index=address_index,
                 )
                 if taxonomy is not None
-                else []
+                else CategoryAddresses(primary=[], entries=[])
             )
-            category_path = [path for _node, path in path_entries]
+            # The primary address alone — the breadcrumb a product page leads
+            # with, and the list every gate and audit below is scoped to. It is
+            # byte-identical to the whole ``category_path`` of a build made before
+            # the alternates existed, which is what makes the rebuild's diff
+            # auditable: a primary that moves is a defect, not noise.
+            path_entries = addressing.primary
+            category_path_primary = path_strings(path_entries)
+            # The field itself: the union across every address, primary first.
+            category_path = path_strings(addressing.entries)
 
             flat_selection = select_category_label_entries(
                 primary_tag,
@@ -1314,6 +1351,12 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
                 lang,
                 max_n=MAX_NUM_TAXONOMY_TAGS,
                 vocabulary=vocabulary,
+                # The PRIMARY chain's nodes, deliberately, not the union's. The
+                # cap reserves a slot for every node here, so widening it to the
+                # alternates would change which incidental tags survive and move
+                # ``taxonomy_tags`` on products whose addressing is the only thing
+                # that changed — the one field this restoration is supposed to
+                # leave byte-identical alongside the primary.
                 chain_tags={node for node, _path in path_entries},
             )
             flat_entries = flat_selection.entries
@@ -1420,6 +1463,15 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
                 "currency": pricing_cfg.currency,
                 "taxonomy_tags": taxonomy_tags,
                 "category_path": category_path,
+                # The one address the product page leads with, kept as its own
+                # field rather than left implicit in ``category_path``'s ordering.
+                # A breadcrumb renderer must not have to know that "the primary is
+                # the first N values" — the ordering of a multi-valued keyword
+                # field is not a contract anything downstream should lean on, and
+                # the union is exactly the shape from which the primary cannot be
+                # re-derived (which address is primary is a property of the graph,
+                # not of the strings).
+                "category_path_primary": category_path_primary,
                 "attrs": attrs,
                 "attr_keys": attr_keys,
                 "dietary_restrictions": dietary_restrictions,
@@ -1430,11 +1482,11 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
 
             if category_path:
                 c.with_category_path += 1
-            # Property 2 (one address per category) and the label invariants
+            # Property 2 (one PRIMARY address per category) and the label invariants
             # (one label per category, one category per label), on the records
             # actually written. The flat entries go in even when no path
             # resolved, so a tag that never reaches a chain is still audited.
-            address_audit.record(path_entries, flat_entries)
+            address_audit.record(path_entries, flat_entries, addressing.entries)
             # What the cap discarded from the written record. Counted here, with
             # the address audit, so the number describes the catalog that was
             # emitted rather than the records a later gate dropped.
@@ -1472,15 +1524,28 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
 
     c.products_with_truncated_taxonomy_tags = cap_audit.products
     c.truncated_taxonomy_tags = cap_audit.tags_dropped
-    c.categories_at_multiple_addresses = address_audit.conflict_count
+    c.categories_at_multiple_primary_addresses = address_audit.conflict_count
+    c.products_at_multiple_addresses = address_audit.multi_address_products
     c.categories_under_multiple_labels = address_audit.label_conflict_count
     c.labels_shared_by_multiple_categories = address_audit.shared_label_count
     audit_summary = address_audit.summary()
+    log(
+        f"Category addressing: {address_audit.multi_address_products:,} of "
+        f"{address_audit.products:,} written products sit at more than one address; "
+        f"{address_audit.multi_address_category_count:,} categories are emitted at "
+        f"more than one (most for one category: "
+        f"{address_audit.max_addresses_for_a_category:,}). "
+        f"{len(address_audit.distinct_paths):,} distinct category_path values, "
+        f"{address_audit.mean_path_values:.3f} mean per product, "
+        f"{address_audit.max_path_values:,} at most."
+    )
     if address_audit.conflict_count:
         log(
             f"WARNING: {address_audit.conflict_count:,} categories resolved to more "
-            "than one path address in this run — category_path is no longer a strict "
-            "tree. See category_path_addresses in the report."
+            "than one PRIMARY path address in this run. Alternate addresses are "
+            "expected and counted above; a category whose *primary* moves between "
+            "products is a defect, and the expected value here is zero. See "
+            "category_path_addresses in the report."
         )
         for example in audit_summary["examples"]:
             log(f"  {example['category']}: {' | '.join(example['addresses'])}")
@@ -1510,10 +1575,13 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
         "pricing_config": str(args.pricing_config),
         "elapsed_seconds": elapsed,
         "counters": c.__dict__,
-        # Property 2: every category must occupy exactly one position in the
-        # tree, and render under exactly one label (and that label must name only
-        # it). Reported per run so a regression shows up here rather than in a
-        # hand audit of the built index.
+        # Property 2: every category must have exactly one PRIMARY position, and
+        # render under exactly one label (and that label must name only it).
+        # Alternate addresses are the restored DAG and are counted here as a shape,
+        # not a violation. Reported per run so a regression shows up here rather
+        # than in a hand audit of the built index. The distinct-path and
+        # mean/max-values numbers in this block are what a downstream
+        # ``category_path`` aggregation has to be sized against.
         "category_path_addresses": audit_summary,
         # Every product tag that did not survive curation, by reason, with the
         # worst offenders named. Separate from the address audit above on
@@ -1544,10 +1612,17 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
                 if taxonomy is not None
                 else "no taxonomy loaded: tags aliased and curated-dropped only, not validated"
             ),
+            # These two describe DIFFERENT shapes and both are named, because the
+            # report is the run's own self-description and is the artifact a
+            # downstream consumer reads to learn what it is being handed. Since
+            # the source DAG's alternate addresses are emitted, ``category_path``
+            # is no longer one root->leaf chain: it is the prefix-closed union
+            # over every address. The single chain is ``category_path_primary``.
             "category_path": (
                 "disabled"
                 if args.no_taxonomy
-                else f"hierarchical root->leaf path from OFF taxonomy "
+                else f"prefix-closed union of the cumulative OFF-taxonomy paths of "
+                f"every address the product sits at, primary address first "
                 f"(written for {c.with_category_path:,}/{c.written:,} records"
                 + (
                     f"; {c.missing_category_path:,} unresolved products dropped"
@@ -1557,6 +1632,15 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
                     else ""
                 )
                 + ")"
+            ),
+            "category_path_primary": (
+                "disabled"
+                if args.no_taxonomy
+                else f"the primary address alone: one hierarchical root->leaf chain "
+                f"of cumulative paths from the OFF taxonomy, and the head of "
+                f"category_path (written for the same "
+                f"{c.with_category_path:,}/{c.written:,} records — a record carries "
+                f"both fields or neither)"
             ),
             "price": "category baseline unit model + deterministic noise + label premiums + retail rounding",
             "dietary_restrictions": "keyword list derived from labels_tags and ingredients_analysis_tags (positive-only)",

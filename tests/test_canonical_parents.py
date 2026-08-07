@@ -1,10 +1,11 @@
 """Unit tests for the run-wide canonical parent map.
 
-``build_canonical_parent_map`` collapses the Open Food Facts category DAG to a
-spanning forest **once per run**, so that a category's address never depends on
-which product you are looking at. These use small synthetic taxonomies, each
-built to isolate one rule of the selection; the property tests that this exists
-to serve run on real data in ``test_category_addressing.py``.
+``build_canonical_parent_map`` picks each node's **primary** parent **once per
+run**, so that a category's addressing never depends on which product you are
+looking at. These use small synthetic taxonomies, each built to isolate one rule
+of the selection; the property tests that this exists to serve run on real data
+in ``test_category_addressing.py``. The alternates the primary is chosen from
+are covered in ``test_multi_address.py``.
 
 Run with ``pytest tests/`` or directly: ``python tests/test_canonical_parents.py``.
 """
@@ -20,9 +21,11 @@ from off_demo_extract.taxonomy import (  # noqa: E402
     AddressAudit,
     build_canonical_parent_map,
     build_category_path,
+    build_primary_category_path,
     canonical_ancestry,
     category_chain,
     category_path_entries,
+    primary_category_path_entries,
 )
 
 EXCLUDE = {"en:null", "en:unknown", "en:undefined"}
@@ -55,14 +58,25 @@ def test_untagged_ancestors_are_materialised() -> None:
     filed under a one-segment path here and a four-segment one on a product that
     tagged more of the same lineage.
     """
-    sparse = build_category_path(["en:tea-bags"], TAXONOMY, EXCLUDE, lang="en")
-    complete = build_category_path(
+    sparse = build_primary_category_path(["en:tea-bags"], TAXONOMY, EXCLUDE, lang="en")
+    complete = build_primary_category_path(
         ["en:beverages", "en:hot-beverages", "en:teas", "en:tea-bags"],
         TAXONOMY,
         EXCLUDE,
         lang="en",
     )
     assert sparse == complete, "the same leaf must resolve to the same path"
+    # And the same holds of the whole address set, which is the property the
+    # primary is only one half of: a node's alternates are enumerated from the
+    # same global graph, so they cannot depend on the product either.
+    assert build_category_path(
+        ["en:tea-bags"], TAXONOMY, EXCLUDE, lang="en"
+    ) == build_category_path(
+        ["en:beverages", "en:hot-beverages", "en:teas", "en:tea-bags"],
+        TAXONOMY,
+        EXCLUDE,
+        lang="en",
+    )
     assert sparse == [
         "Beverages",
         "Beverages/Hot beverages",
@@ -173,17 +187,32 @@ def test_prebuilt_map_matches_the_on_demand_one() -> None:
     ) == category_chain(tags, TAXONOMY, EXCLUDE, keep_prefixes={"en"})
 
 
-def test_address_audit_flags_a_category_at_two_addresses() -> None:
-    """The extract-time property-2 check must actually fire, not just exist."""
+def test_address_audit_flags_a_category_at_two_primary_addresses() -> None:
+    """The extract-time property-2 check must actually fire, not just exist.
+
+    It watches the **primary** address. A node legitimately holds several
+    addresses now, so the audit would be useless if it fired on those — and
+    equally useless if restoring the alternates had quietly stopped it firing on
+    a primary that moved, which is the regression it exists for.
+    """
     audit = AddressAudit()
-    audit.record(category_path_entries(["en:tea-bags"], TAXONOMY, EXCLUDE, "en"))
+    audit.record(primary_category_path_entries(["en:tea-bags"], TAXONOMY, EXCLUDE, "en"))
     assert audit.conflict_count == 0
 
-    # Same node, a different address: exactly what a regression would look like.
+    # The alternates of the same product, which must NOT be read as a conflict.
+    entries = category_path_entries(["en:tea-bags"], TAXONOMY, EXCLUDE, "en")
+    primary = primary_category_path_entries(["en:tea-bags"], TAXONOMY, EXCLUDE, "en")
+    assert len(entries) > len(primary), "the fixture DAG must give en:teas two addresses"
+    audit.record(primary, (), entries)
+    assert audit.conflict_count == 0
+    assert audit.multi_address_category_count >= 1
+    assert audit.multi_address_products == 1
+
+    # Same node, a different PRIMARY address: exactly what a regression looks like.
     audit.record([("en:tea-bags", "Somewhere else/Tea bags")])
     assert audit.conflict_count == 1
     summary = audit.summary()
-    assert summary["categories_at_multiple_addresses"] == 1
+    assert summary["categories_at_multiple_primary_addresses"] == 1
     assert summary["examples"][0]["category"] == "en:tea-bags"
     assert len(summary["examples"][0]["addresses"]) == 2
 

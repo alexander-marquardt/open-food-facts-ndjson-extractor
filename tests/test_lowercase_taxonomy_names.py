@@ -267,13 +267,13 @@ def test_a_mid_breadcrumb_segment_is_capitalised_in_the_emitted_path() -> None:
     """
     records = _extract("en")
     record = records[ICE_CREAM_PRODUCT.zfill(13)]
-    assert record["category_path"] == [
+    assert record["category_path_primary"] == [
         "Desserts",
         "Desserts/Frozen desserts",
         "Desserts/Frozen desserts/Ice creams and sorbets",
         "Desserts/Frozen desserts/Ice creams and sorbets/Ice creams",
         "Desserts/Frozen desserts/Ice creams and sorbets/Ice creams/Ice cream tubs",
-    ], record["category_path"]
+    ], record["category_path_primary"]
     assert "Ice creams" in record["taxonomy_tags"], record["taxonomy_tags"]
 
 
@@ -281,12 +281,12 @@ def test_a_leaf_segment_is_capitalised_and_its_ancestors_are_untouched() -> None
     """``chorizo`` is the leaf; the four segments above it already read correctly."""
     records = _extract("en")
     record = records[CHORIZO_PRODUCT.zfill(13)]
-    assert record["category_path"] == [
+    assert record["category_path_primary"] == [
         "Meats and their products",
         "Meats and their products/Prepared meats",
         "Meats and their products/Prepared meats/Cured sausages",
         "Meats and their products/Prepared meats/Cured sausages/Chorizo",
-    ], record["category_path"]
+    ], record["category_path_primary"]
     assert "Chorizo" in record["taxonomy_tags"], record["taxonomy_tags"]
 
 
@@ -294,8 +294,10 @@ def test_a_hyphenated_ancestor_survives_the_leaf_being_capitalised() -> None:
     """``Plant-based foods and beverages`` must arrive with its hyphen intact."""
     records = _extract("en")
     record = records[CORN_SALAD_PRODUCT.zfill(13)]
-    assert record["category_path"][0] == "Plant-based foods and beverages"
-    assert record["category_path"][-1].endswith("/Corn salad"), record["category_path"]
+    assert record["category_path_primary"][0] == "Plant-based foods and beverages"
+    assert record["category_path_primary"][-1].endswith("/Corn salad"), record[
+        "category_path_primary"
+    ]
     assert "Corn salad" in record["taxonomy_tags"], record["taxonomy_tags"]
     assert "Plant-based foods and beverages" in record["taxonomy_tags"]
 

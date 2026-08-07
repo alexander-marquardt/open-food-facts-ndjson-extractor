@@ -1,7 +1,12 @@
 #!/usr/bin/env python3
-"""Bulk-add the hierarchical ``category_path`` field onto an existing index.
+"""Bulk-add the hierarchical category fields onto an existing index.
 
-Reads an extractor NDJSON (which contains ``id`` = GTIN and ``category_path``)
+Writes both ``category_path`` — every address the product sits at, as cumulative
+``/``-joined strings — and ``category_path_primary``, the one address a product
+page leads with. They go in one partial update because a document holding one
+without the other is a document that cannot render its own breadcrumb.
+
+Reads an extractor NDJSON (which contains ``id`` = GTIN and both fields)
 and issues partial ``_update`` operations keyed by ``_id`` (= GTIN on PRISM
 catalog indexes). Partial updates merge the one field and **do not** run any
 ingest pipeline, so existing fields — including the copied embedding vectors —
@@ -236,6 +241,11 @@ def inject(
     for doc in records:
         gtin = str(doc.get("id") or "").strip()
         path = doc.get("category_path") or []
+        # Written in the same partial update, never in a second pass: an index
+        # holding the addresses but not the primary cannot render "one address
+        # plus also categorized as …", and the two arriving separately would
+        # leave a window where the document disagrees with itself.
+        primary = doc.get("category_path_primary") or []
         if not gtin:
             continue
         if not path:
@@ -246,7 +256,11 @@ def inject(
             # index says exactly what this extract says.
             outcome.empty_overwritten += 1
         batch.append(json.dumps({"update": {"_id": gtin, "_index": index}}))
-        batch.append(json.dumps({"doc": {"category_path": path}}))
+        batch.append(
+            json.dumps(
+                {"doc": {"category_path": path, "category_path_primary": primary}}
+            )
+        )
         outcome.sent += 1
         if len(batch) >= batch_size * 2:
             flush()

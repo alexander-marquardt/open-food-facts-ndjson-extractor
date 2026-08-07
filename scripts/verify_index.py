@@ -230,8 +230,25 @@ CHUNK = 1 << 22
 READ_ONLY_ENDPOINTS = frozenset({"_search", "_count", "_mapping", "_settings"})
 
 # Enough for every catalog built here (the largest uses 16,743 distinct
-# ``taxonomy_tags`` values) with room to spare, and saturation escalates rather than
+# ``taxonomy_tags`` values, and 14,847 distinct ``category_path`` values once the
+# source DAG's alternate addresses are emitted — up from 5,582 while each product
+# had one address) with room to spare, and saturation escalates rather than
 # truncates, so this is a performance knob and not a correctness one.
+#
+# Those two counts are measurements of *particular builds*, not ceilings: they
+# were taken over the whole dump under the ``fr`` catalog's membership rules, and
+# a run that keeps more products reaches more distinct paths. Do not read 14,847
+# as a bound. The bound that does hold comes from the taxonomy: every emitted
+# path is a prefix of some address of a node the language filter makes eligible,
+# which is 21,655 distinct path strings for ``en``, 22,296 for ``es`` and 27,696
+# for ``fr`` over the pinned snapshot (see the README's "Canonical parents and
+# the tie-break" for the command that recomputes them). 30,000 clears all three,
+# which is why this value is safe rather than lucky.
+#
+# Any *other* consumer sizing a ``category_path`` aggregation has to be
+# re-checked against the ceiling for its locale, not against a build's count: one
+# still sized for the collapsed cardinality truncates silently, and a truncated
+# facet lies.
 DEFAULT_TERMS_SIZE = 30000
 COMPOSITE_PAGE = 10000
 

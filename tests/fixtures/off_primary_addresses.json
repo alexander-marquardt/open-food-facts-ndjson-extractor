@@ -1,0 +1,6420 @@
+{
+ "_provenance": {
+  "taxonomy": "Open Food Facts categories.json, pinned snapshot sha256 74717ecc001cf8661f6ec0bb3fc8c7a0cf317a6355a245004e892348fe575ec5",
+  "taxonomy_slice": "ancestor closure of the sampled products' tags over the full parents DAG; nodes carry parents verbatim and the name keys display_label can read for en/es/fr (lang, en, xx)",
+  "products": "first 500000 lines of the Open Food Facts products JSONL export, evenly spaced across every line carrying a code and a categories_tags list whose every tag is a taxonomy node",
+  "expected_primary": "produced by src/off_demo_extract/taxonomy.py's build_category_path as of commit a19d04b, the last commit before a product could hold more than one address",
+  "category_exclude": "empty, as the extractor's builds pass none"
+ },
+ "taxonomy": {
+  "en:alcoholic-beverages": {
+   "parents": [
+    "en:beverages"
+   ],
+   "name": {
+    "en": "Alcoholic beverages",
+    "es": "Bebidas alcohólicas",
+    "fr": "Boissons alcoolisées"
+   }
+  },
+  "en:almond-oils": {
+   "parents": [
+    "en:nut-oils"
+   ],
+   "name": {
+    "en": "Almond oils",
+    "es": "Aceites de almendras",
+    "fr": "Huiles d'amande"
+   }
+  },
+  "en:anchovy": {
+   "parents": [
+    "en:fatty-fishes",
+    "en:fishes"
+   ],
+   "name": {
+    "en": "Anchovy",
+    "es": "Anchoa",
+    "fr": "Anchois"
+   }
+  },
+  "en:anchovy-fillets": {
+   "parents": [
+    "en:anchovy",
+    "en:fish-fillets"
+   ],
+   "name": {
+    "en": "Anchovy fillets",
+    "es": "Filetes de anchoa",
+    "fr": "Filets d'anchois"
+   }
+  },
+  "en:animal-fats": {
+   "parents": [
+    "en:fats"
+   ],
+   "name": {
+    "en": "Animal fats",
+    "es": "Grasas animales",
+    "fr": "Matières grasses animales"
+   }
+  },
+  "en:appetizers": {
+   "parents": [
+    "en:salty-snacks"
+   ],
+   "name": {
+    "en": "Appetizers",
+    "es": "Aperitivos",
+    "fr": "Amuse-gueules"
+   }
+  },
+  "en:apple-compotes": {
+   "parents": [
+    "en:compotes"
+   ],
+   "name": {
+    "en": "Apple compotes",
+    "es": "Compotas de manzana",
+    "fr": "Compotes de pomme"
+   }
+  },
+  "en:apple-juices": {
+   "parents": [
+    "en:fruit-juices",
+    "en:unsweetened-beverages"
+   ],
+   "name": {
+    "en": "Apple juices",
+    "es": "Zumos de manzana",
+    "fr": "Jus de pomme"
+   }
+  },
+  "en:applesauces": {
+   "parents": [
+    "en:apple-compotes"
+   ],
+   "name": {
+    "en": "Applesauces",
+    "fr": "Compotes pommes nature"
+   }
+  },
+  "en:apricot-jams": {
+   "parents": [
+    "en:jams"
+   ],
+   "name": {
+    "en": "Apricot jams",
+    "es": "Confituras de albaricoque",
+    "fr": "Confitures d'abricot"
+   }
+  },
+  "en:asparagus": {
+   "parents": [
+    "en:vegetable-rods"
+   ],
+   "name": {
+    "en": "Asparagus",
+    "es": "Espárragos",
+    "fr": "Asperges"
+   }
+  },
+  "en:avocados": {
+   "parents": [
+    "en:tropical-fruits"
+   ],
+   "name": {
+    "en": "Avocados",
+    "es": "Aguacates",
+    "fr": "Avocats"
+   }
+  },
+  "en:bee-products": {
+   "parents": [],
+   "name": {
+    "en": "Bee products",
+    "es": "Productos apícolas",
+    "fr": "Produits de la ruche"
+   }
+  },
+  "en:beers": {
+   "parents": [
+    "en:alcoholic-beverages"
+   ],
+   "name": {
+    "en": "Beers",
+    "es": "Cervezas",
+    "fr": "Bières"
+   }
+  },
+  "en:beverage-preparations": {
+   "parents": [
+    "en:beverages-and-beverages-preparations"
+   ],
+   "name": {
+    "en": "Beverage preparations",
+    "es": "Preparaciones de bebidas",
+    "fr": "Préparations pour boissons"
+   }
+  },
+  "en:beverages": {
+   "parents": [
+    "en:beverages-and-beverages-preparations"
+   ],
+   "name": {
+    "en": "Beverages",
+    "es": "Bebidas",
+    "fr": "Boissons"
+   }
+  },
+  "en:beverages-and-beverages-preparations": {
+   "parents": [],
+   "name": {
+    "en": "Beverages and beverages preparations",
+    "es": "Bebidas y preparaciones de bebidas",
+    "fr": "Boissons et préparations de boissons"
+   }
+  },
+  "en:bifidus-yogurts": {
+   "parents": [
+    "en:fermented-dairy-desserts"
+   ],
+   "name": {
+    "en": "Bifidus yogurts",
+    "es": "Yogures bifidus",
+    "fr": "Yaourts au Bifidus"
+   }
+  },
+  "en:biscuits": {
+   "parents": [
+    "en:biscuits-and-cakes",
+    "en:biscuits-and-crackers"
+   ],
+   "name": {
+    "en": "Biscuits",
+    "es": "Galletas",
+    "fr": "biscuits"
+   }
+  },
+  "en:biscuits-and-cakes": {
+   "parents": [
+    "en:sweet-snacks"
+   ],
+   "name": {
+    "en": "Biscuits and cakes",
+    "es": "Galletas y pasteles",
+    "fr": "Biscuits et gâteaux"
+   }
+  },
+  "en:biscuits-and-crackers": {
+   "parents": [],
+   "name": {
+    "en": "Biscuits and crackers",
+    "fr": "Biscuits sucrés & biscuits apéritifs"
+   }
+  },
+  "en:black-tapenades": {
+   "parents": [
+    "en:tapenades"
+   ],
+   "name": {
+    "en": "Black tapenades",
+    "fr": "Tapenades noires"
+   }
+  },
+  "en:breads": {
+   "parents": [
+    "en:cereals-and-their-products"
+   ],
+   "name": {
+    "en": "Breads",
+    "es": "Panes",
+    "fr": "Pains"
+   }
+  },
+  "en:breakfast-cereals": {
+   "parents": [
+    "en:breakfasts",
+    "en:cereals-and-their-products"
+   ],
+   "name": {
+    "en": "Breakfast cereals",
+    "es": "Cereales para el desayuno",
+    "fr": "Céréales pour petit-déjeuner"
+   }
+  },
+  "en:breakfast-cereals-rich-in-fibre": {
+   "parents": [
+    "en:breakfast-cereals"
+   ],
+   "name": {
+    "en": "Breakfast cereals rich in fibre",
+    "fr": "Céréales pour petit déjeuner riches en fibres"
+   }
+  },
+  "en:breakfasts": {
+   "parents": [],
+   "name": {
+    "en": "Breakfasts",
+    "es": "Desayunos",
+    "fr": "Petit-déjeuners"
+   }
+  },
+  "en:bulk": {
+   "parents": [],
+   "name": {
+    "en": "Bulk",
+    "fr": "Vrac"
+   }
+  },
+  "en:butters": {
+   "parents": [
+    "en:animal-fats",
+    "en:dairy-spreads",
+    "en:milkfat"
+   ],
+   "name": {
+    "en": "Butters",
+    "es": "Mantequillas",
+    "fr": "Beurres"
+   }
+  },
+  "en:caen-style-tripes": {
+   "parents": [
+    "en:specialty-made-with-tripe"
+   ],
+   "name": {
+    "en": "Caen-style tripes",
+    "fr": "Tripes à la mode de Caen"
+   }
+  },
+  "en:cakes": {
+   "parents": [
+    "en:biscuits-and-cakes"
+   ],
+   "name": {
+    "en": "Cakes",
+    "es": "Pasteles",
+    "fr": "gâteaux"
+   }
+  },
+  "en:canned-asparagus": {
+   "parents": [
+    "en:asparagus",
+    "en:canned-vegetables"
+   ],
+   "name": {
+    "en": "Canned asparagus",
+    "es": "Espárragos en conserva",
+    "fr": "Asperges en conserve"
+   }
+  },
+  "en:canned-foods": {
+   "parents": [],
+   "name": {
+    "en": "Canned foods",
+    "es": "Conservas",
+    "fr": "Conserves"
+   }
+  },
+  "en:canned-legumes": {
+   "parents": [
+    "en:canned-plant-based-foods",
+    "en:legumes"
+   ],
+   "name": {
+    "en": "Canned legumes",
+    "es": "Leguminosas en conserva",
+    "fr": "Légumineuses en conserve"
+   }
+  },
+  "en:canned-meals": {
+   "parents": [
+    "en:canned-foods",
+    "en:meals"
+   ],
+   "name": {
+    "en": "Canned meals",
+    "es": "Comidas preparadas en conserva",
+    "fr": "Plats préparés en conserve"
+   }
+  },
+  "en:canned-mussels": {
+   "parents": [
+    "en:canned-foods",
+    "en:mussels"
+   ],
+   "name": {
+    "en": "Canned mussels",
+    "es": "Mejillones enlatados",
+    "fr": "Moules en conserve"
+   }
+  },
+  "en:canned-peas-and-carrots": {
+   "parents": [
+    "en:canned-vegetables"
+   ],
+   "name": {
+    "en": "Canned peas and carrots",
+    "es": "Guisantes y zanahorias en conserva",
+    "fr": "Petits pois et carottes en conserve"
+   }
+  },
+  "en:canned-plant-based-foods": {
+   "parents": [
+    "en:canned-foods",
+    "en:plant-based-foods"
+   ],
+   "name": {
+    "en": "Canned plant-based foods",
+    "es": "Alimentos de origen vegetal en conserva",
+    "fr": "Aliments à base de plantes en conserve"
+   }
+  },
+  "en:canned-soups": {
+   "parents": [
+    "en:canned-meals",
+    "en:soups"
+   ],
+   "name": {
+    "en": "Canned soups",
+    "es": "Sopas en conserva",
+    "fr": "Soupes en conserve"
+   }
+  },
+  "en:canned-vegetables": {
+   "parents": [
+    "en:canned-plant-based-foods",
+    "en:vegetables-based-foods"
+   ],
+   "name": {
+    "en": "Canned vegetables",
+    "es": "Verduras y hortalizas en conserva",
+    "fr": "Légumes en conserve"
+   }
+  },
+  "en:canned-white-asparagus": {
+   "parents": [
+    "en:canned-asparagus",
+    "en:white-asparagus"
+   ],
+   "name": {
+    "en": "Canned white asparagus",
+    "es": "Espárragos blancos en conserva",
+    "fr": "Asperges blanches en conserve"
+   }
+  },
+  "en:carbonated-drinks": {
+   "parents": [
+    "en:beverages"
+   ],
+   "name": {
+    "en": "Carbonated drinks",
+    "es": "Bebidas carbonatadas",
+    "fr": "Boissons gazeuses"
+   }
+  },
+  "en:cashew-nuts": {
+   "parents": [
+    "en:nuts"
+   ],
+   "name": {
+    "en": "Cashew nuts",
+    "es": "Anacardos",
+    "fr": "Noix de cajou"
+   }
+  },
+  "en:cereal-flakes": {
+   "parents": [
+    "en:breakfast-cereals",
+    "en:flakes"
+   ],
+   "name": {
+    "en": "Cereal flakes",
+    "es": "Copos de cereales",
+    "fr": "Flocons de céréales"
+   }
+  },
+  "en:cereal-grains": {
+   "parents": [
+    "en:cereals-and-their-products",
+    "en:seeds"
+   ],
+   "name": {
+    "en": "Cereal grains",
+    "es": "Cereales en grano",
+    "fr": "Céréales en grains"
+   }
+  },
+  "en:cereal-semolinas": {
+   "parents": [
+    "en:cereals-and-their-products"
+   ],
+   "name": {
+    "en": "Cereal semolinas",
+    "es": "Sémolas y semolinas de cereales",
+    "fr": "Semoules de céréales"
+   }
+  },
+  "en:cereals-and-potatoes": {
+   "parents": [
+    "en:plant-based-foods"
+   ],
+   "name": {
+    "en": "Cereals and potatoes",
+    "es": "Cereales y patatas",
+    "fr": "Céréales et pommes de terre"
+   }
+  },
+  "en:cereals-and-their-products": {
+   "parents": [
+    "en:cereals-and-potatoes"
+   ],
+   "name": {
+    "en": "Cereals and their products",
+    "es": "Cereales y derivados",
+    "fr": "Céréales et dérivés"
+   }
+  },
+  "en:cheeses": {
+   "parents": [
+    "en:fermented-milk-products"
+   ],
+   "name": {
+    "en": "Cheeses",
+    "es": "Quesos",
+    "fr": "Fromages"
+   }
+  },
+  "en:chia": {
+   "parents": [
+    "en:seeds"
+   ],
+   "name": {
+    "en": "Chia",
+    "es": "Semillas de chía",
+    "fr": "Chia",
+    "xx": "Chia"
+   }
+  },
+  "en:chicken-and-its-products": {
+   "parents": [
+    "en:meats-and-their-products"
+   ],
+   "name": {
+    "en": "Chicken and its products",
+    "es": "Pollo y sus productos",
+    "fr": "Poulet et dérivés"
+   }
+  },
+  "en:chicken-breasts": {
+   "parents": [
+    "en:chickens"
+   ],
+   "name": {
+    "en": "Chicken breasts",
+    "es": "Pechugas de pollo",
+    "fr": "Filets de poulet"
+   }
+  },
+  "en:chicken-risottos": {
+   "parents": [
+    "en:meals-with-chicken",
+    "en:risottos"
+   ],
+   "name": {
+    "en": "Chicken risottos",
+    "fr": "Risottos au poulet"
+   }
+  },
+  "en:chicken-wraps": {
+   "parents": [
+    "en:wraps"
+   ],
+   "name": {
+    "en": "Chicken wraps",
+    "es": "Wraps de pollo",
+    "fr": "Wraps au poulet"
+   }
+  },
+  "en:chickens": {
+   "parents": [
+    "en:chicken-and-its-products",
+    "en:poultries"
+   ],
+   "name": {
+    "en": "Chickens",
+    "es": "pollo",
+    "fr": "Poulets"
+   }
+  },
+  "en:chips-and-fries": {
+   "parents": [],
+   "name": {
+    "en": "Chips and fries",
+    "fr": "Chips et frites"
+   }
+  },
+  "en:chocolate-cakes": {
+   "parents": [
+    "en:cakes"
+   ],
+   "name": {
+    "en": "Chocolate cakes",
+    "es": "Pasteles de chocolate",
+    "fr": "Gâteaux au chocolat"
+   }
+  },
+  "en:chocolate-spreads": {
+   "parents": [
+    "en:sweet-spreads",
+    "fr:pates-a-tartiner"
+   ],
+   "name": {
+    "en": "Chocolate spreads",
+    "es": "Cremas de chocolate",
+    "fr": "Pâtes à tartiner au chocolat"
+   }
+  },
+  "en:chocolates": {
+   "parents": [
+    "en:cocoa-and-its-products",
+    "en:sweet-snacks"
+   ],
+   "name": {
+    "en": "Chocolates",
+    "es": "Chocolates",
+    "fr": "Chocolats"
+   }
+  },
+  "en:chorizo": {
+   "parents": [
+    "en:cured-sausages"
+   ],
+   "name": {
+    "en": "chorizo",
+    "es": "chorizo",
+    "fr": "chorizo"
+   }
+  },
+  "en:cocoa-and-hazelnuts-spreads": {
+   "parents": [
+    "en:chocolate-spreads",
+    "en:hazelnut-spreads"
+   ],
+   "name": {
+    "en": "Cocoa and hazelnuts spreads",
+    "es": "Cremas de cacao y avellanas",
+    "fr": "Pâtes à tartiner aux noisettes et au cacao"
+   }
+  },
+  "en:cocoa-and-its-products": {
+   "parents": [],
+   "name": {
+    "en": "Cocoa and its products",
+    "es": "Cacao y sus productos",
+    "fr": "Cacao et dérivés"
+   }
+  },
+  "en:coconut-oils": {
+   "parents": [
+    "en:fruit-and-fruit-seed-oils"
+   ],
+   "name": {
+    "en": "Coconut oils",
+    "es": "Aceites de coco",
+    "fr": "Huiles de coco"
+   }
+  },
+  "en:combination-meals": {
+   "parents": [
+    "en:meals"
+   ],
+   "name": {
+    "en": "Combination Meals"
+   }
+  },
+  "en:common-beans": {
+   "parents": [
+    "en:pulses"
+   ],
+   "name": {
+    "en": "Common beans",
+    "es": "Alubias"
+   }
+  },
+  "en:compotes": {
+   "parents": [
+    "en:desserts",
+    "en:fruits-based-foods"
+   ],
+   "name": {
+    "en": "Compotes",
+    "es": "Compotas",
+    "fr": "Compotes"
+   }
+  },
+  "en:condiments": {
+   "parents": [],
+   "name": {
+    "en": "Condiments",
+    "es": "Condimentos",
+    "fr": "Condiments"
+   }
+  },
+  "en:confectioneries": {
+   "parents": [
+    "en:sweet-snacks"
+   ],
+   "name": {
+    "en": "Confectioneries",
+    "es": "Dulces",
+    "fr": "Confiseries"
+   }
+  },
+  "en:cooking-helpers": {
+   "parents": [],
+   "name": {
+    "en": "Cooking helpers",
+    "es": "Ayudas culinarias",
+    "fr": "Aides culinaires"
+   }
+  },
+  "en:country-style-pates": {
+   "parents": [
+    "en:pork-pates"
+   ],
+   "name": {
+    "en": "Country-style Pâtés",
+    "fr": "Pâtés de campagne"
+   }
+  },
+  "en:cow-cheeses": {
+   "parents": [
+    "en:cheeses"
+   ],
+   "name": {
+    "en": "Cow cheeses",
+    "es": "Quesos de vaca",
+    "fr": "Fromages de vache"
+   }
+  },
+  "en:cow-milks": {
+   "parents": [
+    "en:milks"
+   ],
+   "name": {
+    "en": "Cow milks",
+    "es": "Leche de vaca",
+    "fr": "Laits de vache"
+   }
+  },
+  "en:crackers-appetizers": {
+   "parents": [
+    "en:appetizers",
+    "en:biscuits-and-crackers"
+   ],
+   "name": {
+    "en": "Crackers (Appetizers)",
+    "es": "Crackers",
+    "fr": "Biscuits apéritifs"
+   }
+  },
+  "en:cream-of-vegetable-soups": {
+   "parents": [
+    "en:cream-soups",
+    "en:vegetable-soups"
+   ],
+   "name": {
+    "en": "Cream of vegetable soups",
+    "es": "Cremas de verduras y hortalizas",
+    "fr": "Veloutés de légumes"
+   }
+  },
+  "en:cream-soups": {
+   "parents": [
+    "en:soups"
+   ],
+   "name": {
+    "en": "Cream soups",
+    "es": "Sopas de tipo crema",
+    "fr": "Veloutés"
+   }
+  },
+  "en:creamer": {
+   "parents": [
+    "en:dairy-substitutes"
+   ],
+   "name": {
+    "en": "Creamer"
+   }
+  },
+  "en:crepes": {
+   "parents": [
+    "en:crepes-and-galettes"
+   ],
+   "name": {
+    "en": "Crêpes",
+    "es": "crepe",
+    "fr": "crêpes"
+   }
+  },
+  "en:crepes-and-galettes": {
+   "parents": [],
+   "name": {
+    "en": "Crêpes and galettes",
+    "es": "Crêpes y galettes",
+    "fr": "Crêpes et galettes"
+   }
+  },
+  "en:crisps": {
+   "parents": [
+    "en:appetizers",
+    "en:chips-and-fries"
+   ],
+   "name": {
+    "en": "Crisps",
+    "es": "Chips fritos",
+    "fr": "Chips"
+   }
+  },
+  "en:crustaceans": {
+   "parents": [
+    "en:seafood"
+   ],
+   "name": {
+    "en": "Crustaceans",
+    "es": "Crustáceos",
+    "fr": "Crustacés"
+   }
+  },
+  "en:cured-sausages": {
+   "parents": [
+    "en:prepared-meats"
+   ],
+   "name": {
+    "en": "Cured sausages",
+    "es": "Embutidos curados",
+    "fr": "Saucissons"
+   }
+  },
+  "en:dairies": {
+   "parents": [],
+   "name": {
+    "en": "Dairies",
+    "es": "Lácteos",
+    "fr": "Produits laitiers"
+   }
+  },
+  "en:dairy-desserts": {
+   "parents": [
+    "en:dairies",
+    "en:desserts"
+   ],
+   "name": {
+    "en": "Dairy desserts",
+    "es": "Postres lácteos",
+    "fr": "Desserts lactés"
+   }
+  },
+  "en:dairy-spreads": {
+   "parents": [
+    "en:spreads"
+   ],
+   "name": {
+    "en": "Dairy spreads",
+    "es": "La pasta de leche",
+    "fr": "Produits laitiers à tartiner"
+   }
+  },
+  "en:dairy-substitutes": {
+   "parents": [
+    "en:plant-based-foods-and-beverages"
+   ],
+   "name": {
+    "en": "Dairy substitutes",
+    "fr": "Substituts de produits laitiers"
+   }
+  },
+  "en:dark-chocolates": {
+   "parents": [
+    "en:chocolates"
+   ],
+   "name": {
+    "en": "Dark chocolates",
+    "es": "Chocolates negros",
+    "fr": "Chocolats noirs"
+   }
+  },
+  "en:dehydrated-beverages": {
+   "parents": [
+    "en:beverages",
+    "en:dried-products-to-be-rehydrated"
+   ],
+   "name": {
+    "en": "Dehydrated beverages",
+    "es": "Bebidas deshidratadas",
+    "fr": "Boissons lyophilisées"
+   }
+  },
+  "en:desserts": {
+   "parents": [],
+   "name": {
+    "en": "Desserts",
+    "es": "Postres",
+    "fr": "Desserts"
+   }
+  },
+  "en:dietary-supplements": {
+   "parents": [],
+   "name": {
+    "en": "Dietary supplements",
+    "es": "Suplementos dietéticos",
+    "fr": "Compléments alimentaires"
+   }
+  },
+  "en:dried-products": {
+   "parents": [],
+   "name": {
+    "en": "Dried products",
+    "es": "Productos deshidratados",
+    "fr": "Produits déshydratés"
+   }
+  },
+  "en:dried-products-to-be-rehydrated": {
+   "parents": [
+    "en:dried-products"
+   ],
+   "name": {
+    "en": "Dried products to be rehydrated",
+    "es": "Productos deshidratados para ser rehidratados",
+    "fr": "Produits lyophilisés à reconstituer"
+   }
+  },
+  "en:durum-wheat-semolinas": {
+   "parents": [
+    "en:wheat-semolinas"
+   ],
+   "name": {
+    "en": "Durum wheat semolinas",
+    "es": "Sémolas y semolinas de trigo duro",
+    "fr": "Semoules de blé dur"
+   }
+  },
+  "en:durum-wheat-semolinas-for-couscous": {
+   "parents": [
+    "en:durum-wheat-semolinas"
+   ],
+   "name": {
+    "en": "Durum wheat semolinas for couscous",
+    "es": "Sémolas de trigo duro para couscous",
+    "fr": "Semoules de blé dur pour couscous"
+   }
+  },
+  "en:esl-milks": {
+   "parents": [
+    "en:homogenized-milks"
+   ],
+   "name": {
+    "en": "ESL milks",
+    "fr": "Laits ESL"
+   }
+  },
+  "en:evaporated-milks": {
+   "parents": [
+    "en:dairies"
+   ],
+   "name": {
+    "en": "Evaporated milks",
+    "es": "Leches evaporadas",
+    "fr": "Laits concentrés"
+   }
+  },
+  "en:evaporated-milks-without-sugar": {
+   "parents": [
+    "en:evaporated-milks"
+   ],
+   "name": {
+    "en": "Evaporated milks without sugar",
+    "fr": "Laits concentrés non sucrés"
+   }
+  },
+  "en:extruded-flakes": {
+   "parents": [
+    "en:flakes"
+   ],
+   "name": {
+    "en": "Extruded flakes",
+    "fr": "Flocons extrudés"
+   }
+  },
+  "en:farming-products": {
+   "parents": [],
+   "name": {
+    "en": "Farming products",
+    "es": "Productos agrícolas",
+    "fr": "Produits d'élevages"
+   }
+  },
+  "en:fats": {
+   "parents": [],
+   "name": {
+    "en": "Fats",
+    "es": "Aceites y grasas",
+    "fr": "Matières grasses"
+   }
+  },
+  "en:fatty-fishes": {
+   "parents": [
+    "en:fishes"
+   ],
+   "name": {
+    "en": "Fatty fishes",
+    "fr": "Poissons gras"
+   }
+  },
+  "en:fermented-dairy-desserts": {
+   "parents": [
+    "en:dairy-desserts",
+    "en:fermented-milk-products"
+   ],
+   "name": {
+    "en": "Fermented dairy desserts",
+    "fr": "Desserts lactés fermentés"
+   }
+  },
+  "en:fermented-dairy-desserts-with-fruits": {
+   "parents": [
+    "en:fermented-dairy-desserts"
+   ],
+   "name": {
+    "en": "Fermented dairy desserts with fruits",
+    "fr": "Desserts lactés fermentés aux fruits"
+   }
+  },
+  "en:fermented-foods": {
+   "parents": [],
+   "name": {
+    "en": "Fermented foods",
+    "es": "Comidas fermentadas",
+    "fr": "Produits fermentés"
+   }
+  },
+  "en:fermented-milk-products": {
+   "parents": [
+    "en:dairies",
+    "en:fermented-foods"
+   ],
+   "name": {
+    "en": "Fermented milk products",
+    "es": "Productos fermentados de la leche",
+    "fr": "Produits laitiers fermentés"
+   }
+  },
+  "en:filled-cakes": {
+   "parents": [
+    "en:cakes"
+   ],
+   "name": {
+    "en": "Filled cakes",
+    "fr": "Gâteaux fourrés"
+   }
+  },
+  "en:fish-and-meat-and-eggs": {
+   "parents": [],
+   "name": {
+    "en": "Fish and meat and eggs",
+    "es": "Pescado carne y huevos",
+    "fr": "Poissons et viandes et oeufs"
+   }
+  },
+  "en:fish-fillets": {
+   "parents": [
+    "en:fishes"
+   ],
+   "name": {
+    "en": "Fish fillets",
+    "es": "Filetes de pescado",
+    "fr": "Filets de poissons"
+   }
+  },
+  "en:fishes": {
+   "parents": [
+    "en:fishes-and-their-products"
+   ],
+   "name": {
+    "en": "Fishes",
+    "es": "Pescados",
+    "fr": "Poissons"
+   }
+  },
+  "en:fishes-and-their-products": {
+   "parents": [
+    "en:seafood"
+   ],
+   "name": {
+    "en": "Fishes and their products",
+    "fr": "Poissons et dérivés"
+   }
+  },
+  "en:flakes": {
+   "parents": [
+    "en:plant-based-foods"
+   ],
+   "name": {
+    "en": "Flakes",
+    "es": "Copos",
+    "fr": "Flocons"
+   }
+  },
+  "en:flatbreads": {
+   "parents": [
+    "en:breads"
+   ],
+   "name": {
+    "en": "Flatbreads",
+    "es": "Panes planos",
+    "fr": "Pains plats"
+   }
+  },
+  "en:flavoured-bifidus-yogurts": {
+   "parents": [
+    "en:bifidus-yogurts"
+   ],
+   "name": {
+    "en": "Flavoured bifidus yogurts",
+    "fr": "Yaourts au bifidus aromatisés"
+   }
+  },
+  "en:flavoured-fermented-dairy-desserts": {
+   "parents": [
+    "en:fermented-dairy-desserts"
+   ],
+   "name": {
+    "en": "Flavoured fermented dairy desserts",
+    "fr": "Desserts lactés fermentés aromatisés"
+   }
+  },
+  "en:flavoured-yogurts": {
+   "parents": [
+    "en:flavoured-fermented-dairy-desserts",
+    "en:yogurts"
+   ],
+   "name": {
+    "en": "Flavoured yogurts",
+    "es": "Yogures de sabores",
+    "fr": "Yaourts aromatisés"
+   }
+  },
+  "en:flours": {
+   "parents": [
+    "en:plant-based-foods"
+   ],
+   "name": {
+    "en": "Flours",
+    "es": "Harinas de origen vegetal",
+    "fr": "Farines"
+   }
+  },
+  "en:foies-gras": {
+   "parents": [
+    "en:fish-and-meat-and-eggs"
+   ],
+   "name": {
+    "en": "Foies gras",
+    "es": "Foies gras",
+    "fr": "Foies gras"
+   }
+  },
+  "en:foies-gras-from-ducks": {
+   "parents": [
+    "en:foies-gras"
+   ],
+   "name": {
+    "en": "Foies gras from ducks",
+    "es": "Foies gras de patos",
+    "fr": "Foies gras de canard"
+   }
+  },
+  "en:foies-gras-pates": {
+   "parents": [
+    "en:foies-gras"
+   ],
+   "name": {
+    "en": "Foies gras pâtés",
+    "fr": "Pâtés de foie gras"
+   }
+  },
+  "en:french-butters": {
+   "parents": [
+    "en:butters"
+   ],
+   "name": {
+    "en": "French butters",
+    "fr": "Beurres français"
+   }
+  },
+  "en:french-cheeses": {
+   "parents": [
+    "en:cheeses"
+   ],
+   "name": {
+    "en": "French cheeses",
+    "es": "Quesos Franceses",
+    "fr": "Fromages de France"
+   }
+  },
+  "en:fresh-foods": {
+   "parents": [],
+   "name": {
+    "en": "Fresh foods",
+    "es": "Alimentos frescos",
+    "fr": "Frais"
+   }
+  },
+  "en:fresh-meats": {
+   "parents": [
+    "en:meats"
+   ],
+   "name": {
+    "en": "Fresh meats",
+    "es": "Carnes frías",
+    "fr": "Viandes fraîches"
+   }
+  },
+  "en:fresh-milks": {
+   "parents": [
+    "en:milks"
+   ],
+   "name": {
+    "en": "Fresh milks",
+    "es": "Leches frescas",
+    "fr": "Laits frais"
+   }
+  },
+  "en:frozen-desserts": {
+   "parents": [
+    "en:desserts",
+    "en:frozen-foods"
+   ],
+   "name": {
+    "en": "Frozen desserts",
+    "es": "Postres helados",
+    "fr": "Desserts glacés"
+   }
+  },
+  "en:frozen-foods": {
+   "parents": [],
+   "name": {
+    "en": "Frozen foods",
+    "es": "Congelados",
+    "fr": "Surgelés"
+   }
+  },
+  "en:frozen-plant-based-foods": {
+   "parents": [
+    "en:frozen-foods",
+    "en:plant-based-foods"
+   ],
+   "name": {
+    "en": "Frozen plant-based foods",
+    "es": "Alimentos de origen vegetal congelados",
+    "fr": "Aliments à base de plantes surgelés"
+   }
+  },
+  "en:frozen-ready-made-meals": {
+   "parents": [
+    "en:combination-meals",
+    "en:frozen-foods",
+    "en:meals"
+   ],
+   "name": {
+    "en": "Frozen ready-made meals",
+    "es": "Comidas preparadas congeladas",
+    "fr": "Plats préparés surgelés"
+   }
+  },
+  "en:frozen-soups": {
+   "parents": [
+    "en:frozen-ready-made-meals",
+    "en:soups"
+   ],
+   "name": {
+    "en": "Frozen soups",
+    "es": "Sopas congeladas",
+    "fr": "Soupes surgelées"
+   }
+  },
+  "en:frozen-vegetable-soups": {
+   "parents": [
+    "en:frozen-soups",
+    "en:vegetable-soups"
+   ],
+   "name": {
+    "en": "Frozen vegetable soups",
+    "es": "Sopas de verduras y hortalizas congeladas",
+    "fr": "Soupes de légumes surgelées"
+   }
+  },
+  "en:frozen-vegetables": {
+   "parents": [
+    "en:frozen-plant-based-foods",
+    "en:vegetables-based-foods"
+   ],
+   "name": {
+    "en": "Frozen vegetables",
+    "es": "Verduras y hortalizas congeladas",
+    "fr": "Légumes surgelés"
+   }
+  },
+  "en:fruit-and-fruit-seed-oils": {
+   "parents": [
+    "en:vegetable-oils"
+   ],
+   "name": {
+    "en": "Fruit and fruit seed oils",
+    "es": "Aceites de frutas y semillas de frutas",
+    "fr": "Huiles de fruits et graines de fruits"
+   }
+  },
+  "en:fruit-and-vegetable-preserves": {
+   "parents": [
+    "en:plant-based-spreads",
+    "en:sweet-spreads"
+   ],
+   "name": {
+    "en": "Fruit and vegetable preserves",
+    "es": "Preparaciones a base de frutas y verduras",
+    "fr": "Confitures et marmelades"
+   }
+  },
+  "en:fruit-based-beverages": {
+   "parents": [
+    "en:plant-based-beverages"
+   ],
+   "name": {
+    "en": "Fruit-based beverages",
+    "es": "Bebidas a base de frutas",
+    "fr": "Boissons aux fruits"
+   }
+  },
+  "en:fruit-juices": {
+   "parents": [
+    "en:fruit-based-beverages",
+    "en:juices-and-nectars"
+   ],
+   "name": {
+    "en": "Fruit juices",
+    "es": "Zumos de frutas",
+    "fr": "Jus de fruits"
+   }
+  },
+  "en:fruit-teas": {
+   "parents": [
+    "en:herbal-teas"
+   ],
+   "name": {
+    "en": "Fruit teas",
+    "es": "Infusiones con frutas",
+    "fr": "Infusions aux fruits"
+   }
+  },
+  "en:fruits": {
+   "parents": [
+    "en:fruits-based-foods"
+   ],
+   "name": {
+    "en": "Fruits",
+    "es": "Frutas",
+    "fr": "Fruits"
+   }
+  },
+  "en:fruits-and-vegetables-based-foods": {
+   "parents": [
+    "en:plant-based-foods"
+   ],
+   "name": {
+    "en": "Fruits and vegetables based foods",
+    "es": "Frutas y verduras y sus productos",
+    "fr": "Aliments à base de fruits et de légumes"
+   }
+  },
+  "en:fruits-based-foods": {
+   "parents": [
+    "en:fruits-and-vegetables-based-foods"
+   ],
+   "name": {
+    "en": "Fruits based foods",
+    "es": "Frutas y sus productos",
+    "fr": "Fruits et produits dérivés"
+   }
+  },
+  "en:ginger-beer": {
+   "parents": [
+    "en:non-alcoholic-beers"
+   ],
+   "name": {
+    "en": "Ginger beer",
+    "fr": "Bière de gingembre"
+   }
+  },
+  "en:gingerbreads": {
+   "parents": [
+    "en:biscuits-and-cakes"
+   ],
+   "name": {
+    "en": "Gingerbreads",
+    "fr": "Pains d'épices"
+   }
+  },
+  "en:grated-cheese": {
+   "parents": [
+    "en:cheeses"
+   ],
+   "name": {
+    "en": "Grated cheese",
+    "es": "Queso rallado",
+    "fr": "Fromages râpés"
+   }
+  },
+  "en:green-peas": {
+   "parents": [
+    "en:legumes",
+    "en:vegetables"
+   ],
+   "name": {
+    "en": "Green peas",
+    "es": "Guisantes verdes",
+    "fr": "Petits pois"
+   }
+  },
+  "en:green-tapenades": {
+   "parents": [
+    "en:tapenades"
+   ],
+   "name": {
+    "en": "Green tapenades",
+    "fr": "Tapenades vertes"
+   }
+  },
+  "en:hamburger-buns": {
+   "parents": [
+    "en:special-breads"
+   ],
+   "name": {
+    "en": "Hamburger buns",
+    "es": "Panes para hamburguesas",
+    "fr": "Pains Burger"
+   }
+  },
+  "en:hams": {
+   "parents": [
+    "en:prepared-meats"
+   ],
+   "name": {
+    "en": "Hams",
+    "es": "jamón",
+    "fr": "Jambons"
+   }
+  },
+  "en:hazelnut-spreads": {
+   "parents": [
+    "en:sweet-spreads",
+    "fr:pates-a-tartiner"
+   ],
+   "name": {
+    "en": "Hazelnut spreads",
+    "es": "Cremas a base de avellanas",
+    "fr": "Pâtes à tartiner aux noisettes"
+   }
+  },
+  "en:herbal-teas": {
+   "parents": [
+    "en:beverage-preparations"
+   ],
+   "name": {
+    "en": "Herbal teas",
+    "es": "Plantas para infusiones",
+    "fr": "Infusions"
+   }
+  },
+  "en:homogenized-milks": {
+   "parents": [
+    "en:milks"
+   ],
+   "name": {
+    "en": "Homogenized milks",
+    "es": "Leches homogeneizadas",
+    "fr": "Laits homogénéisés"
+   }
+  },
+  "en:honeys": {
+   "parents": [
+    "en:bee-products",
+    "en:farming-products",
+    "en:sweet-spreads",
+    "en:sweeteners"
+   ],
+   "name": {
+    "en": "Honeys",
+    "es": "Mieles",
+    "fr": "Miels"
+   }
+  },
+  "en:hot-beverages": {
+   "parents": [
+    "en:beverages"
+   ],
+   "name": {
+    "en": "Hot beverages",
+    "es": "Bebidas para tomar calientes",
+    "fr": "Boissons chaudes"
+   }
+  },
+  "en:ice-cream-tubs": {
+   "parents": [
+    "en:ice-creams"
+   ],
+   "name": {
+    "en": "Ice cream tubs",
+    "es": "Tarrinas y bloques de helado",
+    "fr": "Crèmes glacées en pot"
+   }
+  },
+  "en:ice-creams": {
+   "parents": [
+    "en:ice-creams-and-sorbets"
+   ],
+   "name": {
+    "en": "ice creams",
+    "es": "helado",
+    "fr": "glaces"
+   }
+  },
+  "en:ice-creams-and-sorbets": {
+   "parents": [
+    "en:frozen-desserts"
+   ],
+   "name": {
+    "en": "Ice creams and sorbets",
+    "es": "Helados y sorbetes",
+    "fr": "Glaces et sorbets"
+   }
+  },
+  "en:italian-cheeses": {
+   "parents": [
+    "en:cheeses"
+   ],
+   "name": {
+    "en": "Italian cheeses",
+    "es": "Quesos italianos",
+    "fr": "Fromages italiens"
+   }
+  },
+  "en:jams": {
+   "parents": [
+    "en:fruit-and-vegetable-preserves"
+   ],
+   "name": {
+    "en": "Jams",
+    "es": "Confitura",
+    "fr": "Confitures"
+   }
+  },
+  "en:juices-and-nectars": {
+   "parents": [
+    "en:plant-based-beverages"
+   ],
+   "name": {
+    "en": "Juices and nectars",
+    "es": "Zumos y néctares",
+    "fr": "Jus et nectars"
+   }
+  },
+  "en:legume-flours": {
+   "parents": [
+    "en:flours",
+    "en:legumes-and-their-products"
+   ],
+   "name": {
+    "en": "Legume flours",
+    "es": "Harinas de leguminosas",
+    "fr": "Farines de légumineuses"
+   }
+  },
+  "en:legume-seeds": {
+   "parents": [
+    "en:legumes",
+    "en:seeds"
+   ],
+   "name": {
+    "en": "Legume seeds",
+    "es": "Granos de leguminosas",
+    "fr": "Graines de légumineuses"
+   }
+  },
+  "en:legumes": {
+   "parents": [
+    "en:legumes-and-their-products"
+   ],
+   "name": {
+    "en": "Legumes",
+    "es": "Leguminosas",
+    "fr": "Légumineuses"
+   }
+  },
+  "en:legumes-and-their-products": {
+   "parents": [
+    "en:plant-based-foods"
+   ],
+   "name": {
+    "en": "Legumes and their products",
+    "es": "Leguminosas y derivados",
+    "fr": "Légumineuses et dérivés"
+   }
+  },
+  "en:liver-pates": {
+   "parents": [
+    "en:pate"
+   ],
+   "name": {
+    "en": "Liver Pâtés",
+    "fr": "Pâtés de foie"
+   }
+  },
+  "en:mackerel-fillets": {
+   "parents": [
+    "en:fish-fillets",
+    "en:mackerels"
+   ],
+   "name": {
+    "en": "Mackerel fillets",
+    "es": "Filetes De Caballa",
+    "fr": "Filets de maquereaux"
+   }
+  },
+  "en:mackerel-fillets-in-escabeche": {
+   "parents": [
+    "en:mackerel-fillets"
+   ],
+   "name": {
+    "en": "Mackerel fillets in escabeche",
+    "fr": "Filets de maquereaux à l'escabeche"
+   }
+  },
+  "en:mackerels": {
+   "parents": [
+    "en:fatty-fishes",
+    "en:fishes"
+   ],
+   "name": {
+    "en": "Mackerels",
+    "es": "Caballa",
+    "fr": "Maquereaux"
+   }
+  },
+  "en:manchego": {
+   "parents": [
+    "en:sheep-s-milk-cheeses",
+    "en:spanish-cheeses"
+   ],
+   "name": {
+    "en": "Manchego",
+    "es": "Manchego",
+    "fr": "Manchego",
+    "xx": "Manchego"
+   }
+  },
+  "en:maple-syrups": {
+   "parents": [
+    "en:simple-syrups"
+   ],
+   "name": {
+    "en": "Maple syrups",
+    "es": "Siropes de arce",
+    "fr": "Sirops d'érable"
+   }
+  },
+  "en:marble-cakes": {
+   "parents": [
+    "en:cakes"
+   ],
+   "name": {
+    "en": "Marble cakes",
+    "fr": "Gâteaux marbrés"
+   }
+  },
+  "en:marinated-anchovy-fillets": {
+   "parents": [
+    "en:anchovy-fillets"
+   ],
+   "name": {
+    "en": "Marinated anchovy fillets",
+    "fr": "Filets d'anchois marinés"
+   }
+  },
+  "en:marinated-anchovy-fillets-with-vegetable-oil": {
+   "parents": [
+    "en:marinated-anchovy-fillets"
+   ],
+   "name": {
+    "en": "Marinated anchovy fillets with vegetable oil",
+    "fr": "Filets d'anchois marinés à l'huile végétale"
+   }
+  },
+  "en:maroilles": {
+   "parents": [
+    "en:cow-cheeses",
+    "en:french-cheeses"
+   ],
+   "name": {
+    "en": "Maroilles",
+    "fr": "Maroilles"
+   }
+  },
+  "en:meals": {
+   "parents": [],
+   "name": {
+    "en": "Meals",
+    "es": "Comidas preparadas",
+    "fr": "Plats préparés"
+   }
+  },
+  "en:meals-with-chicken": {
+   "parents": [
+    "en:poultry-meals"
+   ],
+   "name": {
+    "en": "Meals with chicken",
+    "es": "Comidas con pollo",
+    "fr": "Plats au poulet"
+   }
+  },
+  "en:meals-with-meat": {
+   "parents": [
+    "en:meals"
+   ],
+   "name": {
+    "en": "Meals with meat",
+    "es": "Comidas con carne",
+    "fr": "Plats préparés à la viande"
+   }
+  },
+  "en:meats": {
+   "parents": [
+    "en:meats-and-their-products"
+   ],
+   "name": {
+    "en": "Meats",
+    "es": "Carnes",
+    "fr": "Viandes"
+   }
+  },
+  "en:meats-and-their-products": {
+   "parents": [],
+   "name": {
+    "en": "Meats and their products",
+    "es": "Productos a base de carne",
+    "fr": "Viandes et dérivés"
+   }
+  },
+  "en:milk-bread-rolls": {
+   "parents": [
+    "en:viennoiseries"
+   ],
+   "name": {
+    "en": "Milk bread rolls",
+    "es": "Panes de leche",
+    "fr": "Pains au lait"
+   }
+  },
+  "en:milk-substitutes": {
+   "parents": [
+    "en:dairy-substitutes"
+   ],
+   "name": {
+    "en": "Milk substitutes",
+    "es": "Sustitutos de la leche",
+    "fr": "Substituts du lait"
+   }
+  },
+  "en:milkfat": {
+   "parents": [
+    "en:dairies",
+    "en:spreadable-fats"
+   ],
+   "name": {
+    "en": "Milkfat",
+    "es": "Grasas de la leche",
+    "fr": "Matière grasse laitière"
+   }
+  },
+  "en:milks": {
+   "parents": [
+    "en:milks-liquid-and-powder"
+   ],
+   "name": {
+    "en": "Milks",
+    "es": "Leches",
+    "fr": "Laits"
+   }
+  },
+  "en:milks-liquid-and-powder": {
+   "parents": [
+    "en:dairies"
+   ],
+   "name": {
+    "en": "Milks (liquid and powder)",
+    "fr": "Laits (fluide et poudre)"
+   }
+  },
+  "en:mollusc": {
+   "parents": [
+    "en:seafood"
+   ],
+   "name": {
+    "en": "Mollusc",
+    "es": "Molusco",
+    "fr": "Mollusques"
+   }
+  },
+  "en:mussels": {
+   "parents": [
+    "en:mollusc"
+   ],
+   "name": {
+    "en": "Mussels",
+    "es": "Mejillones",
+    "fr": "Moules"
+   }
+  },
+  "en:mussels-with-escabeche": {
+   "parents": [
+    "en:canned-mussels"
+   ],
+   "name": {
+    "en": "Mussels with escabeche",
+    "es": "Mejillones en escabeche",
+    "fr": "Moules à l'escabèche"
+   }
+  },
+  "en:non-alcoholic-beers": {
+   "parents": [
+    "en:non-alcoholic-beverages"
+   ],
+   "name": {
+    "en": "Non-alcoholic beers",
+    "es": "Cervezas sin alcohol",
+    "fr": "Bières sans alcool"
+   }
+  },
+  "en:non-alcoholic-beverages": {
+   "parents": [
+    "en:beverages"
+   ],
+   "name": {
+    "en": "Non-alcoholic beverages",
+    "es": "Bebidas no alcohólicas",
+    "fr": "Boissons sans alcool"
+   }
+  },
+  "en:nut-oils": {
+   "parents": [
+    "en:nuts-and-their-products",
+    "en:vegetable-oils"
+   ],
+   "name": {
+    "en": "Nut oils",
+    "es": "Aceites de frutos de cáscara",
+    "fr": "Huiles de fruits à coques"
+   }
+  },
+  "en:nuts": {
+   "parents": [
+    "en:nuts-and-their-products"
+   ],
+   "name": {
+    "en": "Nuts",
+    "es": "Frutos de cáscara",
+    "fr": "Fruits à coques"
+   }
+  },
+  "en:nuts-and-their-products": {
+   "parents": [
+    "en:plant-based-foods"
+   ],
+   "name": {
+    "en": "Nuts and their products",
+    "es": "Frutos de cáscara y derivados",
+    "fr": "Fruits à coques et dérivés"
+   }
+  },
+  "en:offals": {
+   "parents": [
+    "en:fish-and-meat-and-eggs"
+   ],
+   "name": {
+    "en": "Offals",
+    "fr": "Abats"
+   }
+  },
+  "en:parmigiano-reggiano": {
+   "parents": [
+    "en:italian-cheeses"
+   ],
+   "name": {
+    "en": "Parmigiano-Reggiano",
+    "es": "Parmigiano-Reggiano",
+    "fr": "Parmigiano Reggiano",
+    "xx": "Parmigiano Reggiano"
+   }
+  },
+  "en:pasteurised-milks": {
+   "parents": [
+    "en:milks",
+    "en:pasteurised-products"
+   ],
+   "name": {
+    "en": "Pasteurised milks",
+    "es": "Leches pasteurizadas",
+    "fr": "Laits pasteurisés"
+   }
+  },
+  "en:pasteurised-products": {
+   "parents": [],
+   "name": {
+    "en": "Pasteurised products",
+    "es": "Productos pasteurizados",
+    "fr": "Produits pasteurisés"
+   }
+  },
+  "en:pastries": {
+   "parents": [
+    "en:biscuits-and-cakes"
+   ],
+   "name": {
+    "en": "Pastries",
+    "es": "Bolleria",
+    "fr": "Pâtisseries"
+   }
+  },
+  "en:pastry-helpers": {
+   "parents": [
+    "en:cooking-helpers"
+   ],
+   "name": {
+    "en": "Pastry helpers",
+    "fr": "Aides à la pâtisserie"
+   }
+  },
+  "en:pate": {
+   "parents": [
+    "fr:charcuteries-diverses"
+   ],
+   "name": {
+    "en": "Pâté",
+    "es": "Paté",
+    "fr": "Pâté"
+   }
+  },
+  "en:pitas": {
+   "parents": [
+    "en:flatbreads",
+    "en:special-breads"
+   ],
+   "name": {
+    "en": "Pitas",
+    "es": "Pitas",
+    "fr": "Pains Pita",
+    "xx": "Pitas"
+   }
+  },
+  "en:pizzas": {
+   "parents": [
+    "en:meals",
+    "en:pizzas-pies-and-quiches"
+   ],
+   "name": {
+    "en": "Pizzas",
+    "es": "Pizzas",
+    "fr": "Pizzas"
+   }
+  },
+  "en:pizzas-pies-and-quiches": {
+   "parents": [],
+   "name": {
+    "en": "Pizzas pies and quiches",
+    "es": "Pizzas - tartas y quiches",
+    "fr": "Pizzas tartes salées et quiches"
+   }
+  },
+  "en:plant-based-beverages": {
+   "parents": [
+    "en:beverages",
+    "en:plant-based-foods-and-beverages"
+   ],
+   "name": {
+    "en": "Plant-based beverages",
+    "es": "Bebidas de origen vegetal",
+    "fr": "Boissons à base de végétaux"
+   }
+  },
+  "en:plant-based-foods": {
+   "parents": [
+    "en:plant-based-foods-and-beverages"
+   ],
+   "name": {
+    "en": "Plant-based foods",
+    "es": "Alimentos de origen vegetal",
+    "fr": "Aliments d'origine végétale"
+   }
+  },
+  "en:plant-based-foods-and-beverages": {
+   "parents": [],
+   "name": {
+    "en": "Plant-based foods and beverages",
+    "es": "Alimentos y bebidas de origen vegetal",
+    "fr": "Aliments et boissons à base de végétaux"
+   }
+  },
+  "en:plant-based-spreads": {
+   "parents": [
+    "en:plant-based-foods",
+    "en:spreads"
+   ],
+   "name": {
+    "en": "Plant-based spreads",
+    "es": "Untables vegetales",
+    "fr": "Pâtes à tartiner végétales"
+   }
+  },
+  "en:popcorn": {
+   "parents": [
+    "en:snacks"
+   ],
+   "name": {
+    "en": "Popcorn",
+    "es": "Palomitas de maíz",
+    "fr": "Popcorn"
+   }
+  },
+  "en:pork": {
+   "parents": [
+    "en:meats",
+    "en:pork-and-its-products"
+   ],
+   "name": {
+    "en": "Pork",
+    "es": "Carne de cerdo",
+    "fr": "Porc"
+   }
+  },
+  "en:pork-and-its-products": {
+   "parents": [
+    "en:meats-and-their-products"
+   ],
+   "name": {
+    "en": "Pork and its products",
+    "es": "Carne de cerdo y sus productos",
+    "fr": "Porc et dérivés"
+   }
+  },
+  "en:pork-pates": {
+   "parents": [
+    "en:pate",
+    "en:prepared-pork-meats"
+   ],
+   "name": {
+    "en": "Pork Pâtés",
+    "es": "Patés de cerdo",
+    "fr": "Pâtés de porc"
+   }
+  },
+  "en:potato-crisps": {
+   "parents": [
+    "en:crisps",
+    "en:salty-snacks-made-from-potato"
+   ],
+   "name": {
+    "en": "Potato crisps",
+    "es": "Chips de patatas fritas",
+    "fr": "Chips de pommes de terre"
+   }
+  },
+  "en:potatoes-and-their-products": {
+   "parents": [
+    "en:cereals-and-potatoes"
+   ],
+   "name": {
+    "en": "Potatoes and their products"
+   }
+  },
+  "en:poultries": {
+   "parents": [
+    "en:meats"
+   ],
+   "name": {
+    "en": "Poultries",
+    "es": "Aves",
+    "fr": "Volailles"
+   }
+  },
+  "en:poultry-meals": {
+   "parents": [
+    "en:meals-with-meat"
+   ],
+   "name": {
+    "en": "Poultry meals",
+    "es": "Comidas de aves",
+    "fr": "Plats à la volaille"
+   }
+  },
+  "en:prepared-meats": {
+   "parents": [
+    "en:meats-and-their-products"
+   ],
+   "name": {
+    "en": "Prepared meats",
+    "es": "Embutidos",
+    "fr": "Charcuteries"
+   }
+  },
+  "en:prepared-pork-meats": {
+   "parents": [
+    "en:pork-and-its-products",
+    "en:prepared-meats"
+   ],
+   "name": {
+    "en": "Prepared pork meats",
+    "fr": "Charcuteries de porc"
+   }
+  },
+  "en:prepared-poultry-meats": {
+   "parents": [
+    "en:prepared-meats"
+   ],
+   "name": {
+    "en": "Prepared poultry meats",
+    "fr": "Charcuteries de volaille"
+   }
+  },
+  "en:pretzel": {
+   "parents": [
+    "en:crackers-appetizers"
+   ],
+   "name": {
+    "en": "Pretzel",
+    "es": "Bretzel",
+    "fr": "Bretzels"
+   }
+  },
+  "en:psyllium": {
+   "parents": [
+    "en:cooking-helpers",
+    "en:plant-based-foods"
+   ],
+   "name": {
+    "en": "Psyllium",
+    "fr": "Psyllium"
+   }
+  },
+  "en:pulses": {
+   "parents": [
+    "en:legume-seeds"
+   ],
+   "name": {
+    "en": "Pulses",
+    "es": "Legumbres secas",
+    "fr": "Légumineuses sèches"
+   }
+  },
+  "en:pumpkin-and-squash-plant-products": {
+   "parents": [
+    "en:plant-based-foods"
+   ],
+   "name": {
+    "en": "Pumpkin and Squash plant products",
+    "es": "Productos de la planta de la calabaza",
+    "fr": "Produits de la plante de courge"
+   }
+  },
+  "en:pumpkin-seed-oils": {
+   "parents": [
+    "en:pumpkin-seeds-and-their-products",
+    "en:vegetable-oils"
+   ],
+   "name": {
+    "en": "Pumpkin seed oils",
+    "es": "Aceites de semillas de calabaza",
+    "fr": "Huiles de pépins de courge"
+   }
+  },
+  "en:pumpkin-seeds-and-their-products": {
+   "parents": [
+    "en:pumpkin-and-squash-plant-products"
+   ],
+   "name": {
+    "en": "Pumpkin seeds and their products",
+    "es": "Semillas de calabaza y derivados",
+    "fr": "Graines de courge et dérivés"
+   }
+  },
+  "en:red-beans": {
+   "parents": [
+    "en:common-beans"
+   ],
+   "name": {
+    "en": "Red beans",
+    "es": "Alubias rojas",
+    "fr": "Haricots rouges"
+   }
+  },
+  "en:rice-dishes": {
+   "parents": [
+    "en:meals"
+   ],
+   "name": {
+    "en": "Rice dishes",
+    "es": "Platos de arroz",
+    "fr": "Plats à base de riz"
+   }
+  },
+  "en:rices": {
+   "parents": [
+    "en:cereal-grains"
+   ],
+   "name": {
+    "en": "Rices",
+    "es": "Arroces",
+    "fr": "Riz"
+   }
+  },
+  "en:risottos": {
+   "parents": [
+    "en:rice-dishes"
+   ],
+   "name": {
+    "en": "Risottos",
+    "es": "Risotto",
+    "fr": "Risottos"
+   }
+  },
+  "en:roasted-cashew-nuts": {
+   "parents": [
+    "en:bulk",
+    "en:cashew-nuts",
+    "en:roasted-nuts"
+   ],
+   "name": {
+    "en": "Roasted cashew nuts",
+    "fr": "Noix de Cajou grillées"
+   }
+  },
+  "en:roasted-nuts": {
+   "parents": [
+    "en:nuts"
+   ],
+   "name": {
+    "en": "Roasted nuts",
+    "es": "Frutos de cáscara tostados",
+    "fr": "Fruits à coque grillés"
+   }
+  },
+  "en:rolled-flakes": {
+   "parents": [
+    "en:flakes"
+   ],
+   "name": {
+    "en": "Rolled flakes",
+    "fr": "Flocons laminés"
+   }
+  },
+  "en:rolled-oats": {
+   "parents": [
+    "en:cereal-flakes",
+    "en:rolled-flakes"
+   ],
+   "name": {
+    "en": "Rolled oats",
+    "es": "Copos de avena",
+    "fr": "Flocons d'avoine"
+   }
+  },
+  "en:rose-wines": {
+   "parents": [
+    "en:wines"
+   ],
+   "name": {
+    "en": "Rosé wines",
+    "es": "Vinos rosados",
+    "fr": "Vins rosés"
+   }
+  },
+  "en:salted-cashews": {
+   "parents": [
+    "en:cashew-nuts",
+    "en:salted-nuts"
+   ],
+   "name": {
+    "en": "Salted cashews",
+    "fr": "Noix de cajou salées"
+   }
+  },
+  "en:salted-nuts": {
+   "parents": [
+    "en:nuts",
+    "en:salty-snacks"
+   ],
+   "name": {
+    "en": "Salted nuts",
+    "fr": "Fruits à coque salés"
+   }
+  },
+  "en:salted-spreads": {
+   "parents": [
+    "en:spreads"
+   ],
+   "name": {
+    "en": "Salted spreads",
+    "es": "Untables salados",
+    "fr": "Produits à tartiner salés"
+   }
+  },
+  "en:salty-snacks": {
+   "parents": [
+    "en:snacks"
+   ],
+   "name": {
+    "en": "Salty snacks",
+    "es": "Snacks salados",
+    "fr": "Snacks salés"
+   }
+  },
+  "en:salty-snacks-made-from-potato": {
+   "parents": [
+    "en:appetizers",
+    "en:potatoes-and-their-products"
+   ],
+   "name": {
+    "en": "Salty snacks made from potato",
+    "es": "Aperitivos salados elaborados con patata",
+    "fr": "Snacks salés à base de pommes de terre"
+   }
+  },
+  "en:sandwiches": {
+   "parents": [],
+   "name": {
+    "en": "Sandwiches",
+    "es": "Sándwiches",
+    "fr": "Sandwichs"
+   }
+  },
+  "en:seafood": {
+   "parents": [],
+   "name": {
+    "en": "Seafood",
+    "es": "Productos del mar",
+    "fr": "Produits de la mer"
+   }
+  },
+  "en:seeds": {
+   "parents": [
+    "en:plant-based-foods"
+   ],
+   "name": {
+    "en": "Seeds",
+    "es": "Semillas",
+    "fr": "Graines"
+   }
+  },
+  "en:semi-skimmed-milks": {
+   "parents": [
+    "en:milks"
+   ],
+   "name": {
+    "en": "Semi-skimmed milks",
+    "es": "Leche semidesnatada",
+    "fr": "Laits demi-écrémés"
+   }
+  },
+  "en:semi-skimmed-pasteurised-milk": {
+   "parents": [
+    "en:pasteurised-milks",
+    "en:semi-skimmed-milks"
+   ],
+   "name": {
+    "en": "Semi-skimmed pasteurised milk",
+    "fr": "Laits demi-écrémés pasteurisés"
+   }
+  },
+  "en:sheep-s-milk-cheeses": {
+   "parents": [
+    "en:cheeses"
+   ],
+   "name": {
+    "en": "sheep's-milk cheeses",
+    "es": "Quesos de leche de oveja",
+    "fr": "Fromages de brebis"
+   }
+  },
+  "en:shrimps": {
+   "parents": [
+    "en:crustaceans"
+   ],
+   "name": {
+    "en": "Shrimps",
+    "es": "Camarones",
+    "fr": "Crevettes"
+   }
+  },
+  "en:simple-syrups": {
+   "parents": [
+    "en:sweeteners",
+    "en:syrups"
+   ],
+   "name": {
+    "en": "Simple syrups",
+    "es": "Siropes simples",
+    "fr": "Sirops simples"
+   }
+  },
+  "en:snacks": {
+   "parents": [],
+   "name": {
+    "en": "Snacks",
+    "es": "Botanas",
+    "fr": "Snacks"
+   }
+  },
+  "en:sodas": {
+   "parents": [
+    "en:carbonated-drinks"
+   ],
+   "name": {
+    "en": "Sodas",
+    "es": "Sodas",
+    "fr": "Sodas"
+   }
+  },
+  "en:soups": {
+   "parents": [
+    "en:meals"
+   ],
+   "name": {
+    "en": "Soups",
+    "es": "Sopas",
+    "fr": "Soupes"
+   }
+  },
+  "en:soybean-flours": {
+   "parents": [
+    "en:legume-flours"
+   ],
+   "name": {
+    "en": "Soybean flours",
+    "es": "Harinas de soja",
+    "fr": "Farines de soja"
+   }
+  },
+  "en:spanish-cheeses": {
+   "parents": [
+    "en:cheeses"
+   ],
+   "name": {
+    "en": "Spanish cheeses",
+    "es": "Quesos españoles",
+    "fr": "Fromages espagnols"
+   }
+  },
+  "en:special-breads": {
+   "parents": [
+    "en:breads"
+   ],
+   "name": {
+    "en": "Special breads",
+    "es": "Panes especiales",
+    "fr": "Pains spéciaux"
+   }
+  },
+  "en:specialty-made-with-tripe": {
+   "parents": [
+    "en:meals-with-meat"
+   ],
+   "name": {
+    "en": "Specialty made with tripe",
+    "fr": "Spécialités à base de tripes"
+   }
+  },
+  "en:spreadable-fats": {
+   "parents": [
+    "en:spreads"
+   ],
+   "name": {
+    "en": "Spreadable fats",
+    "es": "Grasas para untar",
+    "fr": "Matières grasses à tartiner"
+   }
+  },
+  "en:spreads": {
+   "parents": [],
+   "name": {
+    "en": "Spreads",
+    "es": "Untables",
+    "fr": "Produits à tartiner"
+   }
+  },
+  "en:sugared-crepes": {
+   "parents": [
+    "en:crepes"
+   ],
+   "name": {
+    "en": "Sugared crêpes",
+    "fr": "Crêpes sucrées"
+   }
+  },
+  "en:sweet-pastries-and-pies": {
+   "parents": [
+    "en:sweet-snacks"
+   ],
+   "name": {
+    "en": "Sweet pastries and pies"
+   }
+  },
+  "en:sweet-snacks": {
+   "parents": [
+    "en:snacks"
+   ],
+   "name": {
+    "en": "Sweet snacks",
+    "es": "Snacks dulces",
+    "fr": "Snacks sucrés"
+   }
+  },
+  "en:sweet-spreads": {
+   "parents": [
+    "en:breakfasts",
+    "en:spreads"
+   ],
+   "name": {
+    "en": "Sweet spreads",
+    "es": "Untables dulces",
+    "fr": "Produits à tartiner sucrés"
+   }
+  },
+  "en:sweetened-beverages": {
+   "parents": [
+    "en:beverages"
+   ],
+   "name": {
+    "en": "Sweetened beverages",
+    "es": "Bebidas azucaradas",
+    "fr": "Boissons avec sucre ajouté"
+   }
+  },
+  "en:sweeteners": {
+   "parents": [],
+   "name": {
+    "en": "Sweeteners",
+    "es": "Endulzantes",
+    "fr": "Édulcorants"
+   }
+  },
+  "en:syrups": {
+   "parents": [],
+   "name": {
+    "en": "Syrups",
+    "es": "Siropes",
+    "fr": "Sirops"
+   }
+  },
+  "en:tapenades": {
+   "parents": [
+    "en:salted-spreads"
+   ],
+   "name": {
+    "en": "Tapenades",
+    "es": "Tapenade",
+    "fr": "Tapenades"
+   }
+  },
+  "en:taramasalata": {
+   "parents": [
+    "en:salted-spreads",
+    "en:seafood"
+   ],
+   "name": {
+    "en": "Taramasalata",
+    "fr": "Taramas"
+   }
+  },
+  "en:teas": {
+   "parents": [
+    "en:hot-beverages",
+    "en:plant-based-beverages"
+   ],
+   "name": {
+    "en": "Teas",
+    "es": "Tés",
+    "fr": "Thés"
+   }
+  },
+  "en:terrines": {
+   "parents": [],
+   "name": {
+    "en": "Terrines",
+    "es": "Terrinas",
+    "fr": "Terrines"
+   }
+  },
+  "en:tomatoes": {
+   "parents": [
+    "en:tomatoes-and-their-products",
+    "en:vegetables"
+   ],
+   "name": {
+    "en": "Tomatoes",
+    "es": "Tomates",
+    "fr": "Tomates"
+   }
+  },
+  "en:tomatoes-and-their-products": {
+   "parents": [
+    "en:vegetables-based-foods"
+   ],
+   "name": {
+    "en": "Tomatoes and their products",
+    "es": "Tomates y sus productos",
+    "fr": "Tomates et dérivés"
+   }
+  },
+  "en:tripe": {
+   "parents": [
+    "en:tripe-dishes"
+   ],
+   "name": {
+    "en": "Tripe",
+    "es": "Callos",
+    "fr": "Tripes"
+   }
+  },
+  "en:tripe-dishes": {
+   "parents": [
+    "en:offals"
+   ],
+   "name": {
+    "en": "Tripe dishes",
+    "fr": "Produits tripiers"
+   }
+  },
+  "en:tropical-fruits": {
+   "parents": [
+    "en:fruits"
+   ],
+   "name": {
+    "en": "Tropical fruits",
+    "es": "Frutas tropicales",
+    "fr": "Fruits tropicaux"
+   }
+  },
+  "en:uht-milks": {
+   "parents": [
+    "en:homogenized-milks",
+    "en:pasteurised-products"
+   ],
+   "name": {
+    "en": "UHT Milks",
+    "es": "Leche UHT",
+    "fr": "Laits UHT"
+   }
+  },
+  "en:unsalted-butters": {
+   "parents": [
+    "en:butters"
+   ],
+   "name": {
+    "en": "Unsalted butters",
+    "es": "Mantequila sin sal",
+    "fr": "Beurres doux"
+   }
+  },
+  "en:unsweetened-beverages": {
+   "parents": [
+    "en:beverages"
+   ],
+   "name": {
+    "en": "Unsweetened beverages",
+    "es": "Bebidas no azucaradas",
+    "fr": "Boissons sans sucre ajouté"
+   }
+  },
+  "en:vegetable-based-foods-and-beverages": {
+   "parents": [
+    "en:plant-based-foods-and-beverages"
+   ],
+   "name": {
+    "en": "Vegetable-based foods and beverages",
+    "es": "Comida y bebida vegetal",
+    "fr": "Aliments et boissons à base de légumes"
+   }
+  },
+  "en:vegetable-fats": {
+   "parents": [
+    "en:fats",
+    "en:plant-based-foods"
+   ],
+   "name": {
+    "en": "Vegetable fats",
+    "es": "Grasas vegetales",
+    "fr": "Matières grasses végétales"
+   }
+  },
+  "en:vegetable-oils": {
+   "parents": [
+    "en:vegetable-fats"
+   ],
+   "name": {
+    "en": "Vegetable oils",
+    "es": "Aceites vegetales",
+    "fr": "Huiles"
+   }
+  },
+  "en:vegetable-rods": {
+   "parents": [
+    "en:vegetables"
+   ],
+   "name": {
+    "en": "Vegetable rods",
+    "es": "Verduras de tallo",
+    "fr": "Légumes tiges"
+   }
+  },
+  "en:vegetable-soups": {
+   "parents": [
+    "en:fruits-and-vegetables-based-foods",
+    "en:soups"
+   ],
+   "name": {
+    "en": "Vegetable soups",
+    "es": "Sopas de verduras y hortalizas",
+    "fr": "Soupes de légumes"
+   }
+  },
+  "en:vegetables": {
+   "parents": [
+    "en:vegetables-based-foods"
+   ],
+   "name": {
+    "en": "Vegetables",
+    "es": "Hortalizas",
+    "fr": "Légumes"
+   }
+  },
+  "en:vegetables-based-foods": {
+   "parents": [
+    "en:fruits-and-vegetables-based-foods",
+    "en:vegetable-based-foods-and-beverages"
+   ],
+   "name": {
+    "en": "Vegetables based foods",
+    "es": "Verduras y hortalizas y sus productos",
+    "fr": "Légumes et dérivés"
+   }
+  },
+  "en:viennoiseries": {
+   "parents": [
+    "en:sweet-pastries-and-pies"
+   ],
+   "name": {
+    "en": "Viennoiseries",
+    "es": "Viennoiseries",
+    "fr": "Viennoiseries"
+   }
+  },
+  "en:vinegars": {
+   "parents": [
+    "en:condiments"
+   ],
+   "name": {
+    "en": "Vinegars",
+    "es": "Vinagres",
+    "fr": "Vinaigres"
+   }
+  },
+  "en:vitamins": {
+   "parents": [
+    "en:dietary-supplements"
+   ],
+   "name": {
+    "en": "Vitamins",
+    "es": "Vitaminas",
+    "fr": "Vitamines"
+   }
+  },
+  "en:waffles": {
+   "parents": [
+    "en:pastries"
+   ],
+   "name": {
+    "en": "Waffles",
+    "es": "Gofres",
+    "fr": "Gaufres"
+   }
+  },
+  "en:wheat-semolinas": {
+   "parents": [
+    "en:cereal-semolinas"
+   ],
+   "name": {
+    "en": "Wheat semolinas",
+    "es": "Sémolas y semolinas de trigo",
+    "fr": "Semoules de blé"
+   }
+  },
+  "en:white-asparagus": {
+   "parents": [
+    "en:asparagus"
+   ],
+   "name": {
+    "en": "White asparagus",
+    "es": "Espárragos blancos",
+    "fr": "Asperges blanches"
+   }
+  },
+  "en:white-beans": {
+   "parents": [
+    "en:common-beans"
+   ],
+   "name": {
+    "en": "White beans",
+    "es": "Alubias blancas",
+    "fr": "Haricots blancs"
+   }
+  },
+  "en:white-hams": {
+   "parents": [
+    "en:hams",
+    "en:prepared-pork-meats"
+   ],
+   "name": {
+    "en": "White hams",
+    "es": "jamón cocido",
+    "fr": "Jambons blancs"
+   }
+  },
+  "en:whole-condensed-milk-without-sugar": {
+   "parents": [
+    "en:evaporated-milks-without-sugar"
+   ],
+   "name": {
+    "en": "Whole condensed milk without sugar",
+    "fr": "Lait concentré entier non sucré"
+   }
+  },
+  "en:whole-foies-gras": {
+   "parents": [
+    "en:foies-gras"
+   ],
+   "name": {
+    "en": "Whole foies gras",
+    "es": "Foies gras entero",
+    "fr": "Foies gras entiers"
+   }
+  },
+  "en:whole-milk-uht": {
+   "parents": [
+    "en:uht-milks",
+    "en:whole-milks"
+   ],
+   "name": {
+    "en": "Whole milk UHT",
+    "es": "Leche entera UHT",
+    "fr": "Lait entier UHT"
+   }
+  },
+  "en:whole-milks": {
+   "parents": [
+    "en:milks"
+   ],
+   "name": {
+    "en": "Whole milks",
+    "es": "Leche entera",
+    "fr": "Laits entiers"
+   }
+  },
+  "en:wholemeal-breads": {
+   "parents": [
+    "en:breads"
+   ],
+   "name": {
+    "en": "Wholemeal breads",
+    "es": "Panes integrales",
+    "fr": "Pains complets"
+   }
+  },
+  "en:wine-vinegars": {
+   "parents": [
+    "en:vinegars"
+   ],
+   "name": {
+    "en": "Wine vinegars",
+    "es": "Vinagres de vino",
+    "fr": "Vinaigres de vin"
+   }
+  },
+  "en:wines": {
+   "parents": [
+    "en:alcoholic-beverages"
+   ],
+   "name": {
+    "en": "Wines",
+    "es": "Vinos",
+    "fr": "Vins"
+   }
+  },
+  "en:wines-from-france": {
+   "parents": [
+    "en:wines"
+   ],
+   "name": {
+    "en": "Wines from France",
+    "es": "Vinos de Francia",
+    "fr": "Vins français"
+   }
+  },
+  "en:wraps": {
+   "parents": [
+    "en:sandwiches"
+   ],
+   "name": {
+    "en": "Wraps",
+    "fr": "Wraps"
+   }
+  },
+  "en:yogurts": {
+   "parents": [
+    "en:fermented-dairy-desserts"
+   ],
+   "name": {
+    "en": "Yogurts",
+    "es": "Yogures",
+    "fr": "Yaourts"
+   }
+  },
+  "fr:aiguillettes-de-poulet": {
+   "parents": [
+    "en:chickens"
+   ],
+   "name": {
+    "fr": "Aiguillettes de poulet"
+   }
+  },
+  "fr:beurre-de-bresse": {
+   "parents": [
+    "en:french-butters"
+   ],
+   "name": {
+    "fr": "Beurre de Bresse"
+   }
+  },
+  "fr:charcuteries-cuites": {
+   "parents": [
+    "en:prepared-meats"
+   ],
+   "name": {
+    "fr": "Charcuteries cuites"
+   }
+  },
+  "fr:charcuteries-diverses": {
+   "parents": [
+    "en:prepared-meats"
+   ],
+   "name": {
+    "fr": "Charcuteries diverses"
+   }
+  },
+  "fr:comtes-rhodaniens": {
+   "parents": [
+    "en:wines-from-france"
+   ],
+   "name": {
+    "fr": "Comtés Rhodaniens"
+   }
+  },
+  "fr:foies-gras-mi-cuits": {
+   "parents": [
+    "en:foies-gras"
+   ],
+   "name": {
+    "fr": "Foies gras mi-cuits"
+   }
+  },
+  "fr:gorgonzola-et-mascarpone": {
+   "parents": [
+    "en:italian-cheeses"
+   ],
+   "name": {
+    "fr": "gorgonzola et mascarpone"
+   }
+  },
+  "fr:laits-entiers-concentres": {
+   "parents": [
+    "en:evaporated-milks-without-sugar"
+   ],
+   "name": {
+    "fr": "Laits entiers concentrés"
+   }
+  },
+  "fr:lingots-blancs": {
+   "parents": [
+    "en:white-beans"
+   ],
+   "name": {
+    "fr": "Lingots blancs"
+   }
+  },
+  "fr:nonnettes": {
+   "parents": [
+    "en:filled-cakes",
+    "en:gingerbreads"
+   ],
+   "name": {
+    "fr": "Nonnettes"
+   }
+  },
+  "fr:pates-a-tartiner": {
+   "parents": [
+    "en:sweet-spreads"
+   ],
+   "name": {
+    "fr": "Pâtes à tartiner"
+   }
+  },
+  "fr:specialites-laitieres": {
+   "parents": [
+    "en:fermented-dairy-desserts"
+   ],
+   "name": {
+    "fr": "Spécialités laitières"
+   }
+  },
+  "fr:specialites-laitieres-aux-fruits": {
+   "parents": [
+    "en:fermented-dairy-desserts-with-fruits",
+    "fr:specialites-laitieres"
+   ],
+   "name": {
+    "fr": "Spécialités laitières aux fruits"
+   }
+  },
+  "fr:taramas-au-cabillaud": {
+   "parents": [
+    "en:taramasalata"
+   ],
+   "name": {
+    "fr": "Taramas au cabillaud"
+   }
+  },
+  "fr:vins-moelleux": {
+   "parents": [
+    "en:wines"
+   ],
+   "name": {
+    "fr": "vins moelleux"
+   }
+  }
+ },
+ "products": [
+  {
+   "code": "0000101209159",
+   "categories_tags": [
+    "en:breakfasts",
+    "en:spreads",
+    "en:sweet-spreads",
+    "fr:pates-a-tartiner",
+    "en:hazelnut-spreads",
+    "en:chocolate-spreads",
+    "en:cocoa-and-hazelnuts-spreads"
+   ]
+  },
+  {
+   "code": "0011213252209",
+   "categories_tags": [
+    "en:snacks",
+    "en:sweet-snacks",
+    "en:popcorn"
+   ]
+  },
+  {
+   "code": "0019061091452",
+   "categories_tags": [
+    "en:snacks",
+    "en:sweet-snacks",
+    "en:confectioneries"
+   ]
+  },
+  {
+   "code": "0025293002784",
+   "categories_tags": [
+    "en:dairies",
+    "en:fermented-foods",
+    "en:fermented-milk-products",
+    "en:desserts",
+    "en:dairy-desserts",
+    "en:fermented-dairy-desserts",
+    "en:yogurts"
+   ]
+  },
+  {
+   "code": "0033314223100",
+   "categories_tags": [
+    "en:snacks",
+    "en:sweet-snacks",
+    "en:confectioneries"
+   ]
+  },
+  {
+   "code": "0038749700134",
+   "categories_tags": [
+    "en:snacks",
+    "en:sweet-snacks",
+    "en:biscuits-and-cakes",
+    "en:biscuits"
+   ]
+  },
+  {
+   "code": "0041271005073",
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:dairy-substitutes",
+    "en:milk-substitutes",
+    "en:creamer"
+   ]
+  },
+  {
+   "code": "0041725101108",
+   "categories_tags": [
+    "en:cooking-helpers",
+    "en:pastry-helpers"
+   ]
+  },
+  {
+   "code": "0046583000808",
+   "categories_tags": [
+    "en:dairies",
+    "en:fermented-foods",
+    "en:fermented-milk-products",
+    "en:cheeses"
+   ]
+  },
+  {
+   "code": "0051933232952",
+   "categories_tags": [
+    "en:canned-foods",
+    "en:meals",
+    "en:soups",
+    "en:canned-meals",
+    "en:canned-soups"
+   ]
+  },
+  {
+   "code": "0059749952347",
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:plant-based-foods",
+    "en:cereals-and-potatoes",
+    "en:cereals-and-their-products",
+    "en:cereal-semolinas",
+    "en:wheat-semolinas",
+    "en:durum-wheat-semolinas",
+    "en:durum-wheat-semolinas-for-couscous"
+   ]
+  },
+  {
+   "code": "0070175012337",
+   "categories_tags": [
+    "en:snacks"
+   ]
+  },
+  {
+   "code": "0070740103989",
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:plant-based-foods",
+    "en:fruits-and-vegetables-based-foods",
+    "en:fruits-based-foods",
+    "en:fruits",
+    "en:tropical-fruits",
+    "en:avocados"
+   ]
+  },
+  {
+   "code": "0071443015500",
+   "categories_tags": [
+    "en:snacks",
+    "en:sweet-snacks",
+    "en:confectioneries"
+   ]
+  },
+  {
+   "code": "0072180511157",
+   "categories_tags": [
+    "en:desserts",
+    "en:frozen-foods",
+    "en:frozen-desserts"
+   ]
+  },
+  {
+   "code": "0072945601642",
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:plant-based-foods",
+    "en:cereals-and-potatoes",
+    "en:breads",
+    "en:special-breads",
+    "en:hamburger-buns"
+   ]
+  },
+  {
+   "code": "0074175446246",
+   "categories_tags": [
+    "en:dairies",
+    "en:fermented-foods",
+    "en:fermented-milk-products",
+    "en:cheeses"
+   ]
+  },
+  {
+   "code": "0075450133103",
+   "categories_tags": [
+    "en:meals",
+    "en:pizzas-pies-and-quiches",
+    "en:pizzas"
+   ]
+  },
+  {
+   "code": "0076958414091",
+   "categories_tags": [
+    "en:snacks"
+   ]
+  },
+  {
+   "code": "0077975088258",
+   "categories_tags": [
+    "en:snacks"
+   ]
+  },
+  {
+   "code": "0078742228143",
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:plant-based-foods",
+    "en:fruits-and-vegetables-based-foods",
+    "en:vegetables-based-foods",
+    "en:vegetables",
+    "en:tomatoes-and-their-products",
+    "en:tomatoes"
+   ]
+  },
+  {
+   "code": "0083791070032",
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:plant-based-foods",
+    "en:snacks",
+    "en:cereals-and-potatoes",
+    "en:salty-snacks",
+    "en:appetizers",
+    "en:chips-and-fries",
+    "en:crisps",
+    "en:potato-crisps"
+   ]
+  },
+  {
+   "code": "0085239819906",
+   "categories_tags": [
+    "en:snacks",
+    "en:sweet-snacks",
+    "en:popcorn"
+   ]
+  },
+  {
+   "code": "0092825105459",
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:plant-based-foods",
+    "en:cereals-and-potatoes",
+    "en:seeds",
+    "en:cereals-and-their-products",
+    "en:cereal-grains",
+    "en:rices"
+   ]
+  },
+  {
+   "code": "0099482461294",
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:plant-based-foods",
+    "en:breakfasts",
+    "en:spreads",
+    "en:plant-based-spreads",
+    "en:sweet-spreads",
+    "en:fruit-and-vegetable-preserves"
+   ]
+  },
+  {
+   "code": "0205717710345",
+   "categories_tags": [
+    "en:dairies",
+    "en:fermented-foods",
+    "en:fermented-milk-products",
+    "en:cheeses",
+    "en:sheep-s-milk-cheeses",
+    "en:spanish-cheeses",
+    "en:manchego"
+   ]
+  },
+  {
+   "code": "0230063008532",
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:plant-based-foods",
+    "en:cereals-and-potatoes",
+    "en:breads",
+    "en:wholemeal-breads"
+   ]
+  },
+  {
+   "code": "0502226813964",
+   "categories_tags": [
+    "en:snacks",
+    "en:sweet-snacks",
+    "en:confectioneries"
+   ]
+  },
+  {
+   "code": "0629098612522",
+   "categories_tags": [
+    "en:sweeteners",
+    "en:syrups",
+    "en:simple-syrups",
+    "en:maple-syrups"
+   ]
+  },
+  {
+   "code": "0659422080369",
+   "categories_tags": [
+    "en:snacks",
+    "en:sweet-snacks",
+    "en:biscuits-and-cakes"
+   ]
+  },
+  {
+   "code": "0688267149573",
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:plant-based-foods",
+    "en:snacks",
+    "en:cereals-and-potatoes",
+    "en:sweet-snacks",
+    "en:biscuits-and-cakes",
+    "en:breads",
+    "en:pastries"
+   ]
+  },
+  {
+   "code": "0708820336704",
+   "categories_tags": [
+    "en:snacks",
+    "en:sweet-snacks",
+    "en:confectioneries"
+   ]
+  },
+  {
+   "code": "0717544205418",
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:plant-based-foods",
+    "en:cereals-and-potatoes",
+    "en:breads",
+    "en:special-breads",
+    "en:hamburger-buns"
+   ]
+  },
+  {
+   "code": "0726984190222",
+   "categories_tags": [
+    "en:breakfasts",
+    "en:spreads",
+    "en:sweet-spreads",
+    "en:bee-products",
+    "en:farming-products",
+    "en:sweeteners",
+    "en:honeys"
+   ]
+  },
+  {
+   "code": "0742392701294",
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:plant-based-foods",
+    "en:fats",
+    "en:vegetable-fats",
+    "en:vegetable-oils",
+    "en:fruit-and-fruit-seed-oils",
+    "en:coconut-oils"
+   ]
+  },
+  {
+   "code": "0760232901055",
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:plant-based-foods",
+    "en:fruits-and-vegetables-based-foods",
+    "en:snacks",
+    "en:desserts",
+    "en:fruits-based-foods",
+    "en:compotes",
+    "en:apple-compotes",
+    "en:applesauces"
+   ]
+  },
+  {
+   "code": "0786560579797",
+   "categories_tags": [
+    "en:snacks"
+   ]
+  },
+  {
+   "code": "0810979003038",
+   "categories_tags": [
+    "en:beverages",
+    "en:dried-products",
+    "en:dried-products-to-be-rehydrated",
+    "en:dehydrated-beverages"
+   ]
+  },
+  {
+   "code": "0818108001627",
+   "categories_tags": [
+    "en:cooking-helpers"
+   ]
+  },
+  {
+   "code": "0838766006444",
+   "categories_tags": [
+    "en:beverages"
+   ]
+  },
+  {
+   "code": "0851621003075",
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:beverages",
+    "en:plant-based-beverages",
+    "en:fruit-based-beverages",
+    "en:juices-and-nectars",
+    "en:fruit-juices",
+    "en:unsweetened-beverages",
+    "en:apple-juices"
+   ]
+  },
+  {
+   "code": "0854487006051",
+   "categories_tags": [
+    "en:snacks"
+   ]
+  },
+  {
+   "code": "0857697005319",
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:plant-based-foods",
+    "en:fats",
+    "en:vegetable-fats"
+   ]
+  },
+  {
+   "code": "0873668001432",
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:plant-based-foods",
+    "en:fruits-and-vegetables-based-foods",
+    "en:legumes-and-their-products",
+    "en:legumes",
+    "en:seeds",
+    "en:vegetables-based-foods",
+    "en:frozen-foods",
+    "en:legume-seeds",
+    "en:frozen-plant-based-foods",
+    "en:frozen-vegetables"
+   ]
+  },
+  {
+   "code": "0891627009039",
+   "categories_tags": [
+    "en:frozen-foods"
+   ]
+  },
+  {
+   "code": "19423661",
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:plant-based-foods",
+    "en:legumes-and-their-products",
+    "en:legumes",
+    "en:seeds",
+    "en:legume-seeds",
+    "en:pulses",
+    "en:common-beans",
+    "en:white-beans"
+   ]
+  },
+  {
+   "code": "20046897",
+   "categories_tags": [
+    "en:dairies",
+    "en:fermented-foods",
+    "en:fermented-milk-products",
+    "en:desserts",
+    "en:dairy-desserts",
+    "en:fermented-dairy-desserts",
+    "fr:specialites-laitieres"
+   ]
+  },
+  {
+   "code": "20289126",
+   "categories_tags": [
+    "en:dietary-supplements",
+    "en:vitamins"
+   ]
+  },
+  {
+   "code": "20646356",
+   "categories_tags": [
+    "en:seafood",
+    "en:canned-foods",
+    "en:mollusc",
+    "en:mussels",
+    "en:canned-mussels",
+    "en:mussels-with-escabeche"
+   ]
+  },
+  {
+   "code": "2190906011304",
+   "categories_tags": [
+    "en:meats-and-their-products",
+    "en:meats",
+    "en:chicken-and-its-products",
+    "en:poultries",
+    "en:chickens"
+   ]
+  },
+  {
+   "code": "2268496036936",
+   "categories_tags": [
+    "en:meats-and-their-products",
+    "en:meats",
+    "en:chicken-and-its-products",
+    "en:poultries",
+    "en:chickens",
+    "fr:aiguillettes-de-poulet"
+   ]
+  },
+  {
+   "code": "2449193014438",
+   "categories_tags": [
+    "en:dairies",
+    "en:fermented-foods",
+    "en:fermented-milk-products",
+    "en:cheeses",
+    "en:italian-cheeses",
+    "fr:gorgonzola-et-mascarpone"
+   ]
+  },
+  {
+   "code": "26037042",
+   "categories_tags": [
+    "en:snacks",
+    "en:sweet-snacks",
+    "en:biscuits-and-cakes",
+    "en:cakes",
+    "en:chocolate-cakes",
+    "en:marble-cakes"
+   ]
+  },
+  {
+   "code": "2845168020471",
+   "categories_tags": [
+    "en:meats-and-their-products",
+    "en:meats",
+    "en:prepared-meats",
+    "en:hams",
+    "en:white-hams"
+   ]
+  },
+  {
+   "code": "3017800003558",
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:plant-based-foods",
+    "en:fruits-and-vegetables-based-foods",
+    "en:legumes-and-their-products",
+    "en:canned-foods",
+    "en:legumes",
+    "en:vegetables-based-foods",
+    "en:canned-plant-based-foods",
+    "en:vegetables",
+    "en:canned-vegetables",
+    "en:canned-legumes",
+    "en:green-peas",
+    "en:canned-peas-and-carrots"
+   ]
+  },
+  {
+   "code": "3033491139901",
+   "categories_tags": [
+    "en:dairies",
+    "en:fermented-foods",
+    "en:fermented-milk-products",
+    "en:desserts",
+    "en:dairy-desserts",
+    "en:fermented-dairy-desserts",
+    "en:yogurts",
+    "en:flavoured-fermented-dairy-desserts",
+    "en:bifidus-yogurts",
+    "en:flavoured-bifidus-yogurts",
+    "en:flavoured-yogurts"
+   ]
+  },
+  {
+   "code": "3045320091687",
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:plant-based-foods",
+    "en:fruits-and-vegetables-based-foods",
+    "en:breakfasts",
+    "en:spreads",
+    "en:plant-based-spreads",
+    "en:sweet-spreads",
+    "en:fruit-and-vegetable-preserves",
+    "en:jams",
+    "en:apricot-jams"
+   ]
+  },
+  {
+   "code": "3080216046211",
+   "categories_tags": [
+    "en:beverages",
+    "en:non-alcoholic-beverages",
+    "en:non-alcoholic-beers",
+    "en:sweetened-beverages"
+   ]
+  },
+  {
+   "code": "3110320503000",
+   "categories_tags": [
+    "en:snacks",
+    "en:sweet-snacks",
+    "en:biscuits-and-cakes",
+    "en:cakes",
+    "en:filled-cakes",
+    "fr:nonnettes"
+   ]
+  },
+  {
+   "code": "3159580007989",
+   "categories_tags": [
+    "en:meats-and-their-products",
+    "en:meats",
+    "en:chicken-and-its-products",
+    "en:poultries",
+    "en:chickens",
+    "en:chicken-breasts"
+   ]
+  },
+  {
+   "code": "3175690060119",
+   "categories_tags": [
+    "en:seafood",
+    "en:fishes-and-their-products",
+    "en:fishes",
+    "en:fatty-fishes",
+    "en:anchovy",
+    "en:fish-fillets",
+    "en:anchovy-fillets",
+    "en:marinated-anchovy-fillets",
+    "en:marinated-anchovy-fillets-with-vegetable-oil"
+   ]
+  },
+  {
+   "code": "3185610003133",
+   "categories_tags": [
+    "en:snacks",
+    "en:salty-snacks",
+    "en:appetizers",
+    "en:biscuits-and-crackers",
+    "en:crackers-appetizers",
+    "en:pretzel"
+   ]
+  },
+  {
+   "code": "3222474211899",
+   "categories_tags": [
+    "en:meals",
+    "en:meats-and-their-products",
+    "en:meals-with-meat",
+    "en:rice-dishes",
+    "en:poultry-meals",
+    "en:risottos",
+    "en:meals-with-chicken",
+    "en:chicken-risottos"
+   ]
+  },
+  {
+   "code": "3229248197656",
+   "categories_tags": [
+    "en:desserts",
+    "en:frozen-foods",
+    "en:frozen-desserts",
+    "en:ice-creams-and-sorbets",
+    "en:ice-creams",
+    "en:ice-cream-tubs"
+   ]
+  },
+  {
+   "code": "3245412694486",
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:plant-based-foods",
+    "en:cereals-and-potatoes",
+    "en:breads",
+    "en:flatbreads",
+    "en:special-breads",
+    "en:pitas"
+   ]
+  },
+  {
+   "code": "3250391661022",
+   "categories_tags": [
+    "en:seafood",
+    "en:spreads",
+    "en:salted-spreads",
+    "en:taramasalata",
+    "fr:taramas-au-cabillaud"
+   ]
+  },
+  {
+   "code": "3254950008846",
+   "categories_tags": [
+    "en:snacks",
+    "en:sweet-snacks",
+    "en:biscuits-and-cakes",
+    "en:pastries",
+    "en:waffles"
+   ]
+  },
+  {
+   "code": "3256224658917",
+   "categories_tags": [
+    "en:meats-and-their-products",
+    "en:meats",
+    "en:prepared-meats",
+    "en:cured-sausages",
+    "en:chorizo"
+   ]
+  },
+  {
+   "code": "3257980632487",
+   "categories_tags": [
+    "en:dairies",
+    "en:milks-liquid-and-powder",
+    "en:milks",
+    "en:homogenized-milks",
+    "en:pasteurised-products",
+    "en:uht-milks",
+    "en:whole-milks",
+    "en:whole-milk-uht"
+   ]
+  },
+  {
+   "code": "3258561400075",
+   "categories_tags": [
+    "en:snacks",
+    "en:sweet-snacks",
+    "en:sweet-pastries-and-pies",
+    "en:viennoiseries",
+    "en:milk-bread-rolls"
+   ]
+  },
+  {
+   "code": "3263820006004",
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:plant-based-foods",
+    "en:legumes-and-their-products",
+    "en:legumes",
+    "en:seeds",
+    "en:legume-seeds",
+    "en:pulses",
+    "en:common-beans",
+    "en:white-beans",
+    "fr:lingots-blancs"
+   ]
+  },
+  {
+   "code": "3263858777815",
+   "categories_tags": [
+    "en:sandwiches",
+    "en:wraps",
+    "en:chicken-wraps"
+   ]
+  },
+  {
+   "code": "3266191022543",
+   "categories_tags": [
+    "en:snacks",
+    "en:sweet-snacks",
+    "en:biscuits-and-cakes",
+    "en:cakes",
+    "en:filled-cakes",
+    "fr:nonnettes"
+   ]
+  },
+  {
+   "code": "3270160688449",
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:plant-based-foods",
+    "en:fruits-and-vegetables-based-foods",
+    "en:vegetables-based-foods",
+    "en:frozen-foods",
+    "en:meals",
+    "en:frozen-plant-based-foods",
+    "en:frozen-vegetables",
+    "en:soups",
+    "en:combination-meals",
+    "en:cream-soups",
+    "en:vegetable-soups",
+    "en:cream-of-vegetable-soups",
+    "en:frozen-ready-made-meals",
+    "en:frozen-soups",
+    "en:frozen-vegetable-soups"
+   ]
+  },
+  {
+   "code": "3273220540565",
+   "categories_tags": [
+    "en:dairies",
+    "en:fermented-foods",
+    "en:fermented-milk-products",
+    "en:desserts",
+    "en:dairy-desserts",
+    "en:fermented-dairy-desserts",
+    "en:fermented-dairy-desserts-with-fruits",
+    "fr:specialites-laitieres",
+    "fr:specialites-laitieres-aux-fruits"
+   ]
+  },
+  {
+   "code": "3279130109953",
+   "categories_tags": [
+    "en:snacks",
+    "en:sweet-snacks",
+    "en:biscuits-and-cakes",
+    "en:biscuits"
+   ]
+  },
+  {
+   "code": "3291960002792",
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:plant-based-foods",
+    "en:fats",
+    "en:nuts-and-their-products",
+    "en:vegetable-fats",
+    "en:vegetable-oils",
+    "en:nut-oils",
+    "en:almond-oils"
+   ]
+  },
+  {
+   "code": "3302552302500",
+   "categories_tags": [
+    "en:dairies",
+    "en:fats",
+    "en:spreads",
+    "en:spreadable-fats",
+    "en:animal-fats",
+    "en:dairy-spreads",
+    "en:milkfat",
+    "en:butters",
+    "en:unsalted-butters",
+    "en:french-butters",
+    "fr:beurre-de-bresse"
+   ]
+  },
+  {
+   "code": "3329486531202",
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:plant-based-foods",
+    "en:legumes-and-their-products",
+    "en:flours",
+    "en:legume-flours",
+    "en:soybean-flours"
+   ]
+  },
+  {
+   "code": "3338500631729",
+   "categories_tags": [
+    "en:beverages",
+    "en:alcoholic-beverages",
+    "en:wines",
+    "en:wines-from-france",
+    "en:rose-wines",
+    "fr:comtes-rhodaniens",
+    "fr:vins-moelleux"
+   ]
+  },
+  {
+   "code": "3350033181977",
+   "categories_tags": [
+    "en:sandwiches",
+    "en:wraps"
+   ]
+  },
+  {
+   "code": "3368410004214",
+   "categories_tags": [
+    "en:spreads",
+    "en:salted-spreads",
+    "en:tapenades",
+    "en:black-tapenades"
+   ]
+  },
+  {
+   "code": "3382565068150",
+   "categories_tags": [
+    "en:spreads",
+    "en:salted-spreads",
+    "en:tapenades",
+    "en:green-tapenades"
+   ]
+  },
+  {
+   "code": "3403400000002",
+   "categories_tags": [
+    "en:crepes-and-galettes",
+    "en:crepes",
+    "en:sugared-crepes"
+   ]
+  },
+  {
+   "code": "3428272000059",
+   "categories_tags": [
+    "en:dairies",
+    "en:milks-liquid-and-powder",
+    "en:milks",
+    "en:pasteurised-products",
+    "en:semi-skimmed-milks",
+    "en:pasteurised-milks",
+    "en:semi-skimmed-pasteurised-milk"
+   ]
+  },
+  {
+   "code": "3443705007702",
+   "categories_tags": [
+    "en:fish-and-meat-and-eggs",
+    "en:foies-gras",
+    "en:foies-gras-from-ducks",
+    "en:whole-foies-gras",
+    "fr:foies-gras-mi-cuits"
+   ]
+  },
+  {
+   "code": "3460426049927",
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:plant-based-foods",
+    "en:nuts-and-their-products",
+    "en:nuts",
+    "en:roasted-nuts",
+    "en:cashew-nuts",
+    "en:roasted-cashew-nuts"
+   ]
+  },
+  {
+   "code": "3490090070040",
+   "categories_tags": [
+    "en:condiments",
+    "en:vinegars",
+    "en:wine-vinegars"
+   ]
+  },
+  {
+   "code": "3513851559582",
+   "categories_tags": [
+    "en:snacks",
+    "en:salty-snacks",
+    "en:appetizers",
+    "en:chips-and-fries",
+    "en:crisps"
+   ]
+  },
+  {
+   "code": "3547110000188",
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:plant-based-foods",
+    "en:legumes-and-their-products",
+    "en:legumes",
+    "en:seeds",
+    "en:legume-seeds",
+    "en:pulses",
+    "en:common-beans",
+    "en:red-beans"
+   ]
+  },
+  {
+   "code": "3560070799817",
+   "categories_tags": [
+    "en:dairies",
+    "en:evaporated-milks",
+    "en:evaporated-milks-without-sugar",
+    "en:whole-condensed-milk-without-sugar",
+    "fr:laits-entiers-concentres"
+   ]
+  },
+  {
+   "code": "3564700422168",
+   "categories_tags": [
+    "en:canned-foods",
+    "en:meats-and-their-products",
+    "en:spreads",
+    "en:meats",
+    "en:prepared-meats",
+    "en:salted-spreads",
+    "en:pork-and-its-products",
+    "fr:charcuteries-diverses",
+    "en:pate",
+    "en:pork",
+    "en:liver-pates",
+    "en:pork-pates",
+    "en:terrines",
+    "en:country-style-pates"
+   ]
+  },
+  {
+   "code": "3564709000879",
+   "categories_tags": [
+    "en:meats-and-their-products",
+    "en:meals",
+    "en:fish-and-meat-and-eggs",
+    "en:meals-with-meat",
+    "en:offals",
+    "en:tripe-dishes",
+    "en:specialty-made-with-tripe",
+    "en:caen-style-tripes",
+    "en:tripe"
+   ]
+  },
+  {
+   "code": "3588250000027",
+   "categories_tags": [
+    "en:dairies",
+    "en:fats",
+    "en:spreads",
+    "en:spreadable-fats",
+    "en:animal-fats",
+    "en:dairy-spreads",
+    "en:milkfat",
+    "en:butters"
+   ]
+  },
+  {
+   "code": "3596710455591",
+   "categories_tags": [
+    "en:dairies",
+    "en:milks-liquid-and-powder",
+    "en:milks",
+    "en:homogenized-milks",
+    "en:pasteurised-products",
+    "en:semi-skimmed-milks",
+    "en:uht-milks",
+    "en:cow-milks",
+    "en:esl-milks"
+   ]
+  },
+  {
+   "code": "3661112054144",
+   "categories_tags": [
+    "en:meats-and-their-products",
+    "en:meats",
+    "en:prepared-meats",
+    "en:fresh-foods",
+    "en:hams",
+    "en:pork-and-its-products",
+    "en:pork",
+    "en:white-hams",
+    "fr:charcuteries-cuites"
+   ]
+  },
+  {
+   "code": "3700156945077",
+   "categories_tags": [
+    "en:seafood",
+    "en:crustaceans",
+    "en:shrimps"
+   ]
+  },
+  {
+   "code": "3700650901142",
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:plant-based-foods",
+    "en:snacks",
+    "en:salty-snacks",
+    "en:nuts-and-their-products",
+    "en:nuts",
+    "en:roasted-nuts",
+    "en:salted-nuts",
+    "en:cashew-nuts",
+    "en:roasted-cashew-nuts",
+    "en:salted-cashews"
+   ]
+  },
+  {
+   "code": "3760020065447",
+   "categories_tags": [
+    "en:seafood",
+    "en:fishes-and-their-products",
+    "en:fishes",
+    "en:fatty-fishes",
+    "en:fish-fillets",
+    "en:mackerels",
+    "en:mackerel-fillets",
+    "en:mackerel-fillets-in-escabeche"
+   ]
+  },
+  {
+   "code": "3760059621225",
+   "categories_tags": [
+    "en:fish-and-meat-and-eggs",
+    "en:foies-gras",
+    "en:foies-gras-pates"
+   ]
+  },
+  {
+   "code": "3760099537692",
+   "categories_tags": [
+    "en:dairies",
+    "en:fermented-foods",
+    "en:fermented-milk-products",
+    "en:cheeses",
+    "en:cow-cheeses",
+    "en:french-cheeses",
+    "en:maroilles"
+   ]
+  },
+  {
+   "code": "3760149995960",
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:plant-based-foods",
+    "en:cereals-and-potatoes",
+    "en:seeds",
+    "en:cereals-and-their-products",
+    "en:cereal-grains",
+    "en:chia"
+   ]
+  },
+  {
+   "code": "3760201330043",
+   "categories_tags": [
+    "en:meals"
+   ]
+  },
+  {
+   "code": "3770000409000",
+   "categories_tags": [
+    "en:snacks",
+    "en:sweet-snacks",
+    "en:cocoa-and-its-products",
+    "en:chocolates",
+    "en:dark-chocolates"
+   ]
+  },
+  {
+   "code": "3858884090306",
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:plant-based-foods",
+    "en:fats",
+    "en:vegetable-fats",
+    "en:pumpkin-and-squash-plant-products",
+    "en:vegetable-oils",
+    "en:pumpkin-seeds-and-their-products",
+    "en:pumpkin-seed-oils"
+   ]
+  },
+  {
+   "code": "4003171043452",
+   "categories_tags": [
+    "en:meats-and-their-products",
+    "en:prepared-meats",
+    "en:prepared-poultry-meats"
+   ]
+  },
+  {
+   "code": "4009300014584",
+   "categories_tags": [
+    "en:beverages-and-beverages-preparations",
+    "en:plant-based-foods-and-beverages",
+    "en:beverages",
+    "en:hot-beverages",
+    "en:plant-based-beverages",
+    "en:beverage-preparations",
+    "en:teas",
+    "en:herbal-teas",
+    "en:fruit-teas"
+   ]
+  },
+  {
+   "code": "4019736003557",
+   "categories_tags": [
+    "en:spreads",
+    "en:salted-spreads"
+   ]
+  },
+  {
+   "code": "4061458013680",
+   "categories_tags": [
+    "en:meats-and-their-products",
+    "en:meats",
+    "en:fresh-meats"
+   ]
+  },
+  {
+   "code": "4260042311229",
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:plant-based-foods",
+    "en:breakfasts",
+    "en:cereals-and-potatoes",
+    "en:cereals-and-their-products",
+    "en:breakfast-cereals",
+    "en:flakes",
+    "en:cereal-flakes",
+    "en:extruded-flakes",
+    "en:rolled-flakes",
+    "en:rolled-oats"
+   ]
+  },
+  {
+   "code": "4316268414982",
+   "categories_tags": [
+    "en:dairies",
+    "en:milks-liquid-and-powder",
+    "en:milks",
+    "en:homogenized-milks",
+    "en:fresh-milks",
+    "en:whole-milks",
+    "en:esl-milks"
+   ]
+  },
+  {
+   "code": "4804888287081",
+   "categories_tags": [
+    "en:seafood",
+    "en:canned-foods"
+   ]
+  },
+  {
+   "code": "5010029000184",
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:plant-based-foods",
+    "en:breakfasts",
+    "en:cereals-and-potatoes",
+    "en:cereals-and-their-products",
+    "en:breakfast-cereals",
+    "en:breakfast-cereals-rich-in-fibre"
+   ]
+  },
+  {
+   "code": "5029212780338",
+   "categories_tags": [
+    "en:beverages",
+    "en:carbonated-drinks",
+    "en:sodas",
+    "en:non-alcoholic-beverages",
+    "en:non-alcoholic-beers",
+    "en:ginger-beer",
+    "en:sweetened-beverages"
+   ]
+  },
+  {
+   "code": "5055936871946",
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:plant-based-foods",
+    "en:cooking-helpers",
+    "en:psyllium"
+   ]
+  },
+  {
+   "code": "5201360624560",
+   "categories_tags": [
+    "en:snacks",
+    "en:salty-snacks",
+    "en:appetizers",
+    "en:biscuits-and-crackers",
+    "en:crackers-appetizers"
+   ]
+  },
+  {
+   "code": "5400141293821",
+   "categories_tags": [
+    "en:plant-based-foods-and-beverages",
+    "en:plant-based-foods",
+    "en:fruits-and-vegetables-based-foods",
+    "en:canned-foods",
+    "en:vegetables-based-foods",
+    "en:canned-plant-based-foods",
+    "en:vegetables",
+    "en:canned-vegetables",
+    "en:vegetable-rods",
+    "en:asparagus",
+    "en:white-asparagus",
+    "en:canned-asparagus",
+    "en:canned-white-asparagus"
+   ]
+  },
+  {
+   "code": "5410471127000",
+   "categories_tags": [
+    "en:snacks",
+    "en:sweet-snacks",
+    "en:biscuits-and-cakes",
+    "en:biscuits-and-crackers",
+    "en:biscuits"
+   ]
+  },
+  {
+   "code": "5420024112780",
+   "categories_tags": [
+    "en:dairies",
+    "en:fermented-foods",
+    "en:fermented-milk-products",
+    "en:cheeses",
+    "en:italian-cheeses",
+    "en:grated-cheese",
+    "en:parmigiano-reggiano"
+   ]
+  },
+  {
+   "code": "5601164900349",
+   "categories_tags": [
+    "en:beverages-and-beverages-preparations",
+    "en:beverages",
+    "en:alcoholic-beverages",
+    "en:beers"
+   ]
+  }
+ ],
+ "expected_primary": {
+  "en": {
+   "0000101209159": [
+    "Breakfasts",
+    "Breakfasts/Sweet spreads",
+    "Breakfasts/Sweet spreads/Chocolate spreads",
+    "Breakfasts/Sweet spreads/Chocolate spreads/Cocoa and hazelnuts spreads"
+   ],
+   "0011213252209": [
+    "Snacks",
+    "Snacks/Popcorn"
+   ],
+   "0019061091452": [
+    "Snacks",
+    "Snacks/Sweet snacks",
+    "Snacks/Sweet snacks/Confectioneries"
+   ],
+   "0025293002784": [
+    "Dairies",
+    "Dairies/Dairy desserts",
+    "Dairies/Dairy desserts/Fermented dairy desserts",
+    "Dairies/Dairy desserts/Fermented dairy desserts/Yogurts"
+   ],
+   "0033314223100": [
+    "Snacks",
+    "Snacks/Sweet snacks",
+    "Snacks/Sweet snacks/Confectioneries"
+   ],
+   "0038749700134": [
+    "Snacks",
+    "Snacks/Sweet snacks",
+    "Snacks/Sweet snacks/Biscuits and cakes"
+   ],
+   "0041271005073": [
+    "Plant-based foods and beverages",
+    "Plant-based foods and beverages/Dairy substitutes",
+    "Plant-based foods and beverages/Dairy substitutes/Creamer"
+   ],
+   "0041725101108": [
+    "Cooking helpers",
+    "Cooking helpers/Pastry helpers"
+   ],
+   "0046583000808": [
+    "Dairies",
+    "Dairies/Fermented milk products",
+    "Dairies/Fermented milk products/Cheeses"
+   ],
+   "0051933232952": [
+    "Canned foods",
+    "Canned foods/Canned meals",
+    "Canned foods/Canned meals/Canned soups"
+   ],
+   "0059749952347": [
+    "Plant-based foods and beverages",
+    "Plant-based foods and beverages/Plant-based foods",
+    "Plant-based foods and beverages/Plant-based foods/Cereals and potatoes",
+    "Plant-based foods and beverages/Plant-based foods/Cereals and potatoes/Cereals and their products",
+    "Plant-based foods and beverages/Plant-based foods/Cereals and potatoes/Cereals and their products/Cereal semolinas",
+    "Plant-based foods and beverages/Plant-based foods/Cereals and potatoes/Cereals and their products/Cereal semolinas/Wheat semolinas",
+    "Plant-based foods and beverages/Plant-based foods/Cereals and potatoes/Cereals and their products/Cereal semolinas/Wheat semolinas/Durum wheat semolinas",
+    "Plant-based foods and beverages/Plant-based foods/Cereals and potatoes/Cereals and their products/Cereal semolinas/Wheat semolinas/Durum wheat semolinas/Durum wheat semolinas for couscous"
+   ],
+   "0070175012337": [
+    "Snacks"
+   ],
+   "0070740103989": [
+    "Plant-based foods and beverages",
+    "Plant-based foods and beverages/Plant-based foods",
+    "Plant-based foods and beverages/Plant-based foods/Fruits and vegetables based foods",
+    "Plant-based foods and beverages/Plant-based foods/Fruits and vegetables based foods/Fruits based foods",
+    "Plant-based foods and beverages/Plant-based foods/Fruits and vegetables based foods/Fruits based foods/Fruits",
+    "Plant-based foods and beverages/Plant-based foods/Fruits and vegetables based foods/Fruits based foods/Fruits/Tropical fruits",
+    "Plant-based foods and beverages/Plant-based foods/Fruits and vegetables based foods/Fruits based foods/Fruits/Tropical fruits/Avocados"
+   ],
+   "0071443015500": [
+    "Snacks",
+    "Snacks/Sweet snacks",
+    "Snacks/Sweet snacks/Confectioneries"
+   ],
+   "0072180511157": [
+    "Desserts",
+    "Desserts/Frozen desserts"
+   ],
+   "0072945601642": [
+    "Plant-based foods and beverages",
+    "Plant-based foods and beverages/Plant-based foods",
+    "Plant-based foods and beverages/Plant-based foods/Cereals and potatoes",
+    "Plant-based foods and beverages/Plant-based foods/Cereals and potatoes/Cereals and their products",
+    "Plant-based foods and beverages/Plant-based foods/Cereals and potatoes/Cereals and their products/Breads",
+    "Plant-based foods and beverages/Plant-based foods/Cereals and potatoes/Cereals and their products/Breads/Special breads",
+    "Plant-based foods and beverages/Plant-based foods/Cereals and potatoes/Cereals and their products/Breads/Special breads/Hamburger buns"
+   ],
+   "0074175446246": [
+    "Dairies",
+    "Dairies/Fermented milk products",
+    "Dairies/Fermented milk products/Cheeses"
+   ],
+   "0075450133103": [
+    "Meals",
+    "Meals/Pizzas"
+   ],
+   "0076958414091": [
+    "Snacks"
+   ],
+   "0077975088258": [
+    "Snacks"
+   ],
+   "0078742228143": [
+    "Plant-based foods and beverages",
+    "Plant-based foods and beverages/Vegetable-based foods and beverages",
+    "Plant-based foods and beverages/Vegetable-based foods and beverages/Vegetables based foods",
+    "Plant-based foods and beverages/Vegetable-based foods and beverages/Vegetables based foods/Tomatoes and their products",
+    "Plant-based foods and beverages/Vegetable-based foods and beverages/Vegetables based foods/Tomatoes and their products/Tomatoes"
+   ],
+   "0083791070032": [
+    "Snacks",
+    "Snacks/Salty snacks",
+    "Snacks/Salty snacks/Appetizers"
+   ],
+   "0085239819906": [
+    "Snacks",
+    "Snacks/Popcorn"
+   ],
+   "0092825105459": [
+    "Plant-based foods and beverages",
+    "Plant-based foods and beverages/Plant-based foods",
+    "Plant-based foods and beverages/Plant-based foods/Seeds",
+    "Plant-based foods and beverages/Plant-based foods/Seeds/Cereal grains",
+    "Plant-based foods and beverages/Plant-based foods/Seeds/Cereal grains/Rices"
+   ],
+   "0099482461294": [
+    "Spreads",
+    "Spreads/Plant-based spreads",
+    "Spreads/Plant-based spreads/Fruit and vegetable preserves"
+   ],
+   "0205717710345": [
+    "Dairies",
+    "Dairies/Fermented milk products",
+    "Dairies/Fermented milk products/Cheeses",
+    "Dairies/Fermented milk products/Cheeses/Sheep's-milk cheeses",
+    "Dairies/Fermented milk products/Cheeses/Sheep's-milk cheeses/Manchego"
+   ],
+   "0230063008532": [
+    "Plant-based foods and beverages",
+    "Plant-based foods and beverages/Plant-based foods",
+    "Plant-based foods and beverages/Plant-based foods/Cereals and potatoes",
+    "Plant-based foods and beverages/Plant-based foods/Cereals and potatoes/Cereals and their products",
+    "Plant-based foods and beverages/Plant-based foods/Cereals and potatoes/Cereals and their products/Breads",
+    "Plant-based foods and beverages/Plant-based foods/Cereals and potatoes/Cereals and their products/Breads/Wholemeal breads"
+   ],
+   "0502226813964": [
+    "Snacks",
+    "Snacks/Sweet snacks",
+    "Snacks/Sweet snacks/Confectioneries"
+   ],
+   "0629098612522": [
+    "Sweeteners",
+    "Sweeteners/Simple syrups",
+    "Sweeteners/Simple syrups/Maple syrups"
+   ],
+   "0659422080369": [
+    "Snacks",
+    "Snacks/Sweet snacks",
+    "Snacks/Sweet snacks/Biscuits and cakes"
+   ],
+   "0688267149573": [
+    "Plant-based foods and beverages",
+    "Plant-based foods and beverages/Plant-based foods",
+    "Plant-based foods and beverages/Plant-based foods/Cereals and potatoes",
+    "Plant-based foods and beverages/Plant-based foods/Cereals and potatoes/Cereals and their products",
+    "Plant-based foods and beverages/Plant-based foods/Cereals and potatoes/Cereals and their products/Breads"
+   ],
+   "0708820336704": [
+    "Snacks",
+    "Snacks/Sweet snacks",
+    "Snacks/Sweet snacks/Confectioneries"
+   ],
+   "0717544205418": [
+    "Plant-based foods and beverages",
+    "Plant-based foods and beverages/Plant-based foods",
+    "Plant-based foods and beverages/Plant-based foods/Cereals and potatoes",
+    "Plant-based foods and beverages/Plant-based foods/Cereals and potatoes/Cereals and their products",
+    "Plant-based foods and beverages/Plant-based foods/Cereals and potatoes/Cereals and their products/Breads",
+    "Plant-based foods and beverages/Plant-based foods/Cereals and potatoes/Cereals and their products/Breads/Special breads",
+    "Plant-based foods and beverages/Plant-based foods/Cereals and potatoes/Cereals and their products/Breads/Special breads/Hamburger buns"
+   ],
+   "0726984190222": [
+    "Bee products",
+    "Bee products/Honeys"
+   ],
+   "0742392701294": [
+    "Fats",
+    "Fats/Vegetable fats",
+    "Fats/Vegetable fats/Vegetable oils",
+    "Fats/Vegetable fats/Vegetable oils/Fruit and fruit seed oils",
+    "Fats/Vegetable fats/Vegetable oils/Fruit and fruit seed oils/Coconut oils"
+   ],
+   "0760232901055": [
+    "Desserts",
+    "Desserts/Compotes",
+    "Desserts/Compotes/Apple compotes",
+    "Desserts/Compotes/Apple compotes/Applesauces"
+   ],
+   "0786560579797": [
+    "Snacks"
+   ],
+   "0810979003038": [
+    "Beverages and beverages preparations",
+    "Beverages and beverages preparations/Beverages",
+    "Beverages and beverages preparations/Beverages/Dehydrated beverages"
+   ],
+   "0818108001627": [
+    "Cooking helpers"
+   ],
+   "0838766006444": [
+    "Beverages and beverages preparations",
+    "Beverages and beverages preparations/Beverages"
+   ],
+   "0851621003075": [
+    "Beverages and beverages preparations",
+    "Beverages and beverages preparations/Beverages",
+    "Beverages and beverages preparations/Beverages/Unsweetened beverages",
+    "Beverages and beverages preparations/Beverages/Unsweetened beverages/Apple juices"
+   ],
+   "0854487006051": [
+    "Snacks"
+   ],
+   "0857697005319": [
+    "Plant-based foods and beverages",
+    "Plant-based foods and beverages/Plant-based foods"
+   ],
+   "0873668001432": [
+    "Plant-based foods and beverages",
+    "Plant-based foods and beverages/Plant-based foods",
+    "Plant-based foods and beverages/Plant-based foods/Seeds",
+    "Plant-based foods and beverages/Plant-based foods/Seeds/Legume seeds"
+   ],
+   "0891627009039": [
+    "Frozen foods"
+   ],
+   "19423661": [
+    "Plant-based foods and beverages",
+    "Plant-based foods and beverages/Plant-based foods",
+    "Plant-based foods and beverages/Plant-based foods/Seeds",
+    "Plant-based foods and beverages/Plant-based foods/Seeds/Legume seeds",
+    "Plant-based foods and beverages/Plant-based foods/Seeds/Legume seeds/Pulses",
+    "Plant-based foods and beverages/Plant-based foods/Seeds/Legume seeds/Pulses/Common beans",
+    "Plant-based foods and beverages/Plant-based foods/Seeds/Legume seeds/Pulses/Common beans/White beans"
+   ],
+   "20046897": [
+    "Dairies",
+    "Dairies/Dairy desserts",
+    "Dairies/Dairy desserts/Fermented dairy desserts"
+   ],
+   "20289126": [
+    "Dietary supplements",
+    "Dietary supplements/Vitamins"
+   ],
+   "20646356": [
+    "Seafood",
+    "Seafood/Mollusc",
+    "Seafood/Mollusc/Mussels"
+   ],
+   "2190906011304": [
+    "Meats and their products",
+    "Meats and their products/Chicken and its products",
+    "Meats and their products/Chicken and its products/Chickens"
+   ],
+   "2268496036936": [
+    "Meats and their products",
+    "Meats and their products/Chicken and its products",
+    "Meats and their products/Chicken and its products/Chickens"
+   ],
+   "2449193014438": [
+    "Dairies",
+    "Dairies/Fermented milk products",
+    "Dairies/Fermented milk products/Cheeses",
+    "Dairies/Fermented milk products/Cheeses/Italian cheeses"
+   ],
+   "26037042": [
+    "Snacks",
+    "Snacks/Sweet snacks",
+    "Snacks/Sweet snacks/Biscuits and cakes",
+    "Snacks/Sweet snacks/Biscuits and cakes/Cakes",
+    "Snacks/Sweet snacks/Biscuits and cakes/Cakes/Chocolate cakes"
+   ],
+   "2845168020471": [
+    "Meats and their products",
+    "Meats and their products/Prepared meats",
+    "Meats and their products/Prepared meats/Hams",
+    "Meats and their products/Prepared meats/Hams/White hams"
+   ],
+   "3017800003558": [
+    "Plant-based foods and beverages",
+    "Plant-based foods and beverages/Plant-based foods",
+    "Plant-based foods and beverages/Plant-based foods/Legumes and their products",
+    "Plant-based foods and beverages/Plant-based foods/Legumes and their products/Legumes",
+    "Plant-based foods and beverages/Plant-based foods/Legumes and their products/Legumes/Green peas"
+   ],
+   "3033491139901": [
+    "Dairies",
+    "Dairies/Dairy desserts",
+    "Dairies/Dairy desserts/Fermented dairy desserts",
+    "Dairies/Dairy desserts/Fermented dairy desserts/Bifidus yogurts",
+    "Dairies/Dairy desserts/Fermented dairy desserts/Bifidus yogurts/Flavoured bifidus yogurts"
+   ],
+   "3045320091687": [
+    "Spreads",
+    "Spreads/Plant-based spreads",
+    "Spreads/Plant-based spreads/Fruit and vegetable preserves",
+    "Spreads/Plant-based spreads/Fruit and vegetable preserves/Jams",
+    "Spreads/Plant-based spreads/Fruit and vegetable preserves/Jams/Apricot jams"
+   ],
+   "3080216046211": [
+    "Beverages and beverages preparations",
+    "Beverages and beverages preparations/Beverages",
+    "Beverages and beverages preparations/Beverages/Non-alcoholic beverages",
+    "Beverages and beverages preparations/Beverages/Non-alcoholic beverages/Non-alcoholic beers"
+   ],
+   "3110320503000": [
+    "Snacks",
+    "Snacks/Sweet snacks",
+    "Snacks/Sweet snacks/Biscuits and cakes",
+    "Snacks/Sweet snacks/Biscuits and cakes/Cakes",
+    "Snacks/Sweet snacks/Biscuits and cakes/Cakes/Filled cakes"
+   ],
+   "3159580007989": [
+    "Meats and their products",
+    "Meats and their products/Chicken and its products",
+    "Meats and their products/Chicken and its products/Chickens",
+    "Meats and their products/Chicken and its products/Chickens/Chicken breasts"
+   ],
+   "3175690060119": [
+    "Seafood",
+    "Seafood/Fishes and their products",
+    "Seafood/Fishes and their products/Fishes",
+    "Seafood/Fishes and their products/Fishes/Anchovy",
+    "Seafood/Fishes and their products/Fishes/Anchovy/Anchovy fillets",
+    "Seafood/Fishes and their products/Fishes/Anchovy/Anchovy fillets/Marinated anchovy fillets",
+    "Seafood/Fishes and their products/Fishes/Anchovy/Anchovy fillets/Marinated anchovy fillets/Marinated anchovy fillets with vegetable oil"
+   ],
+   "3185610003133": [
+    "Snacks",
+    "Snacks/Salty snacks",
+    "Snacks/Salty snacks/Appetizers"
+   ],
+   "3222474211899": [
+    "Meals",
+    "Meals/Rice dishes",
+    "Meals/Rice dishes/Risottos",
+    "Meals/Rice dishes/Risottos/Chicken risottos"
+   ],
+   "3229248197656": [
+    "Desserts",
+    "Desserts/Frozen desserts",
+    "Desserts/Frozen desserts/Ice creams and sorbets",
+    "Desserts/Frozen desserts/Ice creams and sorbets/Ice creams",
+    "Desserts/Frozen desserts/Ice creams and sorbets/Ice creams/Ice cream tubs"
+   ],
+   "3245412694486": [
+    "Plant-based foods and beverages",
+    "Plant-based foods and beverages/Plant-based foods",
+    "Plant-based foods and beverages/Plant-based foods/Cereals and potatoes",
+    "Plant-based foods and beverages/Plant-based foods/Cereals and potatoes/Cereals and their products",
+    "Plant-based foods and beverages/Plant-based foods/Cereals and potatoes/Cereals and their products/Breads",
+    "Plant-based foods and beverages/Plant-based foods/Cereals and potatoes/Cereals and their products/Breads/Flatbreads",
+    "Plant-based foods and beverages/Plant-based foods/Cereals and potatoes/Cereals and their products/Breads/Flatbreads/Pitas"
+   ],
+   "3250391661022": [
+    "Spreads",
+    "Spreads/Salted spreads"
+   ],
+   "3254950008846": [
+    "Snacks",
+    "Snacks/Sweet snacks",
+    "Snacks/Sweet snacks/Biscuits and cakes",
+    "Snacks/Sweet snacks/Biscuits and cakes/Pastries",
+    "Snacks/Sweet snacks/Biscuits and cakes/Pastries/Waffles"
+   ],
+   "3256224658917": [
+    "Meats and their products",
+    "Meats and their products/Prepared meats",
+    "Meats and their products/Prepared meats/Cured sausages",
+    "Meats and their products/Prepared meats/Cured sausages/Chorizo"
+   ],
+   "3257980632487": [
+    "Dairies",
+    "Dairies/Milks (liquid and powder)",
+    "Dairies/Milks (liquid and powder)/Milks",
+    "Dairies/Milks (liquid and powder)/Milks/Homogenized milks"
+   ],
+   "3258561400075": [
+    "Snacks",
+    "Snacks/Sweet snacks",
+    "Snacks/Sweet snacks/Sweet pastries and pies",
+    "Snacks/Sweet snacks/Sweet pastries and pies/Viennoiseries",
+    "Snacks/Sweet snacks/Sweet pastries and pies/Viennoiseries/Milk bread rolls"
+   ],
+   "3263820006004": [
+    "Plant-based foods and beverages",
+    "Plant-based foods and beverages/Plant-based foods",
+    "Plant-based foods and beverages/Plant-based foods/Seeds",
+    "Plant-based foods and beverages/Plant-based foods/Seeds/Legume seeds",
+    "Plant-based foods and beverages/Plant-based foods/Seeds/Legume seeds/Pulses",
+    "Plant-based foods and beverages/Plant-based foods/Seeds/Legume seeds/Pulses/Common beans",
+    "Plant-based foods and beverages/Plant-based foods/Seeds/Legume seeds/Pulses/Common beans/White beans"
+   ],
+   "3263858777815": [
+    "Sandwiches",
+    "Sandwiches/Wraps",
+    "Sandwiches/Wraps/Chicken wraps"
+   ],
+   "3266191022543": [
+    "Snacks",
+    "Snacks/Sweet snacks",
+    "Snacks/Sweet snacks/Biscuits and cakes",
+    "Snacks/Sweet snacks/Biscuits and cakes/Cakes",
+    "Snacks/Sweet snacks/Biscuits and cakes/Cakes/Filled cakes"
+   ],
+   "3270160688449": [
+    "Meals",
+    "Meals/Soups",
+    "Meals/Soups/Cream soups",
+    "Meals/Soups/Cream soups/Cream of vegetable soups"
+   ],
+   "3273220540565": [
+    "Dairies",
+    "Dairies/Dairy desserts",
+    "Dairies/Dairy desserts/Fermented dairy desserts",
+    "Dairies/Dairy desserts/Fermented dairy desserts/Fermented dairy desserts with fruits"
+   ],
+   "3279130109953": [
+    "Snacks",
+    "Snacks/Sweet snacks",
+    "Snacks/Sweet snacks/Biscuits and cakes"
+   ],
+   "3291960002792": [
+    "Plant-based foods and beverages",
+    "Plant-based foods and beverages/Plant-based foods",
+    "Plant-based foods and beverages/Plant-based foods/Nuts and their products",
+    "Plant-based foods and beverages/Plant-based foods/Nuts and their products/Nut oils",
+    "Plant-based foods and beverages/Plant-based foods/Nuts and their products/Nut oils/Almond oils"
+   ],
+   "3302552302500": [
+    "Fats",
+    "Fats/Animal fats",
+    "Fats/Animal fats/Butters",
+    "Fats/Animal fats/Butters/French butters"
+   ],
+   "3329486531202": [
+    "Plant-based foods and beverages",
+    "Plant-based foods and beverages/Plant-based foods",
+    "Plant-based foods and beverages/Plant-based foods/Flours",
+    "Plant-based foods and beverages/Plant-based foods/Flours/Legume flours",
+    "Plant-based foods and beverages/Plant-based foods/Flours/Legume flours/Soybean flours"
+   ],
+   "3338500631729": [
+    "Beverages and beverages preparations",
+    "Beverages and beverages preparations/Beverages",
+    "Beverages and beverages preparations/Beverages/Alcoholic beverages",
+    "Beverages and beverages preparations/Beverages/Alcoholic beverages/Wines",
+    "Beverages and beverages preparations/Beverages/Alcoholic beverages/Wines/Rosé wines"
+   ],
+   "3350033181977": [
+    "Sandwiches",
+    "Sandwiches/Wraps"
+   ],
+   "3368410004214": [
+    "Spreads",
+    "Spreads/Salted spreads",
+    "Spreads/Salted spreads/Tapenades",
+    "Spreads/Salted spreads/Tapenades/Black tapenades"
+   ],
+   "3382565068150": [
+    "Spreads",
+    "Spreads/Salted spreads",
+    "Spreads/Salted spreads/Tapenades",
+    "Spreads/Salted spreads/Tapenades/Green tapenades"
+   ],
+   "3403400000002": [
+    "Crêpes and galettes",
+    "Crêpes and galettes/Crêpes",
+    "Crêpes and galettes/Crêpes/Sugared crêpes"
+   ],
+   "3428272000059": [
+    "Dairies",
+    "Dairies/Milks (liquid and powder)",
+    "Dairies/Milks (liquid and powder)/Milks",
+    "Dairies/Milks (liquid and powder)/Milks/Semi-skimmed milks"
+   ],
+   "3443705007702": [
+    "Fish and meat and eggs",
+    "Fish and meat and eggs/Foies gras",
+    "Fish and meat and eggs/Foies gras/Foies gras from ducks"
+   ],
+   "3460426049927": [
+    "Plant-based foods and beverages",
+    "Plant-based foods and beverages/Plant-based foods",
+    "Plant-based foods and beverages/Plant-based foods/Nuts and their products",
+    "Plant-based foods and beverages/Plant-based foods/Nuts and their products/Nuts",
+    "Plant-based foods and beverages/Plant-based foods/Nuts and their products/Nuts/Cashew nuts"
+   ],
+   "3490090070040": [
+    "Condiments",
+    "Condiments/Vinegars",
+    "Condiments/Vinegars/Wine vinegars"
+   ],
+   "3513851559582": [
+    "Snacks",
+    "Snacks/Salty snacks",
+    "Snacks/Salty snacks/Appetizers"
+   ],
+   "3547110000188": [
+    "Plant-based foods and beverages",
+    "Plant-based foods and beverages/Plant-based foods",
+    "Plant-based foods and beverages/Plant-based foods/Seeds",
+    "Plant-based foods and beverages/Plant-based foods/Seeds/Legume seeds",
+    "Plant-based foods and beverages/Plant-based foods/Seeds/Legume seeds/Pulses",
+    "Plant-based foods and beverages/Plant-based foods/Seeds/Legume seeds/Pulses/Common beans",
+    "Plant-based foods and beverages/Plant-based foods/Seeds/Legume seeds/Pulses/Common beans/Red beans"
+   ],
+   "3560070799817": [
+    "Dairies",
+    "Dairies/Evaporated milks",
+    "Dairies/Evaporated milks/Evaporated milks without sugar",
+    "Dairies/Evaporated milks/Evaporated milks without sugar/Whole condensed milk without sugar"
+   ],
+   "3564700422168": [
+    "Meats and their products",
+    "Meats and their products/Pork and its products",
+    "Meats and their products/Pork and its products/Prepared pork meats",
+    "Meats and their products/Pork and its products/Prepared pork meats/Pork Pâtés",
+    "Meats and their products/Pork and its products/Prepared pork meats/Pork Pâtés/Country-style Pâtés"
+   ],
+   "3564709000879": [
+    "Meals",
+    "Meals/Meals with meat",
+    "Meals/Meals with meat/Specialty made with tripe",
+    "Meals/Meals with meat/Specialty made with tripe/Caen-style tripes"
+   ],
+   "3588250000027": [
+    "Fats",
+    "Fats/Animal fats",
+    "Fats/Animal fats/Butters"
+   ],
+   "3596710455591": [
+    "Dairies",
+    "Dairies/Milks (liquid and powder)",
+    "Dairies/Milks (liquid and powder)/Milks",
+    "Dairies/Milks (liquid and powder)/Milks/Homogenized milks",
+    "Dairies/Milks (liquid and powder)/Milks/Homogenized milks/ESL milks"
+   ],
+   "3661112054144": [
+    "Meats and their products",
+    "Meats and their products/Prepared meats",
+    "Meats and their products/Prepared meats/Hams",
+    "Meats and their products/Prepared meats/Hams/White hams"
+   ],
+   "3700156945077": [
+    "Seafood",
+    "Seafood/Crustaceans",
+    "Seafood/Crustaceans/Shrimps"
+   ],
+   "3700650901142": [
+    "Plant-based foods and beverages",
+    "Plant-based foods and beverages/Plant-based foods",
+    "Plant-based foods and beverages/Plant-based foods/Nuts and their products",
+    "Plant-based foods and beverages/Plant-based foods/Nuts and their products/Nuts",
+    "Plant-based foods and beverages/Plant-based foods/Nuts and their products/Nuts/Cashew nuts"
+   ],
+   "3760020065447": [
+    "Seafood",
+    "Seafood/Fishes and their products",
+    "Seafood/Fishes and their products/Fishes",
+    "Seafood/Fishes and their products/Fishes/Fish fillets",
+    "Seafood/Fishes and their products/Fishes/Fish fillets/Mackerel fillets",
+    "Seafood/Fishes and their products/Fishes/Fish fillets/Mackerel fillets/Mackerel fillets in escabeche"
+   ],
+   "3760059621225": [
+    "Fish and meat and eggs",
+    "Fish and meat and eggs/Foies gras",
+    "Fish and meat and eggs/Foies gras/Foies gras pâtés"
+   ],
+   "3760099537692": [
+    "Dairies",
+    "Dairies/Fermented milk products",
+    "Dairies/Fermented milk products/Cheeses",
+    "Dairies/Fermented milk products/Cheeses/Cow cheeses",
+    "Dairies/Fermented milk products/Cheeses/Cow cheeses/Maroilles"
+   ],
+   "3760149995960": [
+    "Plant-based foods and beverages",
+    "Plant-based foods and beverages/Plant-based foods",
+    "Plant-based foods and beverages/Plant-based foods/Seeds",
+    "Plant-based foods and beverages/Plant-based foods/Seeds/Cereal grains"
+   ],
+   "3760201330043": [
+    "Meals"
+   ],
+   "3770000409000": [
+    "Cocoa and its products",
+    "Cocoa and its products/Chocolates",
+    "Cocoa and its products/Chocolates/Dark chocolates"
+   ],
+   "3858884090306": [
+    "Fats",
+    "Fats/Vegetable fats",
+    "Fats/Vegetable fats/Vegetable oils",
+    "Fats/Vegetable fats/Vegetable oils/Pumpkin seed oils"
+   ],
+   "4003171043452": [
+    "Meats and their products",
+    "Meats and their products/Prepared meats",
+    "Meats and their products/Prepared meats/Prepared poultry meats"
+   ],
+   "4009300014584": [
+    "Beverages and beverages preparations",
+    "Beverages and beverages preparations/Beverage preparations",
+    "Beverages and beverages preparations/Beverage preparations/Herbal teas",
+    "Beverages and beverages preparations/Beverage preparations/Herbal teas/Fruit teas"
+   ],
+   "4019736003557": [
+    "Spreads",
+    "Spreads/Salted spreads"
+   ],
+   "4061458013680": [
+    "Meats and their products",
+    "Meats and their products/Meats",
+    "Meats and their products/Meats/Fresh meats"
+   ],
+   "4260042311229": [
+    "Plant-based foods and beverages",
+    "Plant-based foods and beverages/Plant-based foods",
+    "Plant-based foods and beverages/Plant-based foods/Cereals and potatoes",
+    "Plant-based foods and beverages/Plant-based foods/Cereals and potatoes/Cereals and their products"
+   ],
+   "4316268414982": [
+    "Dairies",
+    "Dairies/Milks (liquid and powder)",
+    "Dairies/Milks (liquid and powder)/Milks",
+    "Dairies/Milks (liquid and powder)/Milks/Homogenized milks",
+    "Dairies/Milks (liquid and powder)/Milks/Homogenized milks/ESL milks"
+   ],
+   "4804888287081": [
+    "Canned foods"
+   ],
+   "5010029000184": [
+    "Plant-based foods and beverages",
+    "Plant-based foods and beverages/Plant-based foods",
+    "Plant-based foods and beverages/Plant-based foods/Cereals and potatoes",
+    "Plant-based foods and beverages/Plant-based foods/Cereals and potatoes/Cereals and their products"
+   ],
+   "5029212780338": [
+    "Beverages and beverages preparations",
+    "Beverages and beverages preparations/Beverages",
+    "Beverages and beverages preparations/Beverages/Non-alcoholic beverages",
+    "Beverages and beverages preparations/Beverages/Non-alcoholic beverages/Non-alcoholic beers",
+    "Beverages and beverages preparations/Beverages/Non-alcoholic beverages/Non-alcoholic beers/Ginger beer"
+   ],
+   "5055936871946": [
+    "Plant-based foods and beverages",
+    "Plant-based foods and beverages/Plant-based foods"
+   ],
+   "5201360624560": [
+    "Snacks",
+    "Snacks/Salty snacks",
+    "Snacks/Salty snacks/Appetizers"
+   ],
+   "5400141293821": [
+    "Plant-based foods and beverages",
+    "Plant-based foods and beverages/Vegetable-based foods and beverages",
+    "Plant-based foods and beverages/Vegetable-based foods and beverages/Vegetables based foods",
+    "Plant-based foods and beverages/Vegetable-based foods and beverages/Vegetables based foods/Vegetables",
+    "Plant-based foods and beverages/Vegetable-based foods and beverages/Vegetables based foods/Vegetables/Vegetable rods",
+    "Plant-based foods and beverages/Vegetable-based foods and beverages/Vegetables based foods/Vegetables/Vegetable rods/Asparagus",
+    "Plant-based foods and beverages/Vegetable-based foods and beverages/Vegetables based foods/Vegetables/Vegetable rods/Asparagus/White asparagus"
+   ],
+   "5410471127000": [
+    "Snacks",
+    "Snacks/Sweet snacks",
+    "Snacks/Sweet snacks/Biscuits and cakes"
+   ],
+   "5420024112780": [
+    "Dairies",
+    "Dairies/Fermented milk products",
+    "Dairies/Fermented milk products/Cheeses",
+    "Dairies/Fermented milk products/Cheeses/Italian cheeses",
+    "Dairies/Fermented milk products/Cheeses/Italian cheeses/Parmigiano-Reggiano"
+   ],
+   "5601164900349": [
+    "Beverages and beverages preparations",
+    "Beverages and beverages preparations/Beverages",
+    "Beverages and beverages preparations/Beverages/Alcoholic beverages",
+    "Beverages and beverages preparations/Beverages/Alcoholic beverages/Beers"
+   ]
+  },
+  "es": {
+   "0000101209159": [
+    "Desayunos",
+    "Desayunos/Untables dulces",
+    "Desayunos/Untables dulces/Cremas de chocolate",
+    "Desayunos/Untables dulces/Cremas de chocolate/Cremas de cacao y avellanas"
+   ],
+   "0011213252209": [
+    "Botanas",
+    "Botanas/Palomitas de maíz"
+   ],
+   "0019061091452": [
+    "Botanas",
+    "Botanas/Snacks dulces",
+    "Botanas/Snacks dulces/Dulces"
+   ],
+   "0025293002784": [
+    "Lácteos",
+    "Lácteos/Postres lácteos",
+    "Lácteos/Postres lácteos/Fermented dairy desserts",
+    "Lácteos/Postres lácteos/Fermented dairy desserts/Yogures"
+   ],
+   "0033314223100": [
+    "Botanas",
+    "Botanas/Snacks dulces",
+    "Botanas/Snacks dulces/Dulces"
+   ],
+   "0038749700134": [
+    "Botanas",
+    "Botanas/Snacks dulces",
+    "Botanas/Snacks dulces/Galletas y pasteles"
+   ],
+   "0041271005073": [
+    "Alimentos y bebidas de origen vegetal",
+    "Alimentos y bebidas de origen vegetal/Dairy substitutes",
+    "Alimentos y bebidas de origen vegetal/Dairy substitutes/Creamer"
+   ],
+   "0041725101108": [
+    "Ayudas culinarias",
+    "Ayudas culinarias/Pastry helpers"
+   ],
+   "0046583000808": [
+    "Lácteos",
+    "Lácteos/Productos fermentados de la leche",
+    "Lácteos/Productos fermentados de la leche/Quesos"
+   ],
+   "0051933232952": [
+    "Conservas",
+    "Conservas/Comidas preparadas en conserva",
+    "Conservas/Comidas preparadas en conserva/Sopas en conserva"
+   ],
+   "0059749952347": [
+    "Alimentos y bebidas de origen vegetal",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Cereales y patatas",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Cereales y patatas/Cereales y derivados",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Cereales y patatas/Cereales y derivados/Sémolas y semolinas de cereales",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Cereales y patatas/Cereales y derivados/Sémolas y semolinas de cereales/Sémolas y semolinas de trigo",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Cereales y patatas/Cereales y derivados/Sémolas y semolinas de cereales/Sémolas y semolinas de trigo/Sémolas y semolinas de trigo duro",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Cereales y patatas/Cereales y derivados/Sémolas y semolinas de cereales/Sémolas y semolinas de trigo/Sémolas y semolinas de trigo duro/Sémolas de trigo duro para couscous"
+   ],
+   "0070175012337": [
+    "Botanas"
+   ],
+   "0070740103989": [
+    "Alimentos y bebidas de origen vegetal",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Frutas y verduras y sus productos",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Frutas y verduras y sus productos/Frutas y sus productos",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Frutas y verduras y sus productos/Frutas y sus productos/Frutas",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Frutas y verduras y sus productos/Frutas y sus productos/Frutas/Frutas tropicales",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Frutas y verduras y sus productos/Frutas y sus productos/Frutas/Frutas tropicales/Aguacates"
+   ],
+   "0071443015500": [
+    "Botanas",
+    "Botanas/Snacks dulces",
+    "Botanas/Snacks dulces/Dulces"
+   ],
+   "0072180511157": [
+    "Postres",
+    "Postres/Postres helados"
+   ],
+   "0072945601642": [
+    "Alimentos y bebidas de origen vegetal",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Cereales y patatas",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Cereales y patatas/Cereales y derivados",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Cereales y patatas/Cereales y derivados/Panes",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Cereales y patatas/Cereales y derivados/Panes/Panes especiales",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Cereales y patatas/Cereales y derivados/Panes/Panes especiales/Panes para hamburguesas"
+   ],
+   "0074175446246": [
+    "Lácteos",
+    "Lácteos/Productos fermentados de la leche",
+    "Lácteos/Productos fermentados de la leche/Quesos"
+   ],
+   "0075450133103": [
+    "Comidas preparadas",
+    "Comidas preparadas/Pizzas"
+   ],
+   "0076958414091": [
+    "Botanas"
+   ],
+   "0077975088258": [
+    "Botanas"
+   ],
+   "0078742228143": [
+    "Alimentos y bebidas de origen vegetal",
+    "Alimentos y bebidas de origen vegetal/Comida y bebida vegetal",
+    "Alimentos y bebidas de origen vegetal/Comida y bebida vegetal/Verduras y hortalizas y sus productos",
+    "Alimentos y bebidas de origen vegetal/Comida y bebida vegetal/Verduras y hortalizas y sus productos/Tomates y sus productos",
+    "Alimentos y bebidas de origen vegetal/Comida y bebida vegetal/Verduras y hortalizas y sus productos/Tomates y sus productos/Tomates"
+   ],
+   "0083791070032": [
+    "Botanas",
+    "Botanas/Snacks salados",
+    "Botanas/Snacks salados/Aperitivos"
+   ],
+   "0085239819906": [
+    "Botanas",
+    "Botanas/Palomitas de maíz"
+   ],
+   "0092825105459": [
+    "Alimentos y bebidas de origen vegetal",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Semillas",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Semillas/Cereales en grano",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Semillas/Cereales en grano/Arroces"
+   ],
+   "0099482461294": [
+    "Untables",
+    "Untables/Untables vegetales",
+    "Untables/Untables vegetales/Preparaciones a base de frutas y verduras"
+   ],
+   "0205717710345": [
+    "Lácteos",
+    "Lácteos/Productos fermentados de la leche",
+    "Lácteos/Productos fermentados de la leche/Quesos",
+    "Lácteos/Productos fermentados de la leche/Quesos/Quesos de leche de oveja",
+    "Lácteos/Productos fermentados de la leche/Quesos/Quesos de leche de oveja/Manchego"
+   ],
+   "0230063008532": [
+    "Alimentos y bebidas de origen vegetal",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Cereales y patatas",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Cereales y patatas/Cereales y derivados",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Cereales y patatas/Cereales y derivados/Panes",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Cereales y patatas/Cereales y derivados/Panes/Panes integrales"
+   ],
+   "0502226813964": [
+    "Botanas",
+    "Botanas/Snacks dulces",
+    "Botanas/Snacks dulces/Dulces"
+   ],
+   "0629098612522": [
+    "Endulzantes",
+    "Endulzantes/Siropes simples",
+    "Endulzantes/Siropes simples/Siropes de arce"
+   ],
+   "0659422080369": [
+    "Botanas",
+    "Botanas/Snacks dulces",
+    "Botanas/Snacks dulces/Galletas y pasteles"
+   ],
+   "0688267149573": [
+    "Alimentos y bebidas de origen vegetal",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Cereales y patatas",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Cereales y patatas/Cereales y derivados",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Cereales y patatas/Cereales y derivados/Panes"
+   ],
+   "0708820336704": [
+    "Botanas",
+    "Botanas/Snacks dulces",
+    "Botanas/Snacks dulces/Dulces"
+   ],
+   "0717544205418": [
+    "Alimentos y bebidas de origen vegetal",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Cereales y patatas",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Cereales y patatas/Cereales y derivados",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Cereales y patatas/Cereales y derivados/Panes",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Cereales y patatas/Cereales y derivados/Panes/Panes especiales",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Cereales y patatas/Cereales y derivados/Panes/Panes especiales/Panes para hamburguesas"
+   ],
+   "0726984190222": [
+    "Productos apícolas",
+    "Productos apícolas/Mieles"
+   ],
+   "0742392701294": [
+    "Aceites y grasas",
+    "Aceites y grasas/Grasas vegetales",
+    "Aceites y grasas/Grasas vegetales/Aceites vegetales",
+    "Aceites y grasas/Grasas vegetales/Aceites vegetales/Aceites de frutas y semillas de frutas",
+    "Aceites y grasas/Grasas vegetales/Aceites vegetales/Aceites de frutas y semillas de frutas/Aceites de coco"
+   ],
+   "0760232901055": [
+    "Postres",
+    "Postres/Compotas",
+    "Postres/Compotas/Compotas de manzana",
+    "Postres/Compotas/Compotas de manzana/Applesauces"
+   ],
+   "0786560579797": [
+    "Botanas"
+   ],
+   "0810979003038": [
+    "Bebidas y preparaciones de bebidas",
+    "Bebidas y preparaciones de bebidas/Bebidas",
+    "Bebidas y preparaciones de bebidas/Bebidas/Bebidas deshidratadas"
+   ],
+   "0818108001627": [
+    "Ayudas culinarias"
+   ],
+   "0838766006444": [
+    "Bebidas y preparaciones de bebidas",
+    "Bebidas y preparaciones de bebidas/Bebidas"
+   ],
+   "0851621003075": [
+    "Bebidas y preparaciones de bebidas",
+    "Bebidas y preparaciones de bebidas/Bebidas",
+    "Bebidas y preparaciones de bebidas/Bebidas/Bebidas no azucaradas",
+    "Bebidas y preparaciones de bebidas/Bebidas/Bebidas no azucaradas/Zumos de manzana"
+   ],
+   "0854487006051": [
+    "Botanas"
+   ],
+   "0857697005319": [
+    "Alimentos y bebidas de origen vegetal",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal"
+   ],
+   "0873668001432": [
+    "Alimentos y bebidas de origen vegetal",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Semillas",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Semillas/Granos de leguminosas"
+   ],
+   "0891627009039": [
+    "Congelados"
+   ],
+   "19423661": [
+    "Alimentos y bebidas de origen vegetal",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Semillas",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Semillas/Granos de leguminosas",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Semillas/Granos de leguminosas/Legumbres secas",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Semillas/Granos de leguminosas/Legumbres secas/Alubias",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Semillas/Granos de leguminosas/Legumbres secas/Alubias/Alubias blancas"
+   ],
+   "20046897": [
+    "Lácteos",
+    "Lácteos/Postres lácteos",
+    "Lácteos/Postres lácteos/Fermented dairy desserts"
+   ],
+   "20289126": [
+    "Suplementos dietéticos",
+    "Suplementos dietéticos/Vitaminas"
+   ],
+   "20646356": [
+    "Productos del mar",
+    "Productos del mar/Molusco",
+    "Productos del mar/Molusco/Mejillones"
+   ],
+   "2190906011304": [
+    "Productos a base de carne",
+    "Productos a base de carne/Pollo y sus productos",
+    "Productos a base de carne/Pollo y sus productos/Pollo"
+   ],
+   "2268496036936": [
+    "Productos a base de carne",
+    "Productos a base de carne/Pollo y sus productos",
+    "Productos a base de carne/Pollo y sus productos/Pollo"
+   ],
+   "2449193014438": [
+    "Lácteos",
+    "Lácteos/Productos fermentados de la leche",
+    "Lácteos/Productos fermentados de la leche/Quesos",
+    "Lácteos/Productos fermentados de la leche/Quesos/Quesos italianos"
+   ],
+   "26037042": [
+    "Botanas",
+    "Botanas/Snacks dulces",
+    "Botanas/Snacks dulces/Galletas y pasteles",
+    "Botanas/Snacks dulces/Galletas y pasteles/Pasteles",
+    "Botanas/Snacks dulces/Galletas y pasteles/Pasteles/Pasteles de chocolate"
+   ],
+   "2845168020471": [
+    "Productos a base de carne",
+    "Productos a base de carne/Embutidos",
+    "Productos a base de carne/Embutidos/Jamón",
+    "Productos a base de carne/Embutidos/Jamón/Jamón cocido"
+   ],
+   "3017800003558": [
+    "Alimentos y bebidas de origen vegetal",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Leguminosas y derivados",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Leguminosas y derivados/Leguminosas",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Leguminosas y derivados/Leguminosas/Guisantes verdes"
+   ],
+   "3033491139901": [
+    "Lácteos",
+    "Lácteos/Postres lácteos",
+    "Lácteos/Postres lácteos/Fermented dairy desserts",
+    "Lácteos/Postres lácteos/Fermented dairy desserts/Yogures bifidus",
+    "Lácteos/Postres lácteos/Fermented dairy desserts/Yogures bifidus/Flavoured bifidus yogurts"
+   ],
+   "3045320091687": [
+    "Untables",
+    "Untables/Untables vegetales",
+    "Untables/Untables vegetales/Preparaciones a base de frutas y verduras",
+    "Untables/Untables vegetales/Preparaciones a base de frutas y verduras/Confitura",
+    "Untables/Untables vegetales/Preparaciones a base de frutas y verduras/Confitura/Confituras de albaricoque"
+   ],
+   "3080216046211": [
+    "Bebidas y preparaciones de bebidas",
+    "Bebidas y preparaciones de bebidas/Bebidas",
+    "Bebidas y preparaciones de bebidas/Bebidas/Bebidas no alcohólicas",
+    "Bebidas y preparaciones de bebidas/Bebidas/Bebidas no alcohólicas/Cervezas sin alcohol"
+   ],
+   "3110320503000": [
+    "Botanas",
+    "Botanas/Snacks dulces",
+    "Botanas/Snacks dulces/Galletas y pasteles",
+    "Botanas/Snacks dulces/Galletas y pasteles/Pasteles",
+    "Botanas/Snacks dulces/Galletas y pasteles/Pasteles/Filled cakes"
+   ],
+   "3159580007989": [
+    "Productos a base de carne",
+    "Productos a base de carne/Pollo y sus productos",
+    "Productos a base de carne/Pollo y sus productos/Pollo",
+    "Productos a base de carne/Pollo y sus productos/Pollo/Pechugas de pollo"
+   ],
+   "3175690060119": [
+    "Productos del mar",
+    "Productos del mar/Fishes and their products",
+    "Productos del mar/Fishes and their products/Pescados",
+    "Productos del mar/Fishes and their products/Pescados/Anchoa",
+    "Productos del mar/Fishes and their products/Pescados/Anchoa/Filetes de anchoa",
+    "Productos del mar/Fishes and their products/Pescados/Anchoa/Filetes de anchoa/Marinated anchovy fillets",
+    "Productos del mar/Fishes and their products/Pescados/Anchoa/Filetes de anchoa/Marinated anchovy fillets/Marinated anchovy fillets with vegetable oil"
+   ],
+   "3185610003133": [
+    "Botanas",
+    "Botanas/Snacks salados",
+    "Botanas/Snacks salados/Aperitivos"
+   ],
+   "3222474211899": [
+    "Comidas preparadas",
+    "Comidas preparadas/Platos de arroz",
+    "Comidas preparadas/Platos de arroz/Risotto",
+    "Comidas preparadas/Platos de arroz/Risotto/Chicken risottos"
+   ],
+   "3229248197656": [
+    "Postres",
+    "Postres/Postres helados",
+    "Postres/Postres helados/Helados y sorbetes",
+    "Postres/Postres helados/Helados y sorbetes/Helado",
+    "Postres/Postres helados/Helados y sorbetes/Helado/Tarrinas y bloques de helado"
+   ],
+   "3245412694486": [
+    "Alimentos y bebidas de origen vegetal",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Cereales y patatas",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Cereales y patatas/Cereales y derivados",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Cereales y patatas/Cereales y derivados/Panes",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Cereales y patatas/Cereales y derivados/Panes/Panes planos",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Cereales y patatas/Cereales y derivados/Panes/Panes planos/Pitas"
+   ],
+   "3250391661022": [
+    "Untables",
+    "Untables/Untables salados"
+   ],
+   "3254950008846": [
+    "Botanas",
+    "Botanas/Snacks dulces",
+    "Botanas/Snacks dulces/Galletas y pasteles",
+    "Botanas/Snacks dulces/Galletas y pasteles/Bolleria",
+    "Botanas/Snacks dulces/Galletas y pasteles/Bolleria/Gofres"
+   ],
+   "3256224658917": [
+    "Productos a base de carne",
+    "Productos a base de carne/Embutidos",
+    "Productos a base de carne/Embutidos/Embutidos curados",
+    "Productos a base de carne/Embutidos/Embutidos curados/Chorizo"
+   ],
+   "3257980632487": [
+    "Lácteos",
+    "Lácteos/Milks (liquid and powder)",
+    "Lácteos/Milks (liquid and powder)/Leches",
+    "Lácteos/Milks (liquid and powder)/Leches/Leches homogeneizadas"
+   ],
+   "3258561400075": [
+    "Botanas",
+    "Botanas/Snacks dulces",
+    "Botanas/Snacks dulces/Sweet pastries and pies",
+    "Botanas/Snacks dulces/Sweet pastries and pies/Viennoiseries",
+    "Botanas/Snacks dulces/Sweet pastries and pies/Viennoiseries/Panes de leche"
+   ],
+   "3263820006004": [
+    "Alimentos y bebidas de origen vegetal",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Semillas",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Semillas/Granos de leguminosas",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Semillas/Granos de leguminosas/Legumbres secas",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Semillas/Granos de leguminosas/Legumbres secas/Alubias",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Semillas/Granos de leguminosas/Legumbres secas/Alubias/Alubias blancas"
+   ],
+   "3263858777815": [
+    "Sándwiches",
+    "Sándwiches/Wraps",
+    "Sándwiches/Wraps/Wraps de pollo"
+   ],
+   "3266191022543": [
+    "Botanas",
+    "Botanas/Snacks dulces",
+    "Botanas/Snacks dulces/Galletas y pasteles",
+    "Botanas/Snacks dulces/Galletas y pasteles/Pasteles",
+    "Botanas/Snacks dulces/Galletas y pasteles/Pasteles/Filled cakes"
+   ],
+   "3270160688449": [
+    "Comidas preparadas",
+    "Comidas preparadas/Sopas",
+    "Comidas preparadas/Sopas/Sopas de tipo crema",
+    "Comidas preparadas/Sopas/Sopas de tipo crema/Cremas de verduras y hortalizas"
+   ],
+   "3273220540565": [
+    "Lácteos",
+    "Lácteos/Postres lácteos",
+    "Lácteos/Postres lácteos/Fermented dairy desserts",
+    "Lácteos/Postres lácteos/Fermented dairy desserts/Fermented dairy desserts with fruits"
+   ],
+   "3279130109953": [
+    "Botanas",
+    "Botanas/Snacks dulces",
+    "Botanas/Snacks dulces/Galletas y pasteles"
+   ],
+   "3291960002792": [
+    "Alimentos y bebidas de origen vegetal",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Frutos de cáscara y derivados",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Frutos de cáscara y derivados/Aceites de frutos de cáscara",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Frutos de cáscara y derivados/Aceites de frutos de cáscara/Aceites de almendras"
+   ],
+   "3302552302500": [
+    "Aceites y grasas",
+    "Aceites y grasas/Grasas animales",
+    "Aceites y grasas/Grasas animales/Mantequillas",
+    "Aceites y grasas/Grasas animales/Mantequillas/French butters"
+   ],
+   "3329486531202": [
+    "Alimentos y bebidas de origen vegetal",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Harinas de origen vegetal",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Harinas de origen vegetal/Harinas de leguminosas",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Harinas de origen vegetal/Harinas de leguminosas/Harinas de soja"
+   ],
+   "3338500631729": [
+    "Bebidas y preparaciones de bebidas",
+    "Bebidas y preparaciones de bebidas/Bebidas",
+    "Bebidas y preparaciones de bebidas/Bebidas/Bebidas alcohólicas",
+    "Bebidas y preparaciones de bebidas/Bebidas/Bebidas alcohólicas/Vinos",
+    "Bebidas y preparaciones de bebidas/Bebidas/Bebidas alcohólicas/Vinos/Vinos rosados"
+   ],
+   "3350033181977": [
+    "Sándwiches",
+    "Sándwiches/Wraps"
+   ],
+   "3368410004214": [
+    "Untables",
+    "Untables/Untables salados",
+    "Untables/Untables salados/Tapenade",
+    "Untables/Untables salados/Tapenade/Black tapenades"
+   ],
+   "3382565068150": [
+    "Untables",
+    "Untables/Untables salados",
+    "Untables/Untables salados/Tapenade",
+    "Untables/Untables salados/Tapenade/Green tapenades"
+   ],
+   "3403400000002": [
+    "Crêpes y galettes",
+    "Crêpes y galettes/Crepe",
+    "Crêpes y galettes/Crepe/Sugared crêpes"
+   ],
+   "3428272000059": [
+    "Lácteos",
+    "Lácteos/Milks (liquid and powder)",
+    "Lácteos/Milks (liquid and powder)/Leches",
+    "Lácteos/Milks (liquid and powder)/Leches/Leche semidesnatada"
+   ],
+   "3443705007702": [
+    "Pescado carne y huevos",
+    "Pescado carne y huevos/Foies gras",
+    "Pescado carne y huevos/Foies gras/Foies gras de patos"
+   ],
+   "3460426049927": [
+    "Alimentos y bebidas de origen vegetal",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Frutos de cáscara y derivados",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Frutos de cáscara y derivados/Frutos de cáscara",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Frutos de cáscara y derivados/Frutos de cáscara/Anacardos"
+   ],
+   "3490090070040": [
+    "Condimentos",
+    "Condimentos/Vinagres",
+    "Condimentos/Vinagres/Vinagres de vino"
+   ],
+   "3513851559582": [
+    "Botanas",
+    "Botanas/Snacks salados",
+    "Botanas/Snacks salados/Aperitivos"
+   ],
+   "3547110000188": [
+    "Alimentos y bebidas de origen vegetal",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Semillas",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Semillas/Granos de leguminosas",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Semillas/Granos de leguminosas/Legumbres secas",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Semillas/Granos de leguminosas/Legumbres secas/Alubias",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Semillas/Granos de leguminosas/Legumbres secas/Alubias/Alubias rojas"
+   ],
+   "3560070799817": [
+    "Lácteos",
+    "Lácteos/Leches evaporadas",
+    "Lácteos/Leches evaporadas/Evaporated milks without sugar",
+    "Lácteos/Leches evaporadas/Evaporated milks without sugar/Whole condensed milk without sugar"
+   ],
+   "3564700422168": [
+    "Productos a base de carne",
+    "Productos a base de carne/Carne de cerdo y sus productos",
+    "Productos a base de carne/Carne de cerdo y sus productos/Prepared pork meats",
+    "Productos a base de carne/Carne de cerdo y sus productos/Prepared pork meats/Patés de cerdo",
+    "Productos a base de carne/Carne de cerdo y sus productos/Prepared pork meats/Patés de cerdo/Country-style Pâtés"
+   ],
+   "3564709000879": [
+    "Comidas preparadas",
+    "Comidas preparadas/Comidas con carne",
+    "Comidas preparadas/Comidas con carne/Specialty made with tripe",
+    "Comidas preparadas/Comidas con carne/Specialty made with tripe/Caen-style tripes"
+   ],
+   "3588250000027": [
+    "Aceites y grasas",
+    "Aceites y grasas/Grasas animales",
+    "Aceites y grasas/Grasas animales/Mantequillas"
+   ],
+   "3596710455591": [
+    "Lácteos",
+    "Lácteos/Milks (liquid and powder)",
+    "Lácteos/Milks (liquid and powder)/Leches",
+    "Lácteos/Milks (liquid and powder)/Leches/Leches homogeneizadas",
+    "Lácteos/Milks (liquid and powder)/Leches/Leches homogeneizadas/ESL milks"
+   ],
+   "3661112054144": [
+    "Productos a base de carne",
+    "Productos a base de carne/Embutidos",
+    "Productos a base de carne/Embutidos/Jamón",
+    "Productos a base de carne/Embutidos/Jamón/Jamón cocido"
+   ],
+   "3700156945077": [
+    "Productos del mar",
+    "Productos del mar/Crustáceos",
+    "Productos del mar/Crustáceos/Camarones"
+   ],
+   "3700650901142": [
+    "Alimentos y bebidas de origen vegetal",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Frutos de cáscara y derivados",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Frutos de cáscara y derivados/Frutos de cáscara",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Frutos de cáscara y derivados/Frutos de cáscara/Anacardos"
+   ],
+   "3760020065447": [
+    "Productos del mar",
+    "Productos del mar/Fishes and their products",
+    "Productos del mar/Fishes and their products/Pescados",
+    "Productos del mar/Fishes and their products/Pescados/Filetes de pescado",
+    "Productos del mar/Fishes and their products/Pescados/Filetes de pescado/Filetes De Caballa",
+    "Productos del mar/Fishes and their products/Pescados/Filetes de pescado/Filetes De Caballa/Mackerel fillets in escabeche"
+   ],
+   "3760059621225": [
+    "Pescado carne y huevos",
+    "Pescado carne y huevos/Foies gras",
+    "Pescado carne y huevos/Foies gras/Foies gras pâtés"
+   ],
+   "3760099537692": [
+    "Lácteos",
+    "Lácteos/Productos fermentados de la leche",
+    "Lácteos/Productos fermentados de la leche/Quesos",
+    "Lácteos/Productos fermentados de la leche/Quesos/Quesos de vaca",
+    "Lácteos/Productos fermentados de la leche/Quesos/Quesos de vaca/Maroilles"
+   ],
+   "3760149995960": [
+    "Alimentos y bebidas de origen vegetal",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Semillas",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Semillas/Cereales en grano"
+   ],
+   "3760201330043": [
+    "Comidas preparadas"
+   ],
+   "3770000409000": [
+    "Cacao y sus productos",
+    "Cacao y sus productos/Chocolates",
+    "Cacao y sus productos/Chocolates/Chocolates negros"
+   ],
+   "3858884090306": [
+    "Aceites y grasas",
+    "Aceites y grasas/Grasas vegetales",
+    "Aceites y grasas/Grasas vegetales/Aceites vegetales",
+    "Aceites y grasas/Grasas vegetales/Aceites vegetales/Aceites de semillas de calabaza"
+   ],
+   "4003171043452": [
+    "Productos a base de carne",
+    "Productos a base de carne/Embutidos",
+    "Productos a base de carne/Embutidos/Prepared poultry meats"
+   ],
+   "4009300014584": [
+    "Bebidas y preparaciones de bebidas",
+    "Bebidas y preparaciones de bebidas/Preparaciones de bebidas",
+    "Bebidas y preparaciones de bebidas/Preparaciones de bebidas/Plantas para infusiones",
+    "Bebidas y preparaciones de bebidas/Preparaciones de bebidas/Plantas para infusiones/Infusiones con frutas"
+   ],
+   "4019736003557": [
+    "Untables",
+    "Untables/Untables salados"
+   ],
+   "4061458013680": [
+    "Productos a base de carne",
+    "Productos a base de carne/Carnes",
+    "Productos a base de carne/Carnes/Carnes frías"
+   ],
+   "4260042311229": [
+    "Alimentos y bebidas de origen vegetal",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Cereales y patatas",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Cereales y patatas/Cereales y derivados"
+   ],
+   "4316268414982": [
+    "Lácteos",
+    "Lácteos/Milks (liquid and powder)",
+    "Lácteos/Milks (liquid and powder)/Leches",
+    "Lácteos/Milks (liquid and powder)/Leches/Leches homogeneizadas",
+    "Lácteos/Milks (liquid and powder)/Leches/Leches homogeneizadas/ESL milks"
+   ],
+   "4804888287081": [
+    "Conservas"
+   ],
+   "5010029000184": [
+    "Alimentos y bebidas de origen vegetal",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Cereales y patatas",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal/Cereales y patatas/Cereales y derivados"
+   ],
+   "5029212780338": [
+    "Bebidas y preparaciones de bebidas",
+    "Bebidas y preparaciones de bebidas/Bebidas",
+    "Bebidas y preparaciones de bebidas/Bebidas/Bebidas no alcohólicas",
+    "Bebidas y preparaciones de bebidas/Bebidas/Bebidas no alcohólicas/Cervezas sin alcohol",
+    "Bebidas y preparaciones de bebidas/Bebidas/Bebidas no alcohólicas/Cervezas sin alcohol/Ginger beer"
+   ],
+   "5055936871946": [
+    "Alimentos y bebidas de origen vegetal",
+    "Alimentos y bebidas de origen vegetal/Alimentos de origen vegetal"
+   ],
+   "5201360624560": [
+    "Botanas",
+    "Botanas/Snacks salados",
+    "Botanas/Snacks salados/Aperitivos"
+   ],
+   "5400141293821": [
+    "Alimentos y bebidas de origen vegetal",
+    "Alimentos y bebidas de origen vegetal/Comida y bebida vegetal",
+    "Alimentos y bebidas de origen vegetal/Comida y bebida vegetal/Verduras y hortalizas y sus productos",
+    "Alimentos y bebidas de origen vegetal/Comida y bebida vegetal/Verduras y hortalizas y sus productos/Hortalizas",
+    "Alimentos y bebidas de origen vegetal/Comida y bebida vegetal/Verduras y hortalizas y sus productos/Hortalizas/Verduras de tallo",
+    "Alimentos y bebidas de origen vegetal/Comida y bebida vegetal/Verduras y hortalizas y sus productos/Hortalizas/Verduras de tallo/Espárragos",
+    "Alimentos y bebidas de origen vegetal/Comida y bebida vegetal/Verduras y hortalizas y sus productos/Hortalizas/Verduras de tallo/Espárragos/Espárragos blancos"
+   ],
+   "5410471127000": [
+    "Botanas",
+    "Botanas/Snacks dulces",
+    "Botanas/Snacks dulces/Galletas y pasteles"
+   ],
+   "5420024112780": [
+    "Lácteos",
+    "Lácteos/Productos fermentados de la leche",
+    "Lácteos/Productos fermentados de la leche/Quesos",
+    "Lácteos/Productos fermentados de la leche/Quesos/Quesos italianos",
+    "Lácteos/Productos fermentados de la leche/Quesos/Quesos italianos/Parmigiano-Reggiano"
+   ],
+   "5601164900349": [
+    "Bebidas y preparaciones de bebidas",
+    "Bebidas y preparaciones de bebidas/Bebidas",
+    "Bebidas y preparaciones de bebidas/Bebidas/Bebidas alcohólicas",
+    "Bebidas y preparaciones de bebidas/Bebidas/Bebidas alcohólicas/Cervezas"
+   ]
+  },
+  "fr": {
+   "0000101209159": [
+    "Petit-déjeuners",
+    "Petit-déjeuners/Produits à tartiner sucrés",
+    "Petit-déjeuners/Produits à tartiner sucrés/Pâtes à tartiner au chocolat",
+    "Petit-déjeuners/Produits à tartiner sucrés/Pâtes à tartiner au chocolat/Pâtes à tartiner aux noisettes et au cacao"
+   ],
+   "0011213252209": [
+    "Snacks",
+    "Snacks/Popcorn"
+   ],
+   "0019061091452": [
+    "Snacks",
+    "Snacks/Snacks sucrés",
+    "Snacks/Snacks sucrés/Confiseries"
+   ],
+   "0025293002784": [
+    "Produits laitiers",
+    "Produits laitiers/Desserts lactés",
+    "Produits laitiers/Desserts lactés/Desserts lactés fermentés",
+    "Produits laitiers/Desserts lactés/Desserts lactés fermentés/Yaourts"
+   ],
+   "0033314223100": [
+    "Snacks",
+    "Snacks/Snacks sucrés",
+    "Snacks/Snacks sucrés/Confiseries"
+   ],
+   "0038749700134": [
+    "Snacks",
+    "Snacks/Snacks sucrés",
+    "Snacks/Snacks sucrés/Biscuits et gâteaux"
+   ],
+   "0041271005073": [
+    "Aliments et boissons à base de végétaux",
+    "Aliments et boissons à base de végétaux/Substituts de produits laitiers",
+    "Aliments et boissons à base de végétaux/Substituts de produits laitiers/Creamer"
+   ],
+   "0041725101108": [
+    "Aides culinaires",
+    "Aides culinaires/Aides à la pâtisserie"
+   ],
+   "0046583000808": [
+    "Produits laitiers",
+    "Produits laitiers/Produits laitiers fermentés",
+    "Produits laitiers/Produits laitiers fermentés/Fromages"
+   ],
+   "0051933232952": [
+    "Conserves",
+    "Conserves/Plats préparés en conserve",
+    "Conserves/Plats préparés en conserve/Soupes en conserve"
+   ],
+   "0059749952347": [
+    "Aliments et boissons à base de végétaux",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Céréales et pommes de terre",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Céréales et pommes de terre/Céréales et dérivés",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Céréales et pommes de terre/Céréales et dérivés/Semoules de céréales",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Céréales et pommes de terre/Céréales et dérivés/Semoules de céréales/Semoules de blé",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Céréales et pommes de terre/Céréales et dérivés/Semoules de céréales/Semoules de blé/Semoules de blé dur",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Céréales et pommes de terre/Céréales et dérivés/Semoules de céréales/Semoules de blé/Semoules de blé dur/Semoules de blé dur pour couscous"
+   ],
+   "0070175012337": [
+    "Snacks"
+   ],
+   "0070740103989": [
+    "Aliments et boissons à base de végétaux",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Aliments à base de fruits et de légumes",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Aliments à base de fruits et de légumes/Fruits et produits dérivés",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Aliments à base de fruits et de légumes/Fruits et produits dérivés/Fruits",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Aliments à base de fruits et de légumes/Fruits et produits dérivés/Fruits/Fruits tropicaux",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Aliments à base de fruits et de légumes/Fruits et produits dérivés/Fruits/Fruits tropicaux/Avocats"
+   ],
+   "0071443015500": [
+    "Snacks",
+    "Snacks/Snacks sucrés",
+    "Snacks/Snacks sucrés/Confiseries"
+   ],
+   "0072180511157": [
+    "Desserts",
+    "Desserts/Desserts glacés"
+   ],
+   "0072945601642": [
+    "Aliments et boissons à base de végétaux",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Céréales et pommes de terre",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Céréales et pommes de terre/Céréales et dérivés",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Céréales et pommes de terre/Céréales et dérivés/Pains",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Céréales et pommes de terre/Céréales et dérivés/Pains/Pains spéciaux",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Céréales et pommes de terre/Céréales et dérivés/Pains/Pains spéciaux/Pains Burger"
+   ],
+   "0074175446246": [
+    "Produits laitiers",
+    "Produits laitiers/Produits laitiers fermentés",
+    "Produits laitiers/Produits laitiers fermentés/Fromages"
+   ],
+   "0075450133103": [
+    "Plats préparés",
+    "Plats préparés/Pizzas"
+   ],
+   "0076958414091": [
+    "Snacks"
+   ],
+   "0077975088258": [
+    "Snacks"
+   ],
+   "0078742228143": [
+    "Aliments et boissons à base de végétaux",
+    "Aliments et boissons à base de végétaux/Aliments et boissons à base de légumes",
+    "Aliments et boissons à base de végétaux/Aliments et boissons à base de légumes/Légumes et dérivés",
+    "Aliments et boissons à base de végétaux/Aliments et boissons à base de légumes/Légumes et dérivés/Tomates et dérivés",
+    "Aliments et boissons à base de végétaux/Aliments et boissons à base de légumes/Légumes et dérivés/Tomates et dérivés/Tomates"
+   ],
+   "0083791070032": [
+    "Snacks",
+    "Snacks/Snacks salés",
+    "Snacks/Snacks salés/Amuse-gueules"
+   ],
+   "0085239819906": [
+    "Snacks",
+    "Snacks/Popcorn"
+   ],
+   "0092825105459": [
+    "Aliments et boissons à base de végétaux",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Graines",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Graines/Céréales en grains",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Graines/Céréales en grains/Riz"
+   ],
+   "0099482461294": [
+    "Produits à tartiner",
+    "Produits à tartiner/Pâtes à tartiner végétales",
+    "Produits à tartiner/Pâtes à tartiner végétales/Confitures et marmelades"
+   ],
+   "0205717710345": [
+    "Produits laitiers",
+    "Produits laitiers/Produits laitiers fermentés",
+    "Produits laitiers/Produits laitiers fermentés/Fromages",
+    "Produits laitiers/Produits laitiers fermentés/Fromages/Fromages de brebis",
+    "Produits laitiers/Produits laitiers fermentés/Fromages/Fromages de brebis/Manchego"
+   ],
+   "0230063008532": [
+    "Aliments et boissons à base de végétaux",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Céréales et pommes de terre",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Céréales et pommes de terre/Céréales et dérivés",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Céréales et pommes de terre/Céréales et dérivés/Pains",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Céréales et pommes de terre/Céréales et dérivés/Pains/Pains complets"
+   ],
+   "0502226813964": [
+    "Snacks",
+    "Snacks/Snacks sucrés",
+    "Snacks/Snacks sucrés/Confiseries"
+   ],
+   "0629098612522": [
+    "Édulcorants",
+    "Édulcorants/Sirops simples",
+    "Édulcorants/Sirops simples/Sirops d'érable"
+   ],
+   "0659422080369": [
+    "Snacks",
+    "Snacks/Snacks sucrés",
+    "Snacks/Snacks sucrés/Biscuits et gâteaux"
+   ],
+   "0688267149573": [
+    "Aliments et boissons à base de végétaux",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Céréales et pommes de terre",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Céréales et pommes de terre/Céréales et dérivés",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Céréales et pommes de terre/Céréales et dérivés/Pains"
+   ],
+   "0708820336704": [
+    "Snacks",
+    "Snacks/Snacks sucrés",
+    "Snacks/Snacks sucrés/Confiseries"
+   ],
+   "0717544205418": [
+    "Aliments et boissons à base de végétaux",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Céréales et pommes de terre",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Céréales et pommes de terre/Céréales et dérivés",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Céréales et pommes de terre/Céréales et dérivés/Pains",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Céréales et pommes de terre/Céréales et dérivés/Pains/Pains spéciaux",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Céréales et pommes de terre/Céréales et dérivés/Pains/Pains spéciaux/Pains Burger"
+   ],
+   "0726984190222": [
+    "Produits de la ruche",
+    "Produits de la ruche/Miels"
+   ],
+   "0742392701294": [
+    "Matières grasses",
+    "Matières grasses/Matières grasses végétales",
+    "Matières grasses/Matières grasses végétales/Huiles",
+    "Matières grasses/Matières grasses végétales/Huiles/Huiles de fruits et graines de fruits",
+    "Matières grasses/Matières grasses végétales/Huiles/Huiles de fruits et graines de fruits/Huiles de coco"
+   ],
+   "0760232901055": [
+    "Desserts",
+    "Desserts/Compotes",
+    "Desserts/Compotes/Compotes de pomme",
+    "Desserts/Compotes/Compotes de pomme/Compotes pommes nature"
+   ],
+   "0786560579797": [
+    "Snacks"
+   ],
+   "0810979003038": [
+    "Boissons et préparations de boissons",
+    "Boissons et préparations de boissons/Boissons",
+    "Boissons et préparations de boissons/Boissons/Boissons lyophilisées"
+   ],
+   "0818108001627": [
+    "Aides culinaires"
+   ],
+   "0838766006444": [
+    "Boissons et préparations de boissons",
+    "Boissons et préparations de boissons/Boissons"
+   ],
+   "0851621003075": [
+    "Boissons et préparations de boissons",
+    "Boissons et préparations de boissons/Boissons",
+    "Boissons et préparations de boissons/Boissons/Boissons sans sucre ajouté",
+    "Boissons et préparations de boissons/Boissons/Boissons sans sucre ajouté/Jus de pomme"
+   ],
+   "0854487006051": [
+    "Snacks"
+   ],
+   "0857697005319": [
+    "Aliments et boissons à base de végétaux",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale"
+   ],
+   "0873668001432": [
+    "Aliments et boissons à base de végétaux",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Graines",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Graines/Graines de légumineuses"
+   ],
+   "0891627009039": [
+    "Surgelés"
+   ],
+   "19423661": [
+    "Aliments et boissons à base de végétaux",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Graines",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Graines/Graines de légumineuses",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Graines/Graines de légumineuses/Légumineuses sèches",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Graines/Graines de légumineuses/Légumineuses sèches/Common beans",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Graines/Graines de légumineuses/Légumineuses sèches/Common beans/Haricots blancs"
+   ],
+   "20046897": [
+    "Produits laitiers",
+    "Produits laitiers/Desserts lactés",
+    "Produits laitiers/Desserts lactés/Desserts lactés fermentés",
+    "Produits laitiers/Desserts lactés/Desserts lactés fermentés/Spécialités laitières"
+   ],
+   "20289126": [
+    "Compléments alimentaires",
+    "Compléments alimentaires/Vitamines"
+   ],
+   "20646356": [
+    "Produits de la mer",
+    "Produits de la mer/Mollusques",
+    "Produits de la mer/Mollusques/Moules"
+   ],
+   "2190906011304": [
+    "Viandes et dérivés",
+    "Viandes et dérivés/Poulet et dérivés",
+    "Viandes et dérivés/Poulet et dérivés/Poulets"
+   ],
+   "2268496036936": [
+    "Viandes et dérivés",
+    "Viandes et dérivés/Poulet et dérivés",
+    "Viandes et dérivés/Poulet et dérivés/Poulets",
+    "Viandes et dérivés/Poulet et dérivés/Poulets/Aiguillettes de poulet"
+   ],
+   "2449193014438": [
+    "Produits laitiers",
+    "Produits laitiers/Produits laitiers fermentés",
+    "Produits laitiers/Produits laitiers fermentés/Fromages",
+    "Produits laitiers/Produits laitiers fermentés/Fromages/Fromages italiens",
+    "Produits laitiers/Produits laitiers fermentés/Fromages/Fromages italiens/Gorgonzola et mascarpone"
+   ],
+   "26037042": [
+    "Snacks",
+    "Snacks/Snacks sucrés",
+    "Snacks/Snacks sucrés/Biscuits et gâteaux",
+    "Snacks/Snacks sucrés/Biscuits et gâteaux/Gâteaux",
+    "Snacks/Snacks sucrés/Biscuits et gâteaux/Gâteaux/Gâteaux au chocolat"
+   ],
+   "2845168020471": [
+    "Viandes et dérivés",
+    "Viandes et dérivés/Charcuteries",
+    "Viandes et dérivés/Charcuteries/Jambons",
+    "Viandes et dérivés/Charcuteries/Jambons/Jambons blancs"
+   ],
+   "3017800003558": [
+    "Aliments et boissons à base de végétaux",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Légumineuses et dérivés",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Légumineuses et dérivés/Légumineuses",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Légumineuses et dérivés/Légumineuses/Petits pois"
+   ],
+   "3033491139901": [
+    "Produits laitiers",
+    "Produits laitiers/Desserts lactés",
+    "Produits laitiers/Desserts lactés/Desserts lactés fermentés",
+    "Produits laitiers/Desserts lactés/Desserts lactés fermentés/Yaourts au Bifidus",
+    "Produits laitiers/Desserts lactés/Desserts lactés fermentés/Yaourts au Bifidus/Yaourts au bifidus aromatisés"
+   ],
+   "3045320091687": [
+    "Produits à tartiner",
+    "Produits à tartiner/Pâtes à tartiner végétales",
+    "Produits à tartiner/Pâtes à tartiner végétales/Confitures et marmelades",
+    "Produits à tartiner/Pâtes à tartiner végétales/Confitures et marmelades/Confitures",
+    "Produits à tartiner/Pâtes à tartiner végétales/Confitures et marmelades/Confitures/Confitures d'abricot"
+   ],
+   "3080216046211": [
+    "Boissons et préparations de boissons",
+    "Boissons et préparations de boissons/Boissons",
+    "Boissons et préparations de boissons/Boissons/Boissons sans alcool",
+    "Boissons et préparations de boissons/Boissons/Boissons sans alcool/Bières sans alcool"
+   ],
+   "3110320503000": [
+    "Snacks",
+    "Snacks/Snacks sucrés",
+    "Snacks/Snacks sucrés/Biscuits et gâteaux",
+    "Snacks/Snacks sucrés/Biscuits et gâteaux/Gâteaux",
+    "Snacks/Snacks sucrés/Biscuits et gâteaux/Gâteaux/Gâteaux fourrés"
+   ],
+   "3159580007989": [
+    "Viandes et dérivés",
+    "Viandes et dérivés/Poulet et dérivés",
+    "Viandes et dérivés/Poulet et dérivés/Poulets",
+    "Viandes et dérivés/Poulet et dérivés/Poulets/Filets de poulet"
+   ],
+   "3175690060119": [
+    "Produits de la mer",
+    "Produits de la mer/Poissons et dérivés",
+    "Produits de la mer/Poissons et dérivés/Poissons",
+    "Produits de la mer/Poissons et dérivés/Poissons/Anchois",
+    "Produits de la mer/Poissons et dérivés/Poissons/Anchois/Filets d'anchois",
+    "Produits de la mer/Poissons et dérivés/Poissons/Anchois/Filets d'anchois/Filets d'anchois marinés",
+    "Produits de la mer/Poissons et dérivés/Poissons/Anchois/Filets d'anchois/Filets d'anchois marinés/Filets d'anchois marinés à l'huile végétale"
+   ],
+   "3185610003133": [
+    "Snacks",
+    "Snacks/Snacks salés",
+    "Snacks/Snacks salés/Amuse-gueules"
+   ],
+   "3222474211899": [
+    "Plats préparés",
+    "Plats préparés/Plats à base de riz",
+    "Plats préparés/Plats à base de riz/Risottos",
+    "Plats préparés/Plats à base de riz/Risottos/Risottos au poulet"
+   ],
+   "3229248197656": [
+    "Desserts",
+    "Desserts/Desserts glacés",
+    "Desserts/Desserts glacés/Glaces et sorbets",
+    "Desserts/Desserts glacés/Glaces et sorbets/Glaces",
+    "Desserts/Desserts glacés/Glaces et sorbets/Glaces/Crèmes glacées en pot"
+   ],
+   "3245412694486": [
+    "Aliments et boissons à base de végétaux",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Céréales et pommes de terre",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Céréales et pommes de terre/Céréales et dérivés",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Céréales et pommes de terre/Céréales et dérivés/Pains",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Céréales et pommes de terre/Céréales et dérivés/Pains/Pains plats",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Céréales et pommes de terre/Céréales et dérivés/Pains/Pains plats/Pains Pita"
+   ],
+   "3250391661022": [
+    "Produits de la mer",
+    "Produits de la mer/Taramas",
+    "Produits de la mer/Taramas/Taramas au cabillaud"
+   ],
+   "3254950008846": [
+    "Snacks",
+    "Snacks/Snacks sucrés",
+    "Snacks/Snacks sucrés/Biscuits et gâteaux",
+    "Snacks/Snacks sucrés/Biscuits et gâteaux/Pâtisseries",
+    "Snacks/Snacks sucrés/Biscuits et gâteaux/Pâtisseries/Gaufres"
+   ],
+   "3256224658917": [
+    "Viandes et dérivés",
+    "Viandes et dérivés/Charcuteries",
+    "Viandes et dérivés/Charcuteries/Saucissons",
+    "Viandes et dérivés/Charcuteries/Saucissons/Chorizo"
+   ],
+   "3257980632487": [
+    "Produits laitiers",
+    "Produits laitiers/Laits (fluide et poudre)",
+    "Produits laitiers/Laits (fluide et poudre)/Laits",
+    "Produits laitiers/Laits (fluide et poudre)/Laits/Laits homogénéisés"
+   ],
+   "3258561400075": [
+    "Snacks",
+    "Snacks/Snacks sucrés",
+    "Snacks/Snacks sucrés/Sweet pastries and pies",
+    "Snacks/Snacks sucrés/Sweet pastries and pies/Viennoiseries",
+    "Snacks/Snacks sucrés/Sweet pastries and pies/Viennoiseries/Pains au lait"
+   ],
+   "3263820006004": [
+    "Aliments et boissons à base de végétaux",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Graines",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Graines/Graines de légumineuses",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Graines/Graines de légumineuses/Légumineuses sèches",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Graines/Graines de légumineuses/Légumineuses sèches/Common beans",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Graines/Graines de légumineuses/Légumineuses sèches/Common beans/Haricots blancs",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Graines/Graines de légumineuses/Légumineuses sèches/Common beans/Haricots blancs/Lingots blancs"
+   ],
+   "3263858777815": [
+    "Sandwichs",
+    "Sandwichs/Wraps",
+    "Sandwichs/Wraps/Wraps au poulet"
+   ],
+   "3266191022543": [
+    "Snacks",
+    "Snacks/Snacks sucrés",
+    "Snacks/Snacks sucrés/Biscuits et gâteaux",
+    "Snacks/Snacks sucrés/Biscuits et gâteaux/Gâteaux",
+    "Snacks/Snacks sucrés/Biscuits et gâteaux/Gâteaux/Gâteaux fourrés"
+   ],
+   "3270160688449": [
+    "Plats préparés",
+    "Plats préparés/Soupes",
+    "Plats préparés/Soupes/Veloutés",
+    "Plats préparés/Soupes/Veloutés/Veloutés de légumes"
+   ],
+   "3273220540565": [
+    "Produits laitiers",
+    "Produits laitiers/Desserts lactés",
+    "Produits laitiers/Desserts lactés/Desserts lactés fermentés",
+    "Produits laitiers/Desserts lactés/Desserts lactés fermentés/Desserts lactés fermentés aux fruits",
+    "Produits laitiers/Desserts lactés/Desserts lactés fermentés/Desserts lactés fermentés aux fruits/Spécialités laitières aux fruits"
+   ],
+   "3279130109953": [
+    "Snacks",
+    "Snacks/Snacks sucrés",
+    "Snacks/Snacks sucrés/Biscuits et gâteaux"
+   ],
+   "3291960002792": [
+    "Aliments et boissons à base de végétaux",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Fruits à coques et dérivés",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Fruits à coques et dérivés/Huiles de fruits à coques",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Fruits à coques et dérivés/Huiles de fruits à coques/Huiles d'amande"
+   ],
+   "3302552302500": [
+    "Matières grasses",
+    "Matières grasses/Matières grasses animales",
+    "Matières grasses/Matières grasses animales/Beurres",
+    "Matières grasses/Matières grasses animales/Beurres/Beurres français",
+    "Matières grasses/Matières grasses animales/Beurres/Beurres français/Beurre de Bresse"
+   ],
+   "3329486531202": [
+    "Aliments et boissons à base de végétaux",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Farines",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Farines/Farines de légumineuses",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Farines/Farines de légumineuses/Farines de soja"
+   ],
+   "3338500631729": [
+    "Boissons et préparations de boissons",
+    "Boissons et préparations de boissons/Boissons",
+    "Boissons et préparations de boissons/Boissons/Boissons alcoolisées",
+    "Boissons et préparations de boissons/Boissons/Boissons alcoolisées/Vins",
+    "Boissons et préparations de boissons/Boissons/Boissons alcoolisées/Vins/Vins français",
+    "Boissons et préparations de boissons/Boissons/Boissons alcoolisées/Vins/Vins français/Comtés Rhodaniens"
+   ],
+   "3350033181977": [
+    "Sandwichs",
+    "Sandwichs/Wraps"
+   ],
+   "3368410004214": [
+    "Produits à tartiner",
+    "Produits à tartiner/Produits à tartiner salés",
+    "Produits à tartiner/Produits à tartiner salés/Tapenades",
+    "Produits à tartiner/Produits à tartiner salés/Tapenades/Tapenades noires"
+   ],
+   "3382565068150": [
+    "Produits à tartiner",
+    "Produits à tartiner/Produits à tartiner salés",
+    "Produits à tartiner/Produits à tartiner salés/Tapenades",
+    "Produits à tartiner/Produits à tartiner salés/Tapenades/Tapenades vertes"
+   ],
+   "3403400000002": [
+    "Crêpes et galettes",
+    "Crêpes et galettes/Crêpes",
+    "Crêpes et galettes/Crêpes/Crêpes sucrées"
+   ],
+   "3428272000059": [
+    "Produits laitiers",
+    "Produits laitiers/Laits (fluide et poudre)",
+    "Produits laitiers/Laits (fluide et poudre)/Laits",
+    "Produits laitiers/Laits (fluide et poudre)/Laits/Laits demi-écrémés"
+   ],
+   "3443705007702": [
+    "Poissons et viandes et oeufs",
+    "Poissons et viandes et oeufs/Foies gras",
+    "Poissons et viandes et oeufs/Foies gras/Foies gras de canard"
+   ],
+   "3460426049927": [
+    "Aliments et boissons à base de végétaux",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Fruits à coques et dérivés",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Fruits à coques et dérivés/Fruits à coques",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Fruits à coques et dérivés/Fruits à coques/Noix de cajou"
+   ],
+   "3490090070040": [
+    "Condiments",
+    "Condiments/Vinaigres",
+    "Condiments/Vinaigres/Vinaigres de vin"
+   ],
+   "3513851559582": [
+    "Snacks",
+    "Snacks/Snacks salés",
+    "Snacks/Snacks salés/Amuse-gueules"
+   ],
+   "3547110000188": [
+    "Aliments et boissons à base de végétaux",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Graines",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Graines/Graines de légumineuses",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Graines/Graines de légumineuses/Légumineuses sèches",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Graines/Graines de légumineuses/Légumineuses sèches/Common beans",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Graines/Graines de légumineuses/Légumineuses sèches/Common beans/Haricots rouges"
+   ],
+   "3560070799817": [
+    "Produits laitiers",
+    "Produits laitiers/Laits concentrés",
+    "Produits laitiers/Laits concentrés/Laits concentrés non sucrés",
+    "Produits laitiers/Laits concentrés/Laits concentrés non sucrés/Lait concentré entier non sucré"
+   ],
+   "3564700422168": [
+    "Viandes et dérivés",
+    "Viandes et dérivés/Porc et dérivés",
+    "Viandes et dérivés/Porc et dérivés/Charcuteries de porc",
+    "Viandes et dérivés/Porc et dérivés/Charcuteries de porc/Pâtés de porc",
+    "Viandes et dérivés/Porc et dérivés/Charcuteries de porc/Pâtés de porc/Pâtés de campagne"
+   ],
+   "3564709000879": [
+    "Plats préparés",
+    "Plats préparés/Plats préparés à la viande",
+    "Plats préparés/Plats préparés à la viande/Spécialités à base de tripes",
+    "Plats préparés/Plats préparés à la viande/Spécialités à base de tripes/Tripes à la mode de Caen"
+   ],
+   "3588250000027": [
+    "Matières grasses",
+    "Matières grasses/Matières grasses animales",
+    "Matières grasses/Matières grasses animales/Beurres"
+   ],
+   "3596710455591": [
+    "Produits laitiers",
+    "Produits laitiers/Laits (fluide et poudre)",
+    "Produits laitiers/Laits (fluide et poudre)/Laits",
+    "Produits laitiers/Laits (fluide et poudre)/Laits/Laits homogénéisés",
+    "Produits laitiers/Laits (fluide et poudre)/Laits/Laits homogénéisés/Laits ESL"
+   ],
+   "3661112054144": [
+    "Viandes et dérivés",
+    "Viandes et dérivés/Charcuteries",
+    "Viandes et dérivés/Charcuteries/Jambons",
+    "Viandes et dérivés/Charcuteries/Jambons/Jambons blancs"
+   ],
+   "3700156945077": [
+    "Produits de la mer",
+    "Produits de la mer/Crustacés",
+    "Produits de la mer/Crustacés/Crevettes"
+   ],
+   "3700650901142": [
+    "Aliments et boissons à base de végétaux",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Fruits à coques et dérivés",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Fruits à coques et dérivés/Fruits à coques",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Fruits à coques et dérivés/Fruits à coques/Noix de cajou"
+   ],
+   "3760020065447": [
+    "Produits de la mer",
+    "Produits de la mer/Poissons et dérivés",
+    "Produits de la mer/Poissons et dérivés/Poissons",
+    "Produits de la mer/Poissons et dérivés/Poissons/Filets de poissons",
+    "Produits de la mer/Poissons et dérivés/Poissons/Filets de poissons/Filets de maquereaux",
+    "Produits de la mer/Poissons et dérivés/Poissons/Filets de poissons/Filets de maquereaux/Filets de maquereaux à l'escabeche"
+   ],
+   "3760059621225": [
+    "Poissons et viandes et oeufs",
+    "Poissons et viandes et oeufs/Foies gras",
+    "Poissons et viandes et oeufs/Foies gras/Pâtés de foie gras"
+   ],
+   "3760099537692": [
+    "Produits laitiers",
+    "Produits laitiers/Produits laitiers fermentés",
+    "Produits laitiers/Produits laitiers fermentés/Fromages",
+    "Produits laitiers/Produits laitiers fermentés/Fromages/Fromages de vache",
+    "Produits laitiers/Produits laitiers fermentés/Fromages/Fromages de vache/Maroilles"
+   ],
+   "3760149995960": [
+    "Aliments et boissons à base de végétaux",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Graines",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Graines/Céréales en grains"
+   ],
+   "3760201330043": [
+    "Plats préparés"
+   ],
+   "3770000409000": [
+    "Cacao et dérivés",
+    "Cacao et dérivés/Chocolats",
+    "Cacao et dérivés/Chocolats/Chocolats noirs"
+   ],
+   "3858884090306": [
+    "Matières grasses",
+    "Matières grasses/Matières grasses végétales",
+    "Matières grasses/Matières grasses végétales/Huiles",
+    "Matières grasses/Matières grasses végétales/Huiles/Huiles de pépins de courge"
+   ],
+   "4003171043452": [
+    "Viandes et dérivés",
+    "Viandes et dérivés/Charcuteries",
+    "Viandes et dérivés/Charcuteries/Charcuteries de volaille"
+   ],
+   "4009300014584": [
+    "Boissons et préparations de boissons",
+    "Boissons et préparations de boissons/Préparations pour boissons",
+    "Boissons et préparations de boissons/Préparations pour boissons/Infusions",
+    "Boissons et préparations de boissons/Préparations pour boissons/Infusions/Infusions aux fruits"
+   ],
+   "4019736003557": [
+    "Produits à tartiner",
+    "Produits à tartiner/Produits à tartiner salés"
+   ],
+   "4061458013680": [
+    "Viandes et dérivés",
+    "Viandes et dérivés/Viandes",
+    "Viandes et dérivés/Viandes/Viandes fraîches"
+   ],
+   "4260042311229": [
+    "Aliments et boissons à base de végétaux",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Céréales et pommes de terre",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Céréales et pommes de terre/Céréales et dérivés"
+   ],
+   "4316268414982": [
+    "Produits laitiers",
+    "Produits laitiers/Laits (fluide et poudre)",
+    "Produits laitiers/Laits (fluide et poudre)/Laits",
+    "Produits laitiers/Laits (fluide et poudre)/Laits/Laits homogénéisés",
+    "Produits laitiers/Laits (fluide et poudre)/Laits/Laits homogénéisés/Laits ESL"
+   ],
+   "4804888287081": [
+    "Conserves"
+   ],
+   "5010029000184": [
+    "Aliments et boissons à base de végétaux",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Céréales et pommes de terre",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale/Céréales et pommes de terre/Céréales et dérivés"
+   ],
+   "5029212780338": [
+    "Boissons et préparations de boissons",
+    "Boissons et préparations de boissons/Boissons",
+    "Boissons et préparations de boissons/Boissons/Boissons sans alcool",
+    "Boissons et préparations de boissons/Boissons/Boissons sans alcool/Bières sans alcool",
+    "Boissons et préparations de boissons/Boissons/Boissons sans alcool/Bières sans alcool/Bière de gingembre"
+   ],
+   "5055936871946": [
+    "Aliments et boissons à base de végétaux",
+    "Aliments et boissons à base de végétaux/Aliments d'origine végétale"
+   ],
+   "5201360624560": [
+    "Snacks",
+    "Snacks/Snacks salés",
+    "Snacks/Snacks salés/Amuse-gueules"
+   ],
+   "5400141293821": [
+    "Aliments et boissons à base de végétaux",
+    "Aliments et boissons à base de végétaux/Aliments et boissons à base de légumes",
+    "Aliments et boissons à base de végétaux/Aliments et boissons à base de légumes/Légumes et dérivés",
+    "Aliments et boissons à base de végétaux/Aliments et boissons à base de légumes/Légumes et dérivés/Légumes",
+    "Aliments et boissons à base de végétaux/Aliments et boissons à base de légumes/Légumes et dérivés/Légumes/Légumes tiges",
+    "Aliments et boissons à base de végétaux/Aliments et boissons à base de légumes/Légumes et dérivés/Légumes/Légumes tiges/Asperges",
+    "Aliments et boissons à base de végétaux/Aliments et boissons à base de légumes/Légumes et dérivés/Légumes/Légumes tiges/Asperges/Asperges blanches"
+   ],
+   "5410471127000": [
+    "Snacks",
+    "Snacks/Snacks sucrés",
+    "Snacks/Snacks sucrés/Biscuits et gâteaux"
+   ],
+   "5420024112780": [
+    "Produits laitiers",
+    "Produits laitiers/Produits laitiers fermentés",
+    "Produits laitiers/Produits laitiers fermentés/Fromages",
+    "Produits laitiers/Produits laitiers fermentés/Fromages/Fromages italiens",
+    "Produits laitiers/Produits laitiers fermentés/Fromages/Fromages italiens/Parmigiano Reggiano"
+   ],
+   "5601164900349": [
+    "Boissons et préparations de boissons",
+    "Boissons et préparations de boissons/Boissons",
+    "Boissons et préparations de boissons/Boissons/Boissons alcoolisées",
+    "Boissons et préparations de boissons/Boissons/Boissons alcoolisées/Bières"
+   ]
+  }
+ }
+}
