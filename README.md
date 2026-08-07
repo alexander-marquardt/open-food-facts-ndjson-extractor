@@ -22,7 +22,8 @@ This tool transforms raw, complex Open Food Facts data into a flattened, search-
 | `currency` | string | Currency code (default: USD). |
 | `image_url` | string | Computed primary product image URL. |
 | `taxonomy_tags` | list | Cleaned, flat list of the product's own category tags, de-duplicated, **validated against the taxonomy** (see [Tags that are not taxonomy categories](#tags-that-are-not-taxonomy-categories)) and rendered with the taxonomy's display name for `--lang` — the **same** label the matching `category_path` segment carries, so the two fields can be joined on string. At most 20 values, and never at the expense of a node on the product's own `category_path` (see [How long the flat list is](#how-long-the-flat-list-is)). |
-| `category_path` | list | **Hierarchical** category path — a single root→leaf chain as cumulative `/`-joined strings (e.g. `["Snacks", "Snacks/Salty snacks", "Snacks/Salty snacks/Crisps"]`), reconstructed from the Open Food Facts category taxonomy graph. Powers breadcrumb-style, drill-down category facets. |
+| `category_path` | list | **Hierarchical** category addresses — the union of the cumulative `/`-joined prefixes of **every** position the product sits at (e.g. `["Snacks", "Snacks/Salty snacks", "Snacks/Salty snacks/Crisps"]`), reconstructed from the Open Food Facts category taxonomy graph. The source taxonomy is a DAG, so a product is often reachable by several breadcrumbs; see [Several addresses per product](#several-addresses-per-product). Powers breadcrumb-style, drill-down category facets. |
+| `category_path_primary` | list | The **one** address the product page leads with, as its own cumulative chain — always a prefix of `category_path`. A renderer showing "one address plus *also categorized as …*" reads this for the first half and the rest of `category_path` for the second. |
 | `attrs` | object | **Flattened Dictionary** of key-value attributes (e.g., Nutri-Score, Energy). Most values are strings; the four attributes read from an Open Food Facts list — `Labels`, `Allergens`, `Ingredients analysis`, `Dietary restrictions` — are **lists of values** (see [Multi-valued attributes](#multi-valued-attributes)). |
 | `attr_keys` | list | List of all keys available in `attrs` for faceting. |
 | `dietary_restrictions` | list | Extracted dietary tags (e.g., vegan, vegetarian), derived from `labels_tags` + `ingredients_analysis_tags`, positive-only. |
@@ -323,21 +324,26 @@ taxonomy, which is a directed acyclic graph (a category can have several
 parents). Naively joining the tags with `/` mixes parallel roots and sibling
 branches and yields a nonsense path.
 
-To produce a real tree — the same cumulative-path shape merchandising tools use
-for drill-down facets — the extractor loads the public OFF category taxonomy and
-walks a single canonical chain:
+To produce a real hierarchy — the same cumulative-path shape merchandising tools
+use for drill-down facets — the extractor loads the public OFF category taxonomy
+and walks it:
 
-1. **Once per run**, collapse the whole taxonomy DAG to a spanning forest by
-   giving every category one canonical parent (see [Canonical parents and the
-   tie-break](#canonical-parents-and-the-tie-break)). The whole taxonomy, in
-   every language — the same forest for every catalog.
+1. **Once per run**, give every category one **primary** parent (see [Canonical
+   parents and the tie-break](#canonical-parents-and-the-tie-break)) and
+   enumerate every root→node path over the full `parents` DAG. The path following
+   the primary parent at every hop is the category's **primary address**; the
+   others are its **alternates**. The whole taxonomy, in every language — the same
+   graph for every catalog, so a category's addresses never depend on which
+   product you are looking at.
 2. Keep the product's tags that exist in the taxonomy (drops noise and
    foreign-language-only nodes for the target language).
-3. Pick the most specific of those tags as the leaf, and walk the canonical
-   parent map from it to a **global** taxonomy root — materialising ancestors the
-   product never tagged, in whatever language the taxonomy files them under.
+3. Pick the most specific of those tags as the **primary leaf**, and keep the
+   others that are not already on its chain as alternate leaves. Walk from each to
+   a **global** taxonomy root — materialising ancestors the product never tagged,
+   in whatever language the taxonomy files them under.
 4. Emit cumulative `/`-joined path strings using the taxonomy's localized display
-   names.
+   names: the primary address alone as `category_path_primary`, and the union
+   across every address as `category_path`, primary first.
 
 Note where the target language does and does not apply. It decides step 2 —
 which categories a product may be *filed under*, and which values the flat
@@ -364,11 +370,25 @@ an English catalog can file under, and it buys back their true lineage.
 raw tags:   en:plant-based-foods-and-beverages, en:beverages, en:hot-beverages,
             en:plant-based-beverages, en:teas, en:tea-bags        (a flat DAG union)
 
+category_path_primary:
+  [ "Beverages",
+    "Beverages/Hot beverages",
+    "Beverages/Hot beverages/Teas" ]                    (the address it leads with)
+
 category_path:
   [ "Beverages",
     "Beverages/Hot beverages",
-    "Beverages/Hot beverages/Teas" ]                              (one clean chain)
+    "Beverages/Hot beverages/Teas",                             (primary, in full)
+    "Plant-based foods and beverages",
+    "Plant-based foods and beverages/Plant-based beverages",
+    "Beverages/Plant-based beverages",
+    "Plant-based foods and beverages/Plant-based beverages/Teas",
+    "Beverages/Plant-based beverages/Teas" ]           (en:teas' other addresses)
 ```
+
+`en:teas` has two parents, and each of those has its own parents, so the node sits
+at several addresses and the product is reachable by each of them. The primary
+leads the list and is repeated in a field of its own.
 
 ### Canonical parents and the tie-break
 
@@ -376,14 +396,20 @@ Step 1 is what makes the hierarchy usable for faceting, and it is the reason the
 walk is anchored globally rather than to the product's own tags. Two properties
 have to hold, and both are covered by tests in `tests/test_taxonomy.py`:
 
-- **One address per category.** A category occupies exactly one position in the
-  tree, so every product carrying it files it at the same path. Anchoring only to
-  the product's own tags broke this whenever a product omitted an intermediate
-  tag: the walk stopped at whatever the product happened to hold and invented a
-  shorter path, so the same category showed up at two addresses and its facet
-  count split in two.
-- **One path per product.** Each product carries exactly one root→leaf chain,
-  never a union of branches.
+- **One primary address per category, and one address *set*.** A category's
+  addresses come from the run-wide graph, so every product carrying it resolves
+  it to the same set of paths with the same primary. Anchoring only to the
+  product's own tags broke this whenever a product omitted an intermediate tag:
+  the walk stopped at whatever the product happened to hold and invented a
+  shorter path, so the same category showed up at two addresses **depending on
+  the product**, and its facet count split in two. Several addresses that are a
+  property of the *taxonomy* are a different thing entirely, and are the shape the
+  source data actually has.
+- **A prefix-closed union per product.** `category_path` carries every cumulative
+  prefix of every address the product holds, so a value's ancestors are always
+  values of their own and a drill-down never meets a level with no bucket.
+  `category_path_primary` is additionally a single chain, and is the head of
+  `category_path`.
 
 The canonical parent of each node is chosen by **fewest hops to a taxonomy root**,
 and **on a tie the lexicographically smallest canonical id wins**. The tie-break
@@ -398,14 +424,50 @@ re-ordering a `parents` list cannot move an address. On the current taxonomy all
 this rule agrees with the upstream authored order on every tie today, while not
 being hostage to it.
 
-Collapsing the DAG this way cuts 2,769 of the taxonomy's 17,134 parent edges and
-orphans **zero** categories: every non-root keeps exactly one parent and all 92
-roots stay roots. Only redundant parent relationships are dropped.
+Selecting a primary parent this way picks 14,365 of the taxonomy's 17,134 parent
+edges and orphans **zero** categories: every non-root keeps exactly one primary
+parent and all 92 roots stay roots. The other 2,769 edges are **not dropped** —
+they are what the alternate addresses are enumerated from.
 
-Each run's report carries a `category_path_addresses` block counting the
-categories that resolved to more than one address, the categories that rendered
-under more than one label, and the labels claimed by more than one category. All
-three should always read zero; if any does not, the extraction log says so.
+Each run's report carries a `category_path_addresses` block. Three of its counts
+must read zero — the categories at more than one *primary* address, the categories
+that rendered under more than one label, and the labels claimed by more than one
+category — and the extraction log says so if any does not. The rest of the block
+is measurement, not a gate: the products and categories at several addresses, the
+distinct `category_path` values, and the mean and maximum values per product.
+**Those last three size every downstream `category_path` aggregation** — one still
+sized for the collapsed cardinality truncates silently, and a truncated facet
+panel lies.
+
+### Several addresses per product
+
+The source taxonomy is a DAG: 2,545 of its 14,457 nodes have more than one
+parent, and a node one hop below such a fork inherits the fork whether or not it
+has several parents itself. Roughly two thirds of the products that end up at
+several addresses have a **single-parent leaf** and are multi-addressed only
+because something further up their lineage forks — so counting multi-parent leaves
+undercounts the affected set by about 2.5x.
+
+Two shapes occur, they read very differently, and both are emitted:
+
+- **Pure divergence** — the fork's parents sit under different global roots and
+  share no ancestor. `en:cheeses` is `Dairies/Fermented milk products/Cheeses`
+  *and* `Fermented foods/Fermented milk products/Cheeses`. To a shopper this is
+  two unrelated departments. 412 of the 2,545 multi-parent nodes are this shape.
+- **A reconvergent diamond** — the branches split below a common ancestor and
+  rejoin at the fork, so both addresses share a prefix. 2,133 of the 2,545 are
+  this shape, so it is the majority case, not the exotic one.
+
+`en:peanut-butters` carries both at once: two addresses that split at
+`Plant-based foods` and rejoin at `Legume butters`, and a third from the separate
+root `Spreads`.
+
+**Going from a breadcrumb back to a category id needs the pairing, not the
+string.** `category_path_entries` returns `(canonical_id, cumulative_path)` pairs,
+and the two are not in bijection in either direction: one id now appears at
+several paths, and four nodes in the pinned snapshot render to a full path string
+another node also claims (in a French catalog, `…/Vins italiens/Chianti` is
+claimed by both `en:chianti` and `it:chianti`). Read the pair.
 
 ### One label per category
 

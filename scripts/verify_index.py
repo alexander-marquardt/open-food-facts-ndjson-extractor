@@ -230,8 +230,13 @@ CHUNK = 1 << 22
 READ_ONLY_ENDPOINTS = frozenset({"_search", "_count", "_mapping", "_settings"})
 
 # Enough for every catalog built here (the largest uses 16,743 distinct
-# ``taxonomy_tags`` values) with room to spare, and saturation escalates rather than
-# truncates, so this is a performance knob and not a correctness one.
+# ``taxonomy_tags`` values, and 14,847 distinct ``category_path`` values once the
+# source DAG's alternate addresses are emitted — measured over the whole dump, up
+# from 5,582 while each product had one address) with room to spare, and
+# saturation escalates rather than truncates, so this is a performance knob and
+# not a correctness one. Any *other* consumer sizing a ``category_path``
+# aggregation has to be re-checked against that second number: one still sized
+# for the collapsed cardinality truncates silently, and a truncated facet lies.
 DEFAULT_TERMS_SIZE = 30000
 COMPOSITE_PAGE = 10000
 

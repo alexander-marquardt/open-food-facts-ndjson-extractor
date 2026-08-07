@@ -14,7 +14,11 @@ so the import below is an ordinary top-of-file import.
 
 from __future__ import annotations
 
-from off_demo_extract.taxonomy import build_category_path, category_chain
+from off_demo_extract.taxonomy import (
+    build_category_path,
+    build_primary_category_path,
+    category_chain,
+)
 
 
 def _n(name: str, parents: list[str]) -> dict:
@@ -54,13 +58,18 @@ def test_chain_steps_are_real_parent_child_edges() -> None:
             "the path order does not match the tree"
         )
     # The cumulative display path preserves that same root→leaf order.
-    path = build_category_path(tags, TAXONOMY, EXCLUDE, "en")
+    path = build_primary_category_path(tags, TAXONOMY, EXCLUDE, "en")
     labels = [p.split("/")[-1] for p in path]
     assert labels == [TAXONOMY[c]["name"]["en"] for c in chain]
 
 
-def test_single_clean_chain_from_dag() -> None:
-    """A product's flat tag union collapses to ONE cumulative root→leaf path."""
+def test_the_primary_is_one_clean_chain_from_the_dag() -> None:
+    """A product's flat tag union yields ONE cumulative root→leaf primary path.
+
+    The emitted field is a union of every address, but the address the product
+    page leads with is a single chain — and that chain is what the tag union
+    collapses to, which is the property this test was written for.
+    """
     tags = [
         "en:plant-based-foods-and-beverages",
         "en:beverages",
@@ -69,7 +78,7 @@ def test_single_clean_chain_from_dag() -> None:
         "en:teas",
         "en:tea-bags",
     ]
-    path = build_category_path(tags, TAXONOMY, EXCLUDE, lang="en")
+    path = build_primary_category_path(tags, TAXONOMY, EXCLUDE, lang="en")
 
     # Cumulative paths: each element extends the previous by exactly one segment.
     assert path, "expected a non-empty hierarchy"
@@ -80,6 +89,9 @@ def test_single_clean_chain_from_dag() -> None:
     assert path[0] in {"Beverages", "Plant-based foods and beverages"}
     # The whole thing is a single chain ending at the leaf.
     assert path[-1].split("/")[-1] == "Tea bags"
+    # And the union leads with it, so a consumer reading the head of the emitted
+    # field gets exactly this chain and nothing spliced in front of it.
+    assert build_category_path(tags, TAXONOMY, EXCLUDE, lang="en")[: len(path)] == path
 
 
 def test_no_naive_flatten() -> None:

@@ -8,13 +8,25 @@ NDJSON and the pinned taxonomy file; it never contacts a cluster.
 
 What it checks, per catalog:
 
-* **Property 3 — exactly one chain per product.** ``category_path`` must be a
-  single root->leaf chain rendered as cumulative ``/``-joined strings: element
-  *i* is element *i-1* plus one segment. A union of parallel branches, a gap, or
-  a repeat is a violation and is named.
-* **Property 2 — every category at exactly one address.** A category (a path
-  segment) must occur under one and only one cumulative address across the whole
-  catalog. Two addresses for one category means ``category_path`` is not a tree.
+* **Property 3 — a prefix-closed union of chains per product.** ``category_path``
+  holds the cumulative ``/``-joined addresses of every position the product sits
+  at, so every value's ancestor prefix must be a value of its own, and no value
+  may repeat. ``category_path_primary`` — the one address the product page leads
+  with — must additionally be a *single* chain (element *i* is element *i-1* plus
+  one segment), and must be the head of ``category_path``.
+
+  This is the restatement of the older "exactly one chain per product". The
+  source taxonomy is a DAG, 2,545 of whose 14,457 nodes have several parents, and
+  a catalog that files each of them at one address is asserting something the
+  data does not say. What was load-bearing about the old reading survives on the
+  primary; what it cost was every second breadcrumb to a product.
+* **Property 2 — every category at exactly one PRIMARY address.** A category (a
+  path segment) may occur at several cumulative addresses — that is the DAG — but
+  its address in ``category_path_primary`` must be the same on every product in
+  the catalog. A primary that differs between two products means the breadcrumb a
+  product page leads with is not a property of the category, which is the defect
+  the original check was written for. The number of segments at several
+  *non-primary* addresses is measured and reported, and is not a failure.
 * **Anchoring.** Every chain's first segment must be the display label of one of
   the taxonomy's global roots. This is the artifact-side reading of the
   extractor's ``category_path_anchoring`` block.
@@ -85,6 +97,7 @@ from tolerance import Tolerance
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
 from off_demo_extract.taxonomy import (  # noqa: E402
+    PATH_SEPARATOR,
     display_label,
     global_roots,
     load_taxonomy,
@@ -127,12 +140,46 @@ def values_tolerance(
     )
 
 
+def _union_segments(path: List[str]) -> List[Tuple[str, str]]:
+    """``(segment, address)`` for a prefix-closed union, or raise on a broken one.
+
+    Every element must be either a single root segment or an extension of another
+    element by exactly one segment. Derived by looking the parent prefix up in the
+    value set rather than by trusting adjacency: a union is not ordered as a
+    chain, so "extends its predecessor" is no longer the question — "its ancestor
+    is present" is. Repeats are a violation of their own; ``category_path`` is a
+    set of addresses and a duplicate means something emitted the same address
+    twice.
+    """
+    values = set(path)
+    if len(values) != len(path):
+        raise ValueError("a cumulative path value is emitted more than once")
+    out: List[Tuple[str, str]] = []
+    for element in path:
+        if not element:
+            raise ValueError("empty path value")
+        if PATH_SEPARATOR not in element:
+            out.append((element, element))
+            continue
+        parent, _, tail = element.rpartition(PATH_SEPARATOR)
+        if not tail:
+            raise ValueError(f"{element!r} ends in the path separator")
+        if parent not in values:
+            raise ValueError(
+                f"{element!r} is emitted but its ancestor {parent!r} is not: "
+                "the union is not prefix-closed"
+            )
+        out.append((tail, element))
+    return out
+
+
 def _chain_segments(path: List[str]) -> List[str]:
     """The segment each cumulative element adds, or raise on a broken chain.
 
     Derived by subtracting the previous element rather than by splitting on the
     separator: labels have the separator neutralised at render time, but reading
-    the delta is what actually proves the elements nest.
+    the delta is what actually proves the elements nest. Applied to the PRIMARY
+    address only — the union is checked by :func:`_union_segments`.
     """
     segments: List[str] = []
     previous = ""
@@ -168,8 +215,14 @@ def verify(ndjson: Path, taxonomy_path: Path, lang: str) -> Dict[str, Any]:
     empty_path = 0
     ids: Dict[str, int] = defaultdict(int)
     chain_violations: List[Dict[str, Any]] = []
+    union_violations: List[Dict[str, Any]] = []
     unanchored: List[Dict[str, Any]] = []
+    primary_addresses: Dict[str, Set[str]] = defaultdict(set)
     addresses: Dict[str, Set[str]] = defaultdict(set)
+    multi_address_records = 0
+    path_values = 0
+    max_path_values = 0
+    distinct_paths: Set[str] = set()
     off_vocabulary: Dict[str, int] = defaultdict(int)
     # The denominator the off-snapshot count is a numerator of. Without it, "0
     # values outside the snapshot" cannot be told apart from "no value was ever
@@ -202,30 +255,74 @@ def verify(ndjson: Path, taxonomy_path: Path, lang: str) -> Dict[str, Any]:
                 checked_values.add(value)
                 if value not in vocabulary:
                     off_vocabulary[value] += 1
+            primary = doc.get("category_path_primary") or []
             if not path:
                 empty_path += 1
                 continue
             with_path += 1
             depths[len(path)] += 1
+            path_values += len(path)
+            max_path_values = max(max_path_values, len(path))
+            distinct_paths.update(path)
+            if len(path) > len(primary):
+                multi_address_records += 1
+
+            # The union: prefix-closed, no repeats, and headed by the primary.
             try:
-                segments = _chain_segments(path)
+                union = _union_segments(path)
+                if not primary:
+                    # Refused rather than skipped. Every gate below is scoped to
+                    # the primary, so a record without one would clear property 2
+                    # and the anchoring check by having nothing to check — a
+                    # vacuous pass indistinguishable from a clean catalog. A
+                    # pre-restoration catalog, which carries no such field at all,
+                    # therefore fails here by name instead of silently.
+                    raise ValueError(
+                        "the record carries a category_path but no "
+                        "category_path_primary, so the address it leads with is "
+                        "unstated and nothing below can be checked"
+                    )
+                if path[: len(primary)] != primary:
+                    raise ValueError(
+                        "category_path does not lead with category_path_primary"
+                    )
+            except ValueError as exc:
+                if len(union_violations) < MAX_EXAMPLES:
+                    union_violations.append(
+                        {"id": doc.get("id"), "reason": str(exc), "path": path}
+                    )
+                else:
+                    union_violations.append({"id": doc.get("id"), "reason": str(exc)})
+                union = []
+
+            # The primary: one chain, anchored at a taxonomy root, one address per
+            # segment across the whole catalog.
+            try:
+                segments = _chain_segments(primary)
             except ValueError as exc:
                 if len(chain_violations) < MAX_EXAMPLES:
-                    chain_violations.append({"id": doc.get("id"), "reason": str(exc), "path": path})
+                    chain_violations.append(
+                        {"id": doc.get("id"), "reason": str(exc), "path": primary}
+                    )
                 else:
                     chain_violations.append({"id": doc.get("id"), "reason": str(exc)})
-                continue
-            if segments[0] not in root_labels:
+                segments = []
+            if segments and segments[0] not in root_labels:
                 if len(unanchored) < MAX_EXAMPLES:
                     unanchored.append({"id": doc.get("id"), "head": segments[0]})
                 else:
                     unanchored.append({"id": doc.get("id")})
-            for segment, address in zip(segments, path):
+            for segment, address in zip(segments, primary):
+                primary_addresses[segment].add(address)
+            for segment, address in union:
                 addresses[segment].add(address)
                 checked_values.add(segment)
                 if segment not in vocabulary:
                     off_vocabulary[segment] += 1
 
+    multi_primary = {
+        seg: sorted(addr) for seg, addr in primary_addresses.items() if len(addr) > 1
+    }
     multi_address = {seg: sorted(addr) for seg, addr in addresses.items() if len(addr) > 1}
     return {
         "ndjson": str(ndjson),
@@ -242,11 +339,26 @@ def verify(ndjson: Path, taxonomy_path: Path, lang: str) -> Dict[str, Any]:
         "distinct_categories_in_paths": len(addresses),
         "property_3_single_chain_violations": len(chain_violations),
         "property_3_examples": chain_violations[:MAX_EXAMPLES],
-        "property_2_categories_at_multiple_addresses": len(multi_address),
+        "property_3_union_violations": len(union_violations),
+        "property_3_union_examples": union_violations[:MAX_EXAMPLES],
+        "property_2_categories_at_multiple_primary_addresses": len(multi_primary),
         "property_2_examples": [
+            {"category": seg, "addresses": addr}
+            for seg, addr in list(multi_primary.items())[:MAX_EXAMPLES]
+        ],
+        # Measured, not gated: this is the restored DAG, and the numbers below are
+        # what a downstream ``category_path`` aggregation has to be sized against.
+        # An aggregation still sized for the collapsed cardinality truncates
+        # silently, and a truncated facet panel lies.
+        "categories_at_multiple_addresses": len(multi_address),
+        "multi_address_examples": [
             {"category": seg, "addresses": addr}
             for seg, addr in list(multi_address.items())[:MAX_EXAMPLES]
         ],
+        "records_at_multiple_addresses": multi_address_records,
+        "distinct_category_paths": len(distinct_paths),
+        "mean_category_path_values": round(path_values / with_path, 3) if with_path else 0.0,
+        "max_category_path_values": max_path_values,
         "unanchored_chains": len(unanchored),
         "unanchored_examples": unanchored[:MAX_EXAMPLES],
         "taxonomy_root_labels": len(root_labels),
@@ -293,17 +405,26 @@ def gate(
     if result["property_3_single_chain_violations"]:
         reasons.append(
             (
-                "property_3_single_chain",
-                f"{result['property_3_single_chain_violations']:,} products whose category_path "
-                "is not a single root->leaf chain",
+                "property_3_single_primary_chain",
+                f"{result['property_3_single_chain_violations']:,} products whose "
+                "category_path_primary is not a single root->leaf chain",
             )
         )
-    if result["property_2_categories_at_multiple_addresses"]:
+    if result["property_3_union_violations"]:
         reasons.append(
             (
-                "property_2_one_address_per_category",
-                f"{result['property_2_categories_at_multiple_addresses']:,} categories occur at "
-                "more than one address, so category_path is not a tree",
+                "property_3_prefix_closed_union",
+                f"{result['property_3_union_violations']:,} products whose category_path is not "
+                "a prefix-closed union headed by category_path_primary",
+            )
+        )
+    if result["property_2_categories_at_multiple_primary_addresses"]:
+        reasons.append(
+            (
+                "property_2_one_primary_address_per_category",
+                f"{result['property_2_categories_at_multiple_primary_addresses']:,} categories "
+                "have more than one PRIMARY address, so the breadcrumb a product page leads "
+                "with is not a property of the category",
             )
         )
     if result["unanchored_chains"]:
@@ -352,11 +473,18 @@ def summarise(result: Dict[str, Any]) -> str:
         [
             f"{result['ndjson']} ({result['lang']}): {result['records']:,} records, "
             f"{result['distinct_ids']:,} distinct ids",
-            f"  property 3 (one chain per product): "
-            f"{result['property_3_single_chain_violations']:,} violations",
-            f"  property 2 (one address per category): "
-            f"{result['property_2_categories_at_multiple_addresses']:,} categories at 2+ "
-            "addresses",
+            f"  property 3 (one primary chain per product): "
+            f"{result['property_3_single_chain_violations']:,} violations; "
+            f"(prefix-closed union): {result['property_3_union_violations']:,} violations",
+            f"  property 2 (one primary address per category): "
+            f"{result['property_2_categories_at_multiple_primary_addresses']:,} categories at 2+ "
+            "primary addresses",
+            f"  addressing (measured, not gated): "
+            f"{result['records_at_multiple_addresses']:,} records at 2+ addresses, "
+            f"{result['categories_at_multiple_addresses']:,} categories at 2+ addresses, "
+            f"{result['distinct_category_paths']:,} distinct category_path values "
+            f"(mean {result['mean_category_path_values']}, max "
+            f"{result['max_category_path_values']:,} per record)",
             f"  anchoring: {result['unanchored_chains']:,} chains not headed by a taxonomy root",
             f"  vocabulary: {result['values_outside_pinned_snapshot']:,} of "
             f"{result['values_checked_against_snapshot']:,} distinct values outside the pinned "
