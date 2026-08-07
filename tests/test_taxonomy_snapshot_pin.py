@@ -54,6 +54,7 @@ import pytest
 REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO_ROOT / "src"))
 
+from off_demo_extract import extract as extract_module  # noqa: E402
 from off_demo_extract.extract import main  # noqa: E402
 from off_demo_extract.taxonomy import (  # noqa: E402
     PINNED_TAXONOMY_SHA256,
@@ -282,6 +283,29 @@ def test_the_same_run_completes_when_the_waiver_is_named(capsys, monkeypatch) ->
             write_snapshot=True, capsys=capsys, monkeypatch=monkeypatch,
         )
     assert run.rc == 0, f"the waived run exited {run.rc}: {run.stderr}"
+    assert len(run.records) == 1, run.records
+    assert run.records[0]["category_path"] == [
+        "Beverages",
+        "Beverages/Hot beverages",
+        "Beverages/Hot beverages/Teas",
+    ], run.records[0]["category_path"]
+
+
+def test_a_matching_snapshot_completes_a_pinned_run(capsys, monkeypatch) -> None:
+    """Positive control for the *pinned* branch, through the real CLI.
+
+    The waiver control above proves a run completes with the check switched
+    off — it never enters the comparison at all, so a digest branch that
+    refused every file it looked at would leave it green. This is the path an
+    actual build takes: pin enforced, file matches, run proceeds. The pin is
+    moved to the fixture's digest rather than the fixture to the pin, because a
+    hand-built taxonomy cannot be made to hash to the real snapshot's value.
+    """
+    monkeypatch.setattr(extract_module, "PINNED_TAXONOMY_SHA256", FIXTURE_SHA256)
+    with _tmpdir() as tmp:
+        run = _run(Path(tmp), write_snapshot=True, capsys=capsys, monkeypatch=monkeypatch)
+    assert run.rc == 0, f"a run against the pinned snapshot exited {run.rc}: {run.stderr}"
+    assert run.downloads == [], run.downloads
     assert len(run.records) == 1, run.records
     assert run.records[0]["category_path"] == [
         "Beverages",
